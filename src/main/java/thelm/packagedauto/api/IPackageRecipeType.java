@@ -1,10 +1,10 @@
 package thelm.packagedauto.api;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMaps;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
@@ -36,11 +36,11 @@ public interface IPackageRecipeType {
 	}
 
 	default List<ResourceLocation> getJEICategories() {
-		return new ArrayList<>();
+		return Collections.emptyList();
 	}
 
 	default Int2ObjectMap<ItemStack> getRecipeTransferMap(IRecipeLayoutWrapper recipeLayoutWrapper) {
-		return new Int2ObjectOpenHashMap<>();
+		return Int2ObjectMaps.emptyMap();
 	}
 
 	Object getRepresentation();

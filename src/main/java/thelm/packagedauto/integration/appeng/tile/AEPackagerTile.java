@@ -15,6 +15,7 @@ import appeng.api.networking.crafting.ICraftingProviderHelper;
 import appeng.api.networking.energy.IEnergyGrid;
 import appeng.api.networking.events.MENetworkCraftingPatternChange;
 import appeng.api.networking.security.IActionHost;
+import appeng.api.networking.security.IActionSource;
 import appeng.api.networking.storage.IStorageGrid;
 import appeng.api.storage.IMEMonitor;
 import appeng.api.storage.channels.IItemStorageChannel;
@@ -37,7 +38,7 @@ import thelm.packagedauto.tile.PackagerTile;
 public class AEPackagerTile extends PackagerTile implements IGridHost, IActionHost, ICraftingProvider {
 
 	public BaseGridBlock<AEPackagerTile> gridBlock;
-	public MachineSource source;
+	public IActionSource source;
 	public IGridNode gridNode;
 
 	public AEPackagerTile() {

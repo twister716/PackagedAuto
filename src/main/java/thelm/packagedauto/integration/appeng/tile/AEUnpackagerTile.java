@@ -17,6 +17,7 @@ import appeng.api.networking.crafting.ICraftingProviderHelper;
 import appeng.api.networking.energy.IEnergyGrid;
 import appeng.api.networking.events.MENetworkCraftingPatternChange;
 import appeng.api.networking.security.IActionHost;
+import appeng.api.networking.security.IActionSource;
 import appeng.api.util.AECableType;
 import appeng.api.util.AEPartLocation;
 import appeng.core.Api;
@@ -38,7 +39,7 @@ import thelm.packagedauto.tile.UnpackagerTile;
 public class AEUnpackagerTile extends UnpackagerTile implements IGridHost, IActionHost, ICraftingProvider {
 
 	public BaseGridBlock<AEUnpackagerTile> gridBlock;
-	public MachineSource source;
+	public IActionSource source;
 	public IGridNode gridNode;
 
 	public AEUnpackagerTile() {

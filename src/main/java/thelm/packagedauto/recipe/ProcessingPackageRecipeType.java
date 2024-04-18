@@ -1,6 +1,6 @@
 package thelm.packagedauto.recipe;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.IntStream;
@@ -81,7 +81,7 @@ public class ProcessingPackageRecipeType implements IPackageRecipeType {
 	@Override
 	public List<ResourceLocation> getJEICategories() {
 		return MiscHelper.INSTANCE.conditionalSupplier(()->ModList.get().isLoaded("jei"),
-				()->PackagedAutoJEIPlugin::getAllRecipeCategories, ()->ArrayList<ResourceLocation>::new).get();
+				()->PackagedAutoJEIPlugin::getAllRecipeCategories, ()->Collections::<ResourceLocation>emptyList).get();
 	}
 
 	@Override
