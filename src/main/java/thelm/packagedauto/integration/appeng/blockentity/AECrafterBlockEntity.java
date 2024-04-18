@@ -12,13 +12,13 @@ import appeng.api.networking.IInWorldGridNodeHost;
 import appeng.api.networking.IManagedGridNode;
 import appeng.api.networking.energy.IEnergyService;
 import appeng.api.networking.security.IActionHost;
+import appeng.api.networking.security.IActionSource;
 import appeng.api.networking.storage.IStorageService;
 import appeng.api.stacks.AEItemKey;
 import appeng.api.storage.MEStorage;
 import appeng.api.storage.StorageHelper;
 import appeng.api.util.AECableType;
 import appeng.api.util.AEColor;
-import appeng.me.helpers.MachineSource;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -30,12 +30,12 @@ import thelm.packagedauto.block.entity.CrafterBlockEntity;
 public class AECrafterBlockEntity extends CrafterBlockEntity implements IInWorldGridNodeHost, IGridNodeListener<AECrafterBlockEntity>, IActionHost {
 
 	public boolean firstTick = true;
-	public MachineSource source;
+	public IActionSource source;
 	public IManagedGridNode gridNode;
 
 	public AECrafterBlockEntity(BlockPos pos, BlockState state) {
 		super(pos, state);
-		source = new MachineSource(this);
+		source = IActionSource.ofMachine(this);
 	}
 
 	@Override
@@ -130,6 +130,7 @@ public class AECrafterBlockEntity extends CrafterBlockEntity implements IInWorld
 		}
 	}
 
+	@SuppressWarnings("removal")
 	protected void chargeMEEnergy() {
 		if(getMainNode().isActive()) {
 			IGrid grid = getMainNode().getGrid();

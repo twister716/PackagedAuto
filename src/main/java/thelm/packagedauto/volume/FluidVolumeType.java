@@ -10,6 +10,7 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.material.FlowingFluid;
+import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
@@ -38,6 +39,11 @@ public class FluidVolumeType implements IVolumeType {
 	}
 
 	@Override
+	public Class<?> getTypeBaseClass() {
+		return Fluid.class;
+	}
+
+	@Override
 	public MutableComponent getDisplayName() {
 		return Component.translatable("volume.packagedauto.minecraft.fluid");
 	}
@@ -45,6 +51,19 @@ public class FluidVolumeType implements IVolumeType {
 	@Override
 	public boolean supportsAE() {
 		return true;
+	}
+
+	@Override
+	public Optional<FluidStack> makeStackFromBase(Object volumeBase, int amount, CompoundTag nbt) {
+		if(volumeBase instanceof Fluid fluid) {
+			return Optional.of(new FluidStack(fluid, amount, nbt));
+		}
+		else if(volumeBase instanceof FluidStack fluidStack) {
+			fluidStack = fluidStack.copy();
+			fluidStack.setAmount(amount);
+			return Optional.of(fluidStack);
+		}
+		return Optional.empty();
 	}
 
 	@Override

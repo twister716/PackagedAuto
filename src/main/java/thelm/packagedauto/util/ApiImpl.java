@@ -80,7 +80,8 @@ public class ApiImpl extends PackagedAutoApi {
 
 	@Override
 	public synchronized boolean registerVolumeType(IVolumeType type) {
-		if(VOLUME_REGISTRY.containsKey(type.getName()) || VOLUME_CLASS_REGISTRY.containsKey(type.getTypeClass())) {
+		if(VOLUME_REGISTRY.containsKey(type.getName()) ||
+				VOLUME_CLASS_REGISTRY.containsKey(type.getTypeClass())) {
 			return false;
 		}
 		VOLUME_REGISTRY.put(type.getName(), type);
@@ -95,7 +96,9 @@ public class ApiImpl extends PackagedAutoApi {
 
 	@Override
 	public IVolumeType getVolumeType(Class<?> typeClass) {
-		return VOLUME_CLASS_REGISTRY.get(typeClass);
+		return VOLUME_CLASS_REGISTRY.getOrDefault(typeClass,
+				VOLUME_REGISTRY.values().stream().filter(t->t.getTypeBaseClass().isAssignableFrom(typeClass)).
+				findFirst().orElse(null));
 	}
 
 	@Override

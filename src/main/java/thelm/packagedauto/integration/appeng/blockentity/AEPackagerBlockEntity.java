@@ -17,6 +17,7 @@ import appeng.api.networking.IManagedGridNode;
 import appeng.api.networking.crafting.ICraftingProvider;
 import appeng.api.networking.energy.IEnergyService;
 import appeng.api.networking.security.IActionHost;
+import appeng.api.networking.security.IActionSource;
 import appeng.api.networking.storage.IStorageService;
 import appeng.api.stacks.AEItemKey;
 import appeng.api.stacks.KeyCounter;
@@ -24,7 +25,6 @@ import appeng.api.storage.MEStorage;
 import appeng.api.storage.StorageHelper;
 import appeng.api.util.AECableType;
 import appeng.api.util.AEColor;
-import appeng.me.helpers.MachineSource;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -36,12 +36,12 @@ import thelm.packagedauto.integration.appeng.recipe.PackageCraftingPatternDetail
 
 public class AEPackagerBlockEntity extends PackagerBlockEntity implements IInWorldGridNodeHost, IGridNodeListener<AEPackagerBlockEntity>, IActionHost, ICraftingProvider {
 
-	public MachineSource source;
+	public IActionSource source;
 	public IManagedGridNode gridNode;
 
 	public AEPackagerBlockEntity(BlockPos pos, BlockState state) {
 		super(pos, state);
-		source = new MachineSource(this);
+		source = IActionSource.ofMachine(this);
 	}
 
 	@Override
@@ -165,6 +165,7 @@ public class AEPackagerBlockEntity extends PackagerBlockEntity implements IInWor
 		ICraftingProvider.requestUpdate(getMainNode());
 	}
 
+	@SuppressWarnings("removal")
 	protected void chargeMEEnergy() {
 		if(getMainNode().isActive()) {
 			IGrid grid = getMainNode().getGrid();
