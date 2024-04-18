@@ -1,7 +1,7 @@
 package thelm.packagedauto.recipe;
 
 import java.awt.Color;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.IntStream;
@@ -77,7 +77,7 @@ public class RecipeTypeProcessing implements IRecipeType {
 	@Override
 	public List<String> getJEICategories() {
 		return MiscUtil.conditionalSupplier(()->Loader.isModLoaded("jei"),
-				()->PackagedAutoJEIPlugin::getAllRecipeCategories, ()->ArrayList<String>::new).get();
+				()->PackagedAutoJEIPlugin::getAllRecipeCategories, ()->Collections::<String>emptyList).get();
 	}
 
 	@Optional.Method(modid="jei")

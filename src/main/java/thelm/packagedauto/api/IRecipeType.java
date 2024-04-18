@@ -1,11 +1,11 @@
 package thelm.packagedauto.api;
 
 import java.awt.Color;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMaps;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import mezz.jei.api.gui.IRecipeLayout;
 import net.minecraft.item.ItemStack;
@@ -39,12 +39,12 @@ public interface IRecipeType {
 	}
 
 	default List<String> getJEICategories() {
-		return new ArrayList<>();
+		return Collections.emptyList();
 	}
 
 	@Optional.Method(modid="jei")
 	default Int2ObjectMap<ItemStack> getRecipeTransferMap(IRecipeLayout recipeLayout, String category) {
-		return new Int2ObjectOpenHashMap<>();
+		return Int2ObjectMaps.emptyMap();
 	}
 
 	@SideOnly(Side.CLIENT)

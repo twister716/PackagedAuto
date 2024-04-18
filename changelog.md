@@ -1,1 +1,1 @@
-Add package recipe transfer handler  
+Delay getting recipe categories  

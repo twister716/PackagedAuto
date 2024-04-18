@@ -7,6 +7,7 @@ import appeng.api.IAppEngApi;
 import appeng.api.networking.IGridHost;
 import appeng.api.networking.IGridNode;
 import appeng.api.networking.security.IActionHost;
+import appeng.api.networking.security.IActionSource;
 import appeng.me.helpers.MachineSource;
 import net.minecraft.nbt.NBTTagCompound;
 import thelm.packagedauto.tile.TileBase;
@@ -15,7 +16,7 @@ public class HostHelperTile<TILE extends TileBase & IGridHost & IActionHost> {
 
 	public final TILE tile;
 	public GridBlockTileBase<TILE> gridBlock;
-	public MachineSource source;
+	public IActionSource source;
 	public IGridNode gridNode;
 	private NBTTagCompound data = null;
 

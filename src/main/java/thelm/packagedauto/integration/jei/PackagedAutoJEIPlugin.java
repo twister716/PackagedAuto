@@ -31,7 +31,7 @@ public class PackagedAutoJEIPlugin implements IModPlugin {
 	public static final ResourceLocation BACKGROUND = new ResourceLocation("packagedauto:textures/gui/jei.png");
 
 	public static IJeiRuntime jeiRuntime;
-	public static List<String> allCategories = Collections.emptyList();
+	private static List<String> allCategories;
 
 	@Override
 	public void registerCategories(IRecipeCategoryRegistration registry) {
@@ -60,10 +60,15 @@ public class PackagedAutoJEIPlugin implements IModPlugin {
 	@Override
 	public void onRuntimeAvailable(IJeiRuntime jeiRuntime) {
 		PackagedAutoJEIPlugin.jeiRuntime = jeiRuntime;
-		allCategories = jeiRuntime.getRecipeRegistry().getRecipeCategories().stream().map(IRecipeCategory::getUid).collect(Collectors.toList());
 	}
 
 	public static List<String> getAllRecipeCategories() {
+		if(allCategories == null) {
+			if(jeiRuntime == null) {
+				return Collections.emptyList();
+			}
+			allCategories = jeiRuntime.getRecipeRegistry().getRecipeCategories().stream().map(IRecipeCategory::getUid).collect(Collectors.toList());
+		}
 		return allCategories;
 	}
 
