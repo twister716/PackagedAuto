@@ -14,6 +14,7 @@ import mezz.jei.api.registration.IRecipeTransferRegistration;
 import mezz.jei.api.runtime.IJeiRuntime;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
+import net.neoforged.fml.ModList;
 import thelm.packagedauto.block.EncoderBlock;
 import thelm.packagedauto.block.FluidPackageFillerBlock;
 import thelm.packagedauto.block.PackagerBlock;
@@ -34,7 +35,7 @@ public class PackagedAutoJEIPlugin implements IModPlugin {
 	public static final ResourceLocation BACKGROUND = new ResourceLocation("packagedauto:textures/gui/jei.png");
 
 	public static IJeiRuntime jeiRuntime;
-	public static List<ResourceLocation> allCategories = List.of();
+	private static List<ResourceLocation> allCategories;
 
 	@Override
 	public ResourceLocation getPluginUid() {
@@ -43,51 +44,66 @@ public class PackagedAutoJEIPlugin implements IModPlugin {
 
 	@Override
 	public void registerCategories(IRecipeCategoryRegistration registration) {
-		IGuiHelper guiHelper = registration.getJeiHelpers().getGuiHelper();
-		registration.addRecipeCategories(
-				new PackageRecipeCategory(guiHelper),
-				new PackagingCategory(guiHelper),
-				new PackageProcessingCategory(guiHelper),
-				new PackageContentsCategory(guiHelper),
-				new FluidPackageFillingCategory(guiHelper),
-				new FluidPackageContentsCategory(guiHelper));
+		if(!ModList.get().isLoaded("emi")) {
+			IGuiHelper guiHelper = registration.getJeiHelpers().getGuiHelper();
+			registration.addRecipeCategories(
+					new PackageRecipeCategory(guiHelper),
+					new PackagingCategory(guiHelper),
+					new PackageProcessingCategory(guiHelper),
+					new PackageContentsCategory(guiHelper),
+					new FluidPackageFillingCategory(guiHelper),
+					new FluidPackageContentsCategory(guiHelper));
+		}
 	}
 
 	@Override
 	public void registerRecipeTransferHandlers(IRecipeTransferRegistration registration) {
-		IRecipeTransferHandlerHelper transferHelper = registration.getTransferHelper();
-		registration.addRecipeTransferHandler(new PackageRecipeTransferHandler(transferHelper), PackageRecipeCategory.TYPE);
-		registration.addUniversalRecipeTransferHandler(new EncoderTransferHandler(transferHelper));
+		if(!ModList.get().isLoaded("emi")) {
+			IRecipeTransferHandlerHelper transferHelper = registration.getTransferHelper();
+			registration.addRecipeTransferHandler(new PackageRecipeTransferHandler(transferHelper), PackageRecipeCategory.TYPE);
+			registration.addUniversalRecipeTransferHandler(new EncoderTransferHandler(transferHelper));
+		}
 	}
 
 	@Override
 	public void registerRecipeCatalysts(IRecipeCatalystRegistration registration) {
-		registration.addRecipeCatalyst(new ItemStack(EncoderBlock.INSTANCE), PackageRecipeCategory.TYPE);
-		registration.addRecipeCatalyst(new ItemStack(PackagerBlock.INSTANCE), PackagingCategory.TYPE);
-		registration.addRecipeCatalyst(new ItemStack(PackagerExtensionBlock.INSTANCE), PackagingCategory.TYPE);
-		registration.addRecipeCatalyst(new ItemStack(UnpackagerBlock.INSTANCE), PackageProcessingCategory.TYPE);
-		registration.addRecipeCatalyst(new ItemStack(FluidPackageFillerBlock.INSTANCE), FluidPackageFillingCategory.TYPE);
+		if(!ModList.get().isLoaded("emi")) {
+			registration.addRecipeCatalyst(new ItemStack(EncoderBlock.INSTANCE), PackageRecipeCategory.TYPE);
+			registration.addRecipeCatalyst(new ItemStack(PackagerBlock.INSTANCE), PackagingCategory.TYPE);
+			registration.addRecipeCatalyst(new ItemStack(PackagerExtensionBlock.INSTANCE), PackagingCategory.TYPE);
+			registration.addRecipeCatalyst(new ItemStack(UnpackagerBlock.INSTANCE), PackageProcessingCategory.TYPE);
+			registration.addRecipeCatalyst(new ItemStack(FluidPackageFillerBlock.INSTANCE), FluidPackageFillingCategory.TYPE);
+		}
 	}
 
 	@Override
 	public void registerGuiHandlers(IGuiHandlerRegistration registration) {
-		registration.addGuiContainerHandler(EncoderScreen.class, new EncoderGuiHandler());
-		registration.addGhostIngredientHandler(EncoderScreen.class, new EncoderGhostIngredientHandler());
+		if(!ModList.get().isLoaded("emi")) {
+			registration.addGuiContainerHandler(EncoderScreen.class, new EncoderGuiHandler());
+			registration.addGhostIngredientHandler(EncoderScreen.class, new EncoderGhostIngredientHandler());
+		}
 	}
 
 	@Override
 	public void registerAdvanced(IAdvancedRegistration registration) {
-		registration.addRecipeManagerPlugin(new PackageManagerPlugin());
-		registration.addRecipeManagerPlugin(new FluidPackageManagerPlugin());
+		if(!ModList.get().isLoaded("emi")) {
+			registration.addRecipeManagerPlugin(new PackageManagerPlugin());
+			registration.addRecipeManagerPlugin(new FluidPackageManagerPlugin());
+		}
 	}
 
 	@Override
 	public void onRuntimeAvailable(IJeiRuntime jeiRuntime) {
 		PackagedAutoJEIPlugin.jeiRuntime = jeiRuntime;
-		allCategories = jeiRuntime.getRecipeManager().createRecipeCategoryLookup().includeHidden().get().map(c->c.getRecipeType().getUid()).toList();
 	}
 
 	public static List<ResourceLocation> getAllRecipeCategories() {
+		if(allCategories == null) {
+			if(jeiRuntime == null) {
+				return List.of();
+			}
+			allCategories = jeiRuntime.getRecipeManager().createRecipeCategoryLookup().includeHidden().get().map(c->c.getRecipeType().getUid()).toList();
+		}
 		return allCategories;
 	}
 

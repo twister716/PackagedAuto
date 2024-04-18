@@ -1,6 +1,6 @@
 package thelm.packagedauto.event;
 
-import appeng.capabilities.AppEngCapabilities;
+import appeng.api.AECapabilities;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.inventory.MenuType;
@@ -163,10 +163,10 @@ public class CommonEventHandler {
 		event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, FluidPackageFillerBlockEntity.TYPE_INSTANCE, BaseBlockEntity::getEnergyStorage);
 
 		MiscHelper.INSTANCE.conditionalRunnable(()->ModList.get().isLoaded("ae2"), ()->()->{
-			event.registerBlockEntity(AppEngCapabilities.IN_WORLD_GRID_NODE_HOST, PackagerBlockEntity.TYPE_INSTANCE, AppEngUtil::getAsInWorldGridNodeHost);
-			event.registerBlockEntity(AppEngCapabilities.IN_WORLD_GRID_NODE_HOST, PackagerExtensionBlockEntity.TYPE_INSTANCE, AppEngUtil::getAsInWorldGridNodeHost);
-			event.registerBlockEntity(AppEngCapabilities.IN_WORLD_GRID_NODE_HOST, UnpackagerBlockEntity.TYPE_INSTANCE, AppEngUtil::getAsInWorldGridNodeHost);
-			event.registerBlockEntity(AppEngCapabilities.IN_WORLD_GRID_NODE_HOST, CrafterBlockEntity.TYPE_INSTANCE, AppEngUtil::getAsInWorldGridNodeHost);
+			event.registerBlockEntity(AECapabilities.IN_WORLD_GRID_NODE_HOST, PackagerBlockEntity.TYPE_INSTANCE, AppEngUtil::getAsInWorldGridNodeHost);
+			event.registerBlockEntity(AECapabilities.IN_WORLD_GRID_NODE_HOST, PackagerExtensionBlockEntity.TYPE_INSTANCE, AppEngUtil::getAsInWorldGridNodeHost);
+			event.registerBlockEntity(AECapabilities.IN_WORLD_GRID_NODE_HOST, UnpackagerBlockEntity.TYPE_INSTANCE, AppEngUtil::getAsInWorldGridNodeHost);
+			event.registerBlockEntity(AECapabilities.IN_WORLD_GRID_NODE_HOST, CrafterBlockEntity.TYPE_INSTANCE, AppEngUtil::getAsInWorldGridNodeHost);
 		}, ()->()->{}).run();
 
 		for(IVolumeType volumeType : ApiImpl.INSTANCE.getVolumeTypeRegistry().values()) {

@@ -2,8 +2,6 @@ package thelm.packagedauto.volume;
 
 import java.util.List;
 
-import com.google.common.collect.Lists;
-
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -73,7 +71,7 @@ public record FluidStackWrapper(FluidStack stack) implements IFluidStackWrapper 
 
 	@Override
 	public List<Component> getTooltip() {
-		return Lists.newArrayList(stack.getDisplayName());
+		return List.of(stack.getDisplayName());
 	}
 
 	@Override

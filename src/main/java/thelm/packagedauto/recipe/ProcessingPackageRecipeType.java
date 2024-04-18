@@ -1,6 +1,5 @@
 package thelm.packagedauto.recipe;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
 
@@ -19,6 +18,7 @@ import thelm.packagedauto.api.IPackageRecipeInfo;
 import thelm.packagedauto.api.IPackageRecipeType;
 import thelm.packagedauto.api.IRecipeSlotViewWrapper;
 import thelm.packagedauto.api.IRecipeSlotsViewWrapper;
+import thelm.packagedauto.integration.emi.PackagedAutoEMIPlugin;
 import thelm.packagedauto.integration.jei.PackagedAutoJEIPlugin;
 import thelm.packagedauto.item.VolumePackageItem;
 import thelm.packagedauto.util.MiscHelper;
@@ -81,7 +81,13 @@ public class ProcessingPackageRecipeType implements IPackageRecipeType {
 	@Override
 	public List<ResourceLocation> getJEICategories() {
 		return MiscHelper.INSTANCE.conditionalSupplier(()->ModList.get().isLoaded("jei"),
-				()->PackagedAutoJEIPlugin::getAllRecipeCategories, ()->ArrayList<ResourceLocation>::new).get();
+				()->PackagedAutoJEIPlugin::getAllRecipeCategories, ()->List::<ResourceLocation>of).get();
+	}
+
+	@Override
+	public List<ResourceLocation> getEMICategories() {
+		return MiscHelper.INSTANCE.conditionalSupplier(()->ModList.get().isLoaded("emi"),
+				()->PackagedAutoEMIPlugin::getAllRecipeCategories, ()->List::<ResourceLocation>of).get();
 	}
 
 	@Override
