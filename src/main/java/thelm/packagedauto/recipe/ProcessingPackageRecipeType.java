@@ -81,7 +81,7 @@ public class ProcessingPackageRecipeType implements IPackageRecipeType {
 	@Override
 	public List<ResourceLocation> getJEICategories() {
 		return MiscHelper.INSTANCE.conditionalSupplier(()->ModList.get().isLoaded("jei"),
-				()->PackagedAutoJEIPlugin::getAllRecipeCategories, ()->ArrayList<ResourceLocation>::new).get();
+				()->PackagedAutoJEIPlugin::getAllRecipeCategories, ()->List::<ResourceLocation>of).get();
 	}
 
 	@Override

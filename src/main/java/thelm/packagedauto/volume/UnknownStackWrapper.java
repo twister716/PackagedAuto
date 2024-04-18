@@ -2,8 +2,6 @@ package thelm.packagedauto.volume;
 
 import java.util.List;
 
-import com.google.common.collect.Lists;
-
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
@@ -59,6 +57,6 @@ public class UnknownStackWrapper implements IVolumeStackWrapper {
 
 	@Override
 	public List<Component> getTooltip() {
-		return Lists.newArrayList(new TextComponent("Unknown"));
+		return List.of(new TextComponent("Unknown"));
 	}
 }

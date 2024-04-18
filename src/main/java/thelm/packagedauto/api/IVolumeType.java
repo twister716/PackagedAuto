@@ -18,10 +18,18 @@ public interface IVolumeType {
 
 	Class<?> getTypeClass();
 
+	default Class<?> getTypeBaseClass() {
+		return getTypeClass();
+	}
+
 	MutableComponent getDisplayName();
 
 	default boolean supportsAE() {
 		return false;
+	}
+
+	default Optional<?> makeStackFromBase(Object volumeBase, int amount, CompoundTag nbt) {
+		return Optional.empty();
 	}
 
 	IVolumeStackWrapper getEmptyStackInstance();

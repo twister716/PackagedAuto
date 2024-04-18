@@ -18,10 +18,10 @@ import appeng.api.networking.IManagedGridNode;
 import appeng.api.networking.crafting.ICraftingProvider;
 import appeng.api.networking.energy.IEnergyService;
 import appeng.api.networking.security.IActionHost;
+import appeng.api.networking.security.IActionSource;
 import appeng.api.stacks.KeyCounter;
 import appeng.api.util.AECableType;
 import appeng.api.util.AEColor;
-import appeng.me.helpers.MachineSource;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import net.minecraft.core.BlockPos;
@@ -38,12 +38,12 @@ import thelm.packagedauto.integration.appeng.recipe.RecipeCraftingPatternDetails
 
 public class AEUnpackagerBlockEntity extends UnpackagerBlockEntity implements IInWorldGridNodeHost, IGridNodeListener<AEUnpackagerBlockEntity>, IActionHost, ICraftingProvider {
 
-	public MachineSource source;
+	public IActionSource source;
 	public IManagedGridNode gridNode;
 
 	public AEUnpackagerBlockEntity(BlockPos pos, BlockState state) {
 		super(pos, state);
-		source = new MachineSource(this);
+		source = IActionSource.ofMachine(this);
 	}
 
 	@Override
