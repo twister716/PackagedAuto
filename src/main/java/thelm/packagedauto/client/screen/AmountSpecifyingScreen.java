@@ -55,10 +55,7 @@ public abstract class AmountSpecifyingScreen<C extends BaseMenu<?>> extends Base
 				return false;
 			}
 		});
-		amountField.changeFocus(true);
-
 		addRenderableWidget(amountField);
-		setFocused(amountField);
 
 		int[] increments = getIncrements();
 

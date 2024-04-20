@@ -9,10 +9,10 @@ import dev.emi.emi.api.EmiDragDropHandler;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.widget.Bounds;
 import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import thelm.packagedauto.api.IVolumeType;
-import thelm.packagedauto.client.screen.BaseScreen;
 import thelm.packagedauto.client.screen.EncoderScreen;
 import thelm.packagedauto.network.PacketHandler;
 import thelm.packagedauto.network.packet.SetItemStackPacket;
@@ -52,9 +52,14 @@ public class EncoderDragDropHandler implements EmiDragDropHandler<EncoderScreen>
 	public List<SlotTarget> getTargets(EncoderScreen gui, EmiIngredient ingredient) {
 		ItemStack stack = wrapStack(ingredient);
 		if(!stack.isEmpty()) {
-			return gui.menu.slots.stream().filter(s->s instanceof FalseCopySlot).map(s->new SlotTarget(gui, s)).toList();
+			return gui.menu.slots.stream().filter(s->s instanceof FalseCopySlot).
+					map(s->new SlotTarget(s, getSlotBounds(gui, s))).toList();
 		}
 		return List.of();
+	}
+
+	private static Bounds getSlotBounds(AbstractContainerScreen<?> gui, Slot slot) {
+		return new Bounds(gui.getGuiLeft()+slot.x, gui.getGuiTop()+slot.y, 16, 16);
 	}
 
 	private static ItemStack wrapStack(EmiIngredient emiIngredient) {
@@ -72,15 +77,7 @@ public class EncoderDragDropHandler implements EmiDragDropHandler<EncoderScreen>
 		return ItemStack.EMPTY;
 	}
 
-	static class SlotTarget {
-
-		private final Slot slot;
-		private final Bounds bounds;
-
-		public SlotTarget(BaseScreen<?> screen, Slot slot) {
-			this.slot = slot;
-			this.bounds = new Bounds(screen.getGuiLeft()+slot.x-1, screen.getGuiTop()+slot.y-1, 18, 18);
-		}
+	private static record SlotTarget(Slot slot, Bounds bounds) {
 
 		public Bounds getBounds() {
 			return bounds;
