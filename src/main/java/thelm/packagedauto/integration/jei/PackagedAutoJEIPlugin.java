@@ -12,6 +12,7 @@ import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeTransferRegistration;
 import mezz.jei.api.runtime.IJeiRuntime;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import thelm.packagedauto.block.EncoderBlock;
@@ -72,6 +73,7 @@ public class PackagedAutoJEIPlugin implements IModPlugin {
 	@Override
 	public void registerGuiHandlers(IGuiHandlerRegistration registration) {
 		registration.addGuiContainerHandler(EncoderScreen.class, new EncoderGuiHandler());
+		registration.addGenericGuiContainerHandler(AbstractContainerScreen.class, new FluidVolumeGuiHandler());
 		registration.addGhostIngredientHandler(EncoderScreen.class, new EncoderGhostIngredientHandler());
 	}
 

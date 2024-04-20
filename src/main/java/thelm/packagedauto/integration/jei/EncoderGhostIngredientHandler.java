@@ -3,11 +3,11 @@ package thelm.packagedauto.integration.jei;
 import java.util.List;
 
 import mezz.jei.api.gui.handlers.IGhostIngredientHandler;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import thelm.packagedauto.api.IVolumeType;
-import thelm.packagedauto.client.screen.BaseScreen;
 import thelm.packagedauto.client.screen.EncoderScreen;
 import thelm.packagedauto.network.PacketHandler;
 import thelm.packagedauto.network.packet.SetItemStackPacket;
@@ -22,13 +22,17 @@ public class EncoderGhostIngredientHandler implements IGhostIngredientHandler<En
 		ItemStack stack = wrapStack(ingredient);
 		if(!stack.isEmpty()) {
 			return gui.menu.slots.stream().filter(s->s instanceof FalseCopySlot).
-					<Target<I>>map(s->new SlotTarget<>(gui, s)).toList();
+					<Target<I>>map(s->new SlotTarget<>(s, getSlotArea(gui, s))).toList();
 		}
 		return List.of();
 	}
 
 	@Override
 	public void onComplete() {}
+
+	private static Rect2i getSlotArea(AbstractContainerScreen<?> gui, Slot slot) {
+		return new Rect2i(gui.getGuiLeft()+slot.x, gui.getGuiTop()+slot.y, 16, 16);
+	}
 
 	private static ItemStack wrapStack(Object ingredient) {
 		if(ingredient instanceof ItemStack stack) {
@@ -41,15 +45,7 @@ public class EncoderGhostIngredientHandler implements IGhostIngredientHandler<En
 		return ItemStack.EMPTY;
 	}
 
-	static class SlotTarget<I> implements Target<I> {
-
-		private final Slot slot;
-		private final Rect2i area;
-
-		public SlotTarget(BaseScreen<?> screen, Slot slot) {
-			this.slot = slot;
-			this.area = new Rect2i(screen.getGuiLeft()+slot.x-1, screen.getGuiTop()+slot.y-1, 18, 18);
-		}
+	private static record SlotTarget<I>(Slot slot, Rect2i area) implements Target<I> {
 
 		@Override
 		public Rect2i getArea() {
