@@ -83,9 +83,7 @@ public class AmountSpecifyingScreen extends BaseScreen<AmountSpecifyingContainer
 				return false;
 			}
 		});
-		amountField.changeFocus(true);
 		addButton(amountField);
-		setFocused(amountField);
 
 		int[] increments = getIncrements();
 		int xx = 7;
