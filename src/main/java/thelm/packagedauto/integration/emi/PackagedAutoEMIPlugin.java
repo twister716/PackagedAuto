@@ -33,6 +33,7 @@ public class PackagedAutoEMIPlugin implements EmiPlugin {
 	@Override
 	public void register(EmiRegistry registry) {
 		registry.addDragDropHandler(EncoderScreen.class, new EncoderDragDropHandler());
+		registry.addGenericStackProvider(new FluidVolumeStackProvider());
 		registry.addRecipeHandler(EncoderMenu.TYPE_INSTANCE, new EncoderRecipeHandler());
 	}
 
