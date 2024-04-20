@@ -80,7 +80,6 @@ public class GuiAmountSpecifying extends GuiContainerTileBase<ContainerAmountSpe
 				return false;
 			}
 		});
-		amountField.setFocused(true);
 
 		int[] increments = getIncrements();
 		int xx = 7;
@@ -108,6 +107,12 @@ public class GuiAmountSpecifying extends GuiContainerTileBase<ContainerAmountSpe
 	@Override
 	protected void drawGuiContainerForegroundLayer(int x, int y) {
 		fontRenderer.drawString(I18n.translateToLocal("gui.packagedauto.amount_specifying"), 7, 7, 0x404040);
+	}
+
+	@Override
+	protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
+		super.mouseClicked(mouseX, mouseY, mouseButton);
+		amountField.mouseClicked(mouseX, mouseY, mouseButton);
 	}
 
 	@Override

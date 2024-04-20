@@ -6,9 +6,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import mezz.jei.api.gui.IGhostIngredientHandler;
+import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
-import thelm.packagedauto.client.gui.GuiContainerTileBase;
 import thelm.packagedauto.client.gui.GuiEncoder;
 import thelm.packagedauto.network.PacketHandler;
 import thelm.packagedauto.network.packet.PacketSetItemStack;
@@ -21,13 +21,17 @@ public class EncoderGhostIngredientHandler implements IGhostIngredientHandler<Gu
 		ItemStack stack = wrapStack(ingredient);
 		if(!stack.isEmpty()) {
 			return gui.container.inventorySlots.stream().filter(s->s instanceof SlotFalseCopy).
-					<Target<I>>map(s->new SlotTarget<>(gui, s)).collect(Collectors.toList());
+					<Target<I>>map(s->new SlotTarget<>(s, getSlotArea(gui, s))).collect(Collectors.toList());
 		}
 		return Collections.emptyList();
 	}
 
 	@Override
 	public void onComplete() {}
+
+	private static Rectangle getSlotArea(GuiContainer gui, Slot slot) {
+		return new Rectangle(gui.getGuiLeft()+slot.xPos, gui.getGuiTop()+slot.yPos, 16, 16);
+	}
 
 	private static ItemStack wrapStack(Object ingredient) {
 		if(ingredient instanceof ItemStack) {
@@ -36,14 +40,14 @@ public class EncoderGhostIngredientHandler implements IGhostIngredientHandler<Gu
 		return ItemStack.EMPTY;
 	}
 
-	static class SlotTarget<I> implements Target<I> {
+	private static class SlotTarget<I> implements Target<I> {
 
 		private final Slot slot;
 		private final Rectangle area;
 
-		public SlotTarget(GuiContainerTileBase<?> gui, Slot slot) {
+		private SlotTarget(Slot slot, Rectangle area) {
 			this.slot = slot;
-			this.area = new Rectangle(gui.getGuiLeft()+slot.xPos-1, gui.getGuiTop()+slot.yPos-1, 18, 18);
+			this.area = area;
 		}
 
 		@Override
