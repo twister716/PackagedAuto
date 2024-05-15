@@ -1,5 +1,5 @@
 Added Positioned Package Distributor  
-Added positioned processing recipe type
+Added positioned processing recipe type  
 Uncap item counts in encoded outputs  
 Condense processing recipes during JEI transfer  
 Changed representation of ordered processing to brewing stand  
