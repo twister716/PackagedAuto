@@ -23,11 +23,11 @@ public record SetItemStackPacket(short containerSlot, ItemStack stack) implement
 	@Override
 	public void write(FriendlyByteBuf buf) {
 		buf.writeShort(containerSlot);
-		buf.writeItem(stack);
+		buf.writeItemWithLargeCount(stack);
 	}
 
 	public static SetItemStackPacket read(FriendlyByteBuf buf) {
-		return new SetItemStackPacket(buf.readShort(), buf.readItem());
+		return new SetItemStackPacket(buf.readShort(), buf.readItemWithLargeCount());
 	}
 
 	public void handle(PlayPayloadContext ctx) {

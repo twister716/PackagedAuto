@@ -150,8 +150,14 @@ public class MiscHelper implements IMiscHelper {
 		return list;
 	}
 
+
 	@Override
 	public ListTag saveAllItems(ListTag tagList, List<ItemStack> list) {
+		return saveAllItems(tagList, list, "Index");
+	}
+
+	@Override
+	public ListTag saveAllItems(ListTag tagList, List<ItemStack> list, String indexKey) {
 		for(int i = 0; i < list.size(); ++i) {
 			ItemStack stack = list.get(i);
 			boolean empty = stack.isEmpty();
@@ -162,8 +168,8 @@ public class MiscHelper implements IMiscHelper {
 					stack = new ItemStack(Items.AIR);
 				}
 				CompoundTag nbt = new CompoundTag();
-				nbt.putByte("Index", (byte)i);
-				stack.save(nbt);
+				nbt.putByte(indexKey, (byte)i);
+				saveItemWithLargeCount(nbt, stack);
 				tagList.add(nbt);
 			}
 		}
@@ -172,18 +178,49 @@ public class MiscHelper implements IMiscHelper {
 
 	@Override
 	public void loadAllItems(ListTag tagList, List<ItemStack> list) {
+		loadAllItems(tagList, list, "Index");
+	}
+
+	@Override
+	public void loadAllItems(ListTag tagList, List<ItemStack> list, String indexKey) {
 		list.clear();
-		for(int i = 0; i < tagList.size(); ++i) {
-			CompoundTag nbt = tagList.getCompound(i);
-			int j = nbt.getByte("Index") & 255;
-			while(j >= list.size()) {
-				list.add(ItemStack.EMPTY);
-			}
-			if(j >= 0)  {
-				ItemStack stack = ItemStack.of(nbt);
-				list.set(j, stack.isEmpty() ? ItemStack.EMPTY : stack);
+		try {
+			for(int i = 0; i < tagList.size(); ++i) {
+				CompoundTag nbt = tagList.getCompound(i);
+				int j = nbt.getByte(indexKey) & 255;
+				while(j >= list.size()) {
+					list.add(ItemStack.EMPTY);
+				}
+				if(j >= 0)  {
+					ItemStack stack = loadItemWithLargeCount(nbt);
+					list.set(j, stack.isEmpty() ? ItemStack.EMPTY : stack);
+				}
 			}
 		}
+		catch(UnsupportedOperationException | IndexOutOfBoundsException e) {}
+	}
+
+	@Override
+	public CompoundTag saveItemWithLargeCount(CompoundTag nbt, ItemStack stack) {
+		stack.save(nbt);
+		int count = stack.getCount();
+		if((byte)count == count) {
+			nbt.putByte("Count", (byte)count);
+		}
+		else if((short)count == count) {
+			nbt.putShort("Count", (short)count);
+		}
+		else {
+			nbt.putInt("Count", (short)count);
+		}
+		return nbt;
+	}
+
+	@Override
+	public ItemStack loadItemWithLargeCount(CompoundTag nbt) {
+		ItemStack stack = ItemStack.of(nbt);
+		stack.setCount(nbt.getInt("Count"));
+		return stack;
 	}
 
 	@Override

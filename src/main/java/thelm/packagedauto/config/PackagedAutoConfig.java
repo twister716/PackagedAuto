@@ -1,9 +1,14 @@
 package thelm.packagedauto.config;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
 import net.neoforged.fml.ModLoadingContext;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.neoforge.common.ModConfigSpec;
 import thelm.packagedauto.block.entity.CrafterBlockEntity;
+import thelm.packagedauto.block.entity.DistributorBlockEntity;
 import thelm.packagedauto.block.entity.EncoderBlockEntity;
 import thelm.packagedauto.block.entity.FluidPackageFillerBlockEntity;
 import thelm.packagedauto.block.entity.PackagerBlockEntity;
@@ -17,6 +22,7 @@ public class PackagedAutoConfig {
 	private static ModConfigSpec serverSpec;
 
 	public static ModConfigSpec.IntValue encoderPatternSlots;
+	public static ModConfigSpec.ConfigValue<List<? extends String>> encoderDisabledRecipeTypes;
 
 	public static ModConfigSpec.IntValue packagerEnergyCapacity;
 	public static ModConfigSpec.IntValue packagerEnergyReq;
@@ -31,6 +37,8 @@ public class PackagedAutoConfig {
 	public static ModConfigSpec.IntValue unpackagerEnergyCapacity;
 	public static ModConfigSpec.IntValue unpackagerEnergyUsage;
 	public static ModConfigSpec.BooleanValue unpackagerDrawMEEnergy;
+
+	public static ModConfigSpec.IntValue distributorRange;
 
 	public static ModConfigSpec.IntValue crafterEnergyCapacity;
 	public static ModConfigSpec.IntValue crafterEnergyReq;
@@ -52,6 +60,8 @@ public class PackagedAutoConfig {
 		builder.push("encoder");
 		builder.comment("How many pattern slots should the Package Recipe Encoder have.", "Warning: Changing this value when world is running may cause client crashes.");
 		encoderPatternSlots = builder.defineInRange("pattern_slots", 20, 1, 20);
+		builder.comment("The list of recipe types to disable in the Package Recipe Encoder.");
+		encoderDisabledRecipeTypes = builder.defineListAllowEmpty("disabled_recipe_types", ArrayList<String>::new, s->true);
 		builder.pop();
 
 		builder.push("packager");
@@ -85,6 +95,10 @@ public class PackagedAutoConfig {
 		unpackagerDrawMEEnergy = builder.define("draw_me_energy", true);
 		builder.pop();
 
+		builder.push("distributor");
+		builder.comment("How large the range of the Positioned Package Distributor should be.");
+		distributorRange = builder.defineInRange("range", 16, 1, Integer.MAX_VALUE);
+
 		builder.push("crafter");
 		builder.comment("How much FE the Package Crafter should hold.");
 		crafterEnergyCapacity = builder.defineInRange("energy_capacity", 5000, 0, Integer.MAX_VALUE);
@@ -110,6 +124,7 @@ public class PackagedAutoConfig {
 
 	public static void reloadServerConfig() {
 		EncoderBlockEntity.patternSlots = encoderPatternSlots.get();
+		EncoderBlockEntity.disabledRecipeTypes = Set.copyOf(encoderDisabledRecipeTypes.get());
 
 		PackagerBlockEntity.energyCapacity = packagerEnergyCapacity.get();
 		PackagerBlockEntity.energyReq = packagerEnergyReq.get();
@@ -124,6 +139,8 @@ public class PackagedAutoConfig {
 		UnpackagerBlockEntity.energyCapacity = unpackagerEnergyCapacity.get();
 		UnpackagerBlockEntity.energyUsage = unpackagerEnergyUsage.get();
 		UnpackagerBlockEntity.drawMEEnergy = unpackagerDrawMEEnergy.get();
+
+		DistributorBlockEntity.range = distributorRange.get();
 
 		CrafterBlockEntity.energyCapacity = crafterEnergyCapacity.get();
 		CrafterBlockEntity.energyReq = crafterEnergyReq.get();

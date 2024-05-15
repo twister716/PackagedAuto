@@ -29,12 +29,12 @@ public class BaseMenu<T extends BaseBlockEntity> extends AbstractContainerMenu {
 		addDataSlots(itemHandler);
 	}
 
-	public int getPlayerInvY() {
-		return 84;
-	}
-
 	public int getPlayerInvX() {
 		return 8;
+	}
+
+	public int getPlayerInvY() {
+		return 84;
 	}
 
 	public void setupPlayerInventory() {

@@ -34,7 +34,15 @@ public interface IMiscHelper {
 
 	ListTag saveAllItems(ListTag tagList, List<ItemStack> list);
 
+	ListTag saveAllItems(ListTag tagList, List<ItemStack> list, String indexKey);
+
 	void loadAllItems(ListTag tagList, List<ItemStack> list);
+
+	void loadAllItems(ListTag tagList, List<ItemStack> list, String indexKey);
+
+	CompoundTag saveItemWithLargeCount(CompoundTag nbt, ItemStack stack);
+
+	ItemStack loadItemWithLargeCount(CompoundTag nbt);
 
 	IPackagePattern getPattern(IPackageRecipeInfo recipeInfo, int index);
 

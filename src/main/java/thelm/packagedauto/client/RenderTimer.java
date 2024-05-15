@@ -1,7 +1,6 @@
 package thelm.packagedauto.client;
 
 import net.minecraft.client.Minecraft;
-import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.TickEvent;
 
@@ -14,14 +13,13 @@ public class RenderTimer {
 
 	private RenderTimer() {
 		mc = Minecraft.getInstance();
-		NeoForge.EVENT_BUS.register(this);
+		NeoForge.EVENT_BUS.addListener(this::onClientTick);
 	}
 
 	public int getTicks() {
 		return ticks;
 	}
 
-	@SubscribeEvent
 	public void onClientTick(TickEvent.ClientTickEvent event) {
 		if(event.phase == TickEvent.Phase.START || mc.level == null || mc.player == null || mc.isPaused()) {
 			return;

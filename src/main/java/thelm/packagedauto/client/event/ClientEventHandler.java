@@ -6,14 +6,18 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
+import thelm.packagedauto.client.DistributorRenderer;
 import thelm.packagedauto.client.screen.CrafterScreen;
+import thelm.packagedauto.client.screen.DistributorScreen;
 import thelm.packagedauto.client.screen.EncoderScreen;
 import thelm.packagedauto.client.screen.FluidPackageFillerScreen;
 import thelm.packagedauto.client.screen.PackagerExtensionScreen;
 import thelm.packagedauto.client.screen.PackagerScreen;
 import thelm.packagedauto.client.screen.UnpackagerScreen;
+import thelm.packagedauto.item.DistributorMarkerItem;
 import thelm.packagedauto.item.RecipeHolderItem;
 import thelm.packagedauto.menu.CrafterMenu;
+import thelm.packagedauto.menu.DistributorMenu;
 import thelm.packagedauto.menu.EncoderMenu;
 import thelm.packagedauto.menu.FluidPackageFillerMenu;
 import thelm.packagedauto.menu.PackagerExtensionMenu;
@@ -30,6 +34,7 @@ public class ClientEventHandler {
 
 	public void onConstruct(IEventBus modEventBus) {
 		modEventBus.register(this);
+		DistributorRenderer.INSTANCE.onConstruct();
 	}
 
 	@SubscribeEvent
@@ -37,6 +42,10 @@ public class ClientEventHandler {
 		event.enqueueWork(()->{
 			ItemProperties.register(RecipeHolderItem.INSTANCE,
 					new ResourceLocation("packagedauto", "filled"), (stack, world, living, seed)->{
+						return stack.hasTag() ? 1F : 0F;
+					});
+			ItemProperties.register(DistributorMarkerItem.INSTANCE,
+					new ResourceLocation("packagedauto", "bound"), (stack, world, living, seed)->{
 						return stack.hasTag() ? 1F : 0F;
 					});
 		});
@@ -48,6 +57,7 @@ public class ClientEventHandler {
 		event.register(PackagerMenu.TYPE_INSTANCE, PackagerScreen::new);
 		event.register(PackagerExtensionMenu.TYPE_INSTANCE, PackagerExtensionScreen::new);
 		event.register(UnpackagerMenu.TYPE_INSTANCE, UnpackagerScreen::new);
+		event.register(DistributorMenu.TYPE_INSTANCE, DistributorScreen::new);
 		event.register(CrafterMenu.TYPE_INSTANCE, CrafterScreen::new);
 		event.register(FluidPackageFillerMenu.TYPE_INSTANCE, FluidPackageFillerScreen::new);
 	}

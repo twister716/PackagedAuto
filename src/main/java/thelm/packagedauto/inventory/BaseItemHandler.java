@@ -7,12 +7,13 @@ import java.util.Map;
 
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.ContainerHelper;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.items.IItemHandlerModifiable;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import thelm.packagedauto.block.entity.BaseBlockEntity;
+import thelm.packagedauto.util.MiscHelper;
 
 public class BaseItemHandler<T extends BaseBlockEntity> extends ItemStackHandler implements ContainerData {
 
@@ -37,11 +38,11 @@ public class BaseItemHandler<T extends BaseBlockEntity> extends ItemStackHandler
 
 	public void load(CompoundTag nbt) {
 		stacks.clear();
-		ContainerHelper.loadAllItems(nbt, stacks);
+		MiscHelper.INSTANCE.loadAllItems(nbt.getList("Items", 10), stacks, "Slot");
 	}
 
 	public void save(CompoundTag nbt) {
-		ContainerHelper.saveAllItems(nbt, stacks);
+		nbt.put("Items", MiscHelper.INSTANCE.saveAllItems(new ListTag(), stacks, "Slot"));
 	}
 
 	public void setChanged() {

@@ -29,7 +29,7 @@ public record SetRecipePacket(Int2ObjectMap<ItemStack> map) implements CustomPac
 		buf.writeByte(map.size());
 		for(Int2ObjectMap.Entry<ItemStack> entry : map.int2ObjectEntrySet()) {
 			buf.writeByte(entry.getIntKey());
-			buf.writeItem(entry.getValue());
+			buf.writeItemWithLargeCount(entry.getValue());
 		}
 	}
 
@@ -38,7 +38,7 @@ public record SetRecipePacket(Int2ObjectMap<ItemStack> map) implements CustomPac
 		int size = buf.readByte();
 		for(int i = 0; i < size; ++i) {
 			int index = buf.readByte();
-			ItemStack stack = buf.readItem();
+			ItemStack stack = buf.readItemWithLargeCount();
 			map.put(index, stack);
 		}
 		return new SetRecipePacket(map);
