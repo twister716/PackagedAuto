@@ -57,7 +57,7 @@ public class PackageItem extends Item implements IPackageItem {
 			}
 			return InteractionResultHolder.success(stack);
 		}
-		return InteractionResultHolder.pass(player.getItemInHand(hand));
+		return super.use(level, player, hand);
 	}
 
 	@Override

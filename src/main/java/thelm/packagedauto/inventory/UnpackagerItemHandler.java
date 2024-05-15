@@ -28,6 +28,14 @@ public class UnpackagerItemHandler extends BaseItemHandler<UnpackagerBlockEntity
 	}
 
 	@Override
+	public int getSlotLimit(int slot) {
+		if(slot == 9) {
+			return 1;
+		}
+		return super.getSlotLimit(slot);
+	}
+
+	@Override
 	public boolean isItemValid(int slot, ItemStack stack) {
 		return switch(slot) {
 		case 9 -> stack.getItem() instanceof IPackageRecipeListItem;

@@ -88,15 +88,12 @@ public abstract class BaseScreen<C extends BaseMenu<?>> extends AbstractContaine
 			if(!slot.getItem().isEmpty()) {
 				if(!hasControlDown() && slot.getItem().getItem() instanceof IVolumePackageItem vPackage) {
 					minecraft.setScreen(new VolumeAmountSpecifyingScreen(
-							this, minecraft.player.getInventory(),
-							slot.index, vPackage.getVolumeStack(slot.getItem()),
-							1000000));
+							this, minecraft.player.getInventory(), slot.index, vPackage.getVolumeStack(slot.getItem()), 1000000));
 				}
 				else {
 					minecraft.setScreen(new ItemAmountSpecifyingScreen(
-							this, minecraft.player.getInventory(),
-							slot.index, slot.getItem(),
-							Math.min(slot.getMaxStackSize(), slot.getItem().getMaxStackSize())));
+							this, minecraft.player.getInventory(), slot.index, slot.getItem(),
+							slot.index >= 81 ? 999 : Math.min(slot.getMaxStackSize(), slot.getItem().getMaxStackSize())));
 				}
 			}
 		}

@@ -44,7 +44,7 @@ public class EncoderScreen extends BaseScreen<EncoderMenu> {
 		for(int i = 0; i < patternSlots; ++i) {
 			addRenderableWidget(new ButtonPatternSlot(i, leftPos+29+(i%10)*18, topPos+(patternSlots > 10 ? 16 : 25)+(i/10)*18));
 		}
-		addRenderableWidget(new ButtonRecipeType(leftPos+204, topPos+74));
+		addRenderableWidget(new ButtonRecipeType(leftPos+203, topPos+74));
 		addRenderableWidget(new ButtonSavePatterns(leftPos+213, topPos+16, Component.translatable("block.packagedauto.encoder.save")));
 		addRenderableWidget(new ButtonLoadPatterns(leftPos+213, topPos+34, Component.translatable("block.packagedauto.encoder.load")));
 	}

@@ -33,6 +33,14 @@ public class PackagerItemHandler extends BaseItemHandler<PackagerBlockEntity> {
 	}
 
 	@Override
+	public int getSlotLimit(int slot) {
+		if(slot == 10) {
+			return 1;
+		}
+		return super.getSlotLimit(slot);
+	}
+
+	@Override
 	public boolean isItemValid(int slot, ItemStack stack) {
 		return switch(slot) {
 		case 9 -> false;
