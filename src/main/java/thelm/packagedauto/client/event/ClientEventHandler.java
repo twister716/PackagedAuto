@@ -6,14 +6,18 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import thelm.packagedauto.client.DistributorRenderer;
 import thelm.packagedauto.client.screen.CrafterScreen;
+import thelm.packagedauto.client.screen.DistributorScreen;
 import thelm.packagedauto.client.screen.EncoderScreen;
 import thelm.packagedauto.client.screen.FluidPackageFillerScreen;
 import thelm.packagedauto.client.screen.PackagerExtensionScreen;
 import thelm.packagedauto.client.screen.PackagerScreen;
 import thelm.packagedauto.client.screen.UnpackagerScreen;
+import thelm.packagedauto.item.DistributorMarkerItem;
 import thelm.packagedauto.item.RecipeHolderItem;
 import thelm.packagedauto.menu.CrafterMenu;
+import thelm.packagedauto.menu.DistributorMenu;
 import thelm.packagedauto.menu.EncoderMenu;
 import thelm.packagedauto.menu.FluidPackageFillerMenu;
 import thelm.packagedauto.menu.PackagerExtensionMenu;
@@ -30,6 +34,7 @@ public class ClientEventHandler {
 
 	public void onConstruct() {
 		FMLJavaModLoadingContext.get().getModEventBus().register(this);
+		DistributorRenderer.INSTANCE.onConstruct();
 	}
 
 	@SubscribeEvent
@@ -38,12 +43,17 @@ public class ClientEventHandler {
 		MenuScreens.register(PackagerMenu.TYPE_INSTANCE, PackagerScreen::new);
 		MenuScreens.register(PackagerExtensionMenu.TYPE_INSTANCE, PackagerExtensionScreen::new);
 		MenuScreens.register(UnpackagerMenu.TYPE_INSTANCE, UnpackagerScreen::new);
+		MenuScreens.register(DistributorMenu.TYPE_INSTANCE, DistributorScreen::new);
 		MenuScreens.register(CrafterMenu.TYPE_INSTANCE, CrafterScreen::new);
 		MenuScreens.register(FluidPackageFillerMenu.TYPE_INSTANCE, FluidPackageFillerScreen::new);
 
 		event.enqueueWork(()->{
 			ItemProperties.register(RecipeHolderItem.INSTANCE,
 					new ResourceLocation("packagedauto", "filled"), (stack, world, living, seed)->{
+						return stack.hasTag() ? 1F : 0F;
+					});
+			ItemProperties.register(DistributorMarkerItem.INSTANCE,
+					new ResourceLocation("packagedauto", "bound"), (stack, world, living, seed)->{
 						return stack.hasTag() ? 1F : 0F;
 					});
 		});

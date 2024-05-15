@@ -3,7 +3,6 @@ package thelm.packagedauto.client;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 public class RenderTimer {
 
@@ -14,14 +13,13 @@ public class RenderTimer {
 
 	private RenderTimer() {
 		mc = Minecraft.getInstance();
-		MinecraftForge.EVENT_BUS.register(this);
+		MinecraftForge.EVENT_BUS.addListener(this::onClientTick);
 	}
 
 	public int getTicks() {
 		return ticks;
 	}
 
-	@SubscribeEvent
 	public void onClientTick(TickEvent.ClientTickEvent event) {
 		if(event.phase == TickEvent.Phase.START || mc.level == null || mc.player == null || mc.isPaused()) {
 			return;

@@ -40,7 +40,7 @@ public class RecipeHolderItem extends Item implements IPackageRecipeListItem {
 		if(!level.isClientSide && player.isShiftKeyDown()) {
 			return InteractionResultHolder.success(new ItemStack(INSTANCE, player.getItemInHand(hand).getCount()));
 		}
-		return InteractionResultHolder.pass(player.getItemInHand(hand));
+		return super.use(level, player, hand);
 	}
 
 	@Override

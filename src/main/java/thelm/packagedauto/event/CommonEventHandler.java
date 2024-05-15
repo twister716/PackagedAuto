@@ -13,23 +13,27 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.IForgeRegistry;
 import thelm.packagedauto.block.CrafterBlock;
+import thelm.packagedauto.block.DistributorBlock;
 import thelm.packagedauto.block.EncoderBlock;
 import thelm.packagedauto.block.FluidPackageFillerBlock;
 import thelm.packagedauto.block.PackagerBlock;
 import thelm.packagedauto.block.PackagerExtensionBlock;
 import thelm.packagedauto.block.UnpackagerBlock;
 import thelm.packagedauto.block.entity.CrafterBlockEntity;
+import thelm.packagedauto.block.entity.DistributorBlockEntity;
 import thelm.packagedauto.block.entity.EncoderBlockEntity;
 import thelm.packagedauto.block.entity.FluidPackageFillerBlockEntity;
 import thelm.packagedauto.block.entity.PackagerBlockEntity;
 import thelm.packagedauto.block.entity.PackagerExtensionBlockEntity;
 import thelm.packagedauto.block.entity.UnpackagerBlockEntity;
 import thelm.packagedauto.config.PackagedAutoConfig;
+import thelm.packagedauto.item.DistributorMarkerItem;
 import thelm.packagedauto.item.MiscItem;
 import thelm.packagedauto.item.PackageItem;
 import thelm.packagedauto.item.RecipeHolderItem;
 import thelm.packagedauto.item.VolumePackageItem;
 import thelm.packagedauto.menu.CrafterMenu;
+import thelm.packagedauto.menu.DistributorMenu;
 import thelm.packagedauto.menu.EncoderMenu;
 import thelm.packagedauto.menu.FluidPackageFillerMenu;
 import thelm.packagedauto.menu.PackagerExtensionMenu;
@@ -38,6 +42,7 @@ import thelm.packagedauto.menu.UnpackagerMenu;
 import thelm.packagedauto.network.PacketHandler;
 import thelm.packagedauto.recipe.CraftingPackageRecipeType;
 import thelm.packagedauto.recipe.OrderedProcessingPackageRecipeType;
+import thelm.packagedauto.recipe.PositionedProcessingPackageRecipeType;
 import thelm.packagedauto.recipe.ProcessingPackageRecipeType;
 import thelm.packagedauto.util.ApiImpl;
 import thelm.packagedauto.util.MiscHelper;
@@ -64,6 +69,7 @@ public class CommonEventHandler {
 		registry.register(PackagerBlock.INSTANCE);
 		registry.register(PackagerExtensionBlock.INSTANCE);
 		registry.register(UnpackagerBlock.INSTANCE);
+		registry.register(DistributorBlock.INSTANCE);
 		registry.register(CrafterBlock.INSTANCE);
 		registry.register(FluidPackageFillerBlock.INSTANCE);
 	}
@@ -75,9 +81,11 @@ public class CommonEventHandler {
 		registry.register(PackagerBlock.ITEM_INSTANCE);
 		registry.register(PackagerExtensionBlock.ITEM_INSTANCE);
 		registry.register(UnpackagerBlock.ITEM_INSTANCE);
+		registry.register(DistributorBlock.ITEM_INSTANCE);
 		registry.register(CrafterBlock.ITEM_INSTANCE);
 		registry.register(FluidPackageFillerBlock.ITEM_INSTANCE);
 		registry.register(RecipeHolderItem.INSTANCE);
+		registry.register(DistributorMarkerItem.INSTANCE);
 		registry.register(PackageItem.INSTANCE);
 		registry.register(VolumePackageItem.INSTANCE);
 		registry.register(MiscItem.PACKAGE_COMPONENT);
@@ -91,6 +99,7 @@ public class CommonEventHandler {
 		registry.register(PackagerBlockEntity.TYPE_INSTANCE);
 		registry.register(PackagerExtensionBlockEntity.TYPE_INSTANCE);
 		registry.register(UnpackagerBlockEntity.TYPE_INSTANCE);
+		registry.register(DistributorBlockEntity.TYPE_INSTANCE);
 		registry.register(CrafterBlockEntity.TYPE_INSTANCE);
 		registry.register(FluidPackageFillerBlockEntity.TYPE_INSTANCE);
 	}
@@ -102,6 +111,7 @@ public class CommonEventHandler {
 		registry.register(PackagerMenu.TYPE_INSTANCE);
 		registry.register(PackagerExtensionMenu.TYPE_INSTANCE);
 		registry.register(UnpackagerMenu.TYPE_INSTANCE);
+		registry.register(DistributorMenu.TYPE_INSTANCE);
 		registry.register(CrafterMenu.TYPE_INSTANCE);
 		registry.register(FluidPackageFillerMenu.TYPE_INSTANCE);
 	}
@@ -112,6 +122,7 @@ public class CommonEventHandler {
 
 		ApiImpl.INSTANCE.registerRecipeType(ProcessingPackageRecipeType.INSTANCE);
 		ApiImpl.INSTANCE.registerRecipeType(OrderedProcessingPackageRecipeType.INSTANCE);
+		ApiImpl.INSTANCE.registerRecipeType(PositionedProcessingPackageRecipeType.INSTANCE);
 		ApiImpl.INSTANCE.registerRecipeType(CraftingPackageRecipeType.INSTANCE);
 
 		PacketHandler.registerPackets();

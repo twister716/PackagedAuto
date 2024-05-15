@@ -3,6 +3,8 @@ package thelm.packagedauto.recipe;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Blocks;
 import thelm.packagedauto.api.IPackageRecipeInfo;
 
 public class OrderedProcessingPackageRecipeType extends ProcessingPackageRecipeType {
@@ -33,5 +35,10 @@ public class OrderedProcessingPackageRecipeType extends ProcessingPackageRecipeT
 	@Override
 	public boolean isOrdered() {
 		return true;
+	}
+
+	@Override
+	public Object getRepresentation() {
+		return new ItemStack(Blocks.BREWING_STAND);
 	}
 }

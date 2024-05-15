@@ -8,7 +8,6 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -44,29 +43,31 @@ public class UnpackagerBlock extends BaseBlock {
 	}
 
 	@Override
-	public void destroy(LevelAccessor level, BlockPos pos, BlockState state) {
-		level.getBlockEntity(pos, UnpackagerBlockEntity.TYPE_INSTANCE).ifPresent(blockEntity->{
-			for(PackageTracker tracker : blockEntity.trackers) {
-				if(!tracker.isEmpty()) {
-					if(!tracker.toSend.isEmpty()) {
-						for(ItemStack stack : tracker.toSend) {
-							if(!stack.isEmpty()) {
-								Containers.dropItemStack((Level)level, pos.getX(), pos.getY(), pos.getZ(), stack);
+	public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
+		if(state.getBlock() != newState.getBlock()) {
+			if(level.getBlockEntity(pos) instanceof UnpackagerBlockEntity blockEntity) {
+				for(PackageTracker tracker : blockEntity.trackers) {
+					if(!tracker.isEmpty()) {
+						if(!tracker.toSend.isEmpty()) {
+							for(ItemStack stack : tracker.toSend) {
+								if(!stack.isEmpty()) {
+									Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), stack);
+								}
 							}
 						}
-					}
-					else {
-						List<IPackagePattern> patterns = tracker.recipe.getPatterns();
-						for(int i = 0; i < tracker.received.size() && i < patterns.size(); ++i) {
-							if(tracker.received.getBoolean(i)) {
-								Containers.dropItemStack((Level)level, pos.getX(), pos.getY(), pos.getZ(), patterns.get(i).getOutput());
+						else {
+							List<IPackagePattern> patterns = tracker.recipe.getPatterns();
+							for(int i = 0; i < tracker.received.size() && i < patterns.size(); ++i) {
+								if(tracker.received.getBoolean(i)) {
+									Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), patterns.get(i).getOutput());
+								}
 							}
 						}
 					}
 				}
 			}
-		});
-		super.destroy(level, pos, state);
+		}
+		super.onRemove(state, level, pos, newState, isMoving);
 	}
 
 	@Override
