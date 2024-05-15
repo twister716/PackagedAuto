@@ -1,2 +1,8 @@
-Reduce ghost ingredient handler area  
-Do not focus on the text field in the amount specification UI by default  
+Added Positioned Package Distributor  
+Added positioned processing recipe type  
+Condense processing recipes during JEI transfer  
+Changed representation of ordered processing to brewing stand  
+Add config to disable encoding certain recipe types  
+Disable automation access to encoder  
+Fix unpackager item drops  
+Rearrange language keys  

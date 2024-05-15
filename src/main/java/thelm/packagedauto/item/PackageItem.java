@@ -9,7 +9,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ActionResult;
-import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
@@ -54,9 +53,9 @@ public class PackageItem extends Item implements IPackageItem {
 					}
 				}
 			}
-			return new ActionResult<>(ActionResultType.SUCCESS, stack);
+			return ActionResult.success(stack);
 		}
-		return new ActionResult<>(ActionResultType.PASS, playerIn.getItemInHand(handIn));
+		return super.use(worldIn, playerIn, handIn);
 	}
 
 	@Override

@@ -1,7 +1,9 @@
 package thelm.packagedauto.tile;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -29,6 +31,7 @@ public class EncoderTile extends BaseTile {
 			build(null).setRegistryName("packagedauto:encoder");
 
 	public static int patternSlots = 20;
+	public static Set<String> disabledRecipeTypes = Collections.emptySet();
 
 	public final EncoderPatternItemHandler[] patternItemHandlers = new EncoderPatternItemHandler[patternSlots];
 	public int patternIndex;

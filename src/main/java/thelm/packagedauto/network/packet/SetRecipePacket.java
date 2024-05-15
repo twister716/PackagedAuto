@@ -9,6 +9,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
 import thelm.packagedauto.container.EncoderContainer;
+import thelm.packagedauto.util.MiscHelper;
 
 public class SetRecipePacket {
 
@@ -27,7 +28,7 @@ public class SetRecipePacket {
 		buf.writeByte(pkt.map.size());
 		for(Int2ObjectMap.Entry<ItemStack> entry : pkt.map.int2ObjectEntrySet()) {
 			buf.writeByte(entry.getIntKey());
-			buf.writeItem(entry.getValue());
+			MiscHelper.INSTANCE.writeItemWithLargeCount(buf, entry.getValue());
 		}
 	}
 
@@ -36,7 +37,7 @@ public class SetRecipePacket {
 		int size = buf.readByte();
 		for(int i = 0; i < size; ++i) {
 			int index = buf.readByte();
-			ItemStack stack = buf.readItem();
+			ItemStack stack = MiscHelper.INSTANCE.readItemWithLargeCount(buf);
 			map.put(index, stack);
 		}
 		return new SetRecipePacket(map);

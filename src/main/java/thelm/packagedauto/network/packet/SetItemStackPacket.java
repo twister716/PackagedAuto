@@ -10,6 +10,7 @@ import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
 import net.minecraftforge.items.ItemStackHandler;
 import thelm.packagedauto.slot.FalseCopySlot;
+import thelm.packagedauto.util.MiscHelper;
 
 public class SetItemStackPacket {
 
@@ -23,11 +24,11 @@ public class SetItemStackPacket {
 
 	public static void encode(SetItemStackPacket pkt, PacketBuffer buf) {
 		buf.writeShort(pkt.containerSlot);
-		buf.writeItem(pkt.stack);
+		MiscHelper.INSTANCE.writeItemWithLargeCount(buf, pkt.stack);
 	}
 
 	public static SetItemStackPacket decode(PacketBuffer buf) {
-		return new SetItemStackPacket(buf.readShort(), buf.readItem());
+		return new SetItemStackPacket(buf.readShort(), MiscHelper.INSTANCE.readItemWithLargeCount(buf));
 	}
 
 	public static void handle(SetItemStackPacket pkt, Supplier<NetworkEvent.Context> ctx) {

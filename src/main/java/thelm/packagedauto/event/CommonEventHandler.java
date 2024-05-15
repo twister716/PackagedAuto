@@ -13,24 +13,29 @@ import net.minecraftforge.fml.event.server.FMLServerAboutToStartEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.IForgeRegistry;
 import thelm.packagedauto.block.CrafterBlock;
+import thelm.packagedauto.block.DistributorBlock;
 import thelm.packagedauto.block.EncoderBlock;
 import thelm.packagedauto.block.PackagerBlock;
 import thelm.packagedauto.block.PackagerExtensionBlock;
 import thelm.packagedauto.block.UnpackagerBlock;
 import thelm.packagedauto.config.PackagedAutoConfig;
 import thelm.packagedauto.container.CrafterContainer;
+import thelm.packagedauto.container.DistributorContainer;
 import thelm.packagedauto.container.EncoderContainer;
 import thelm.packagedauto.container.PackagerContainer;
 import thelm.packagedauto.container.PackagerExtensionContainer;
 import thelm.packagedauto.container.UnpackagerContainer;
+import thelm.packagedauto.item.DistributorMarkerItem;
 import thelm.packagedauto.item.MiscItem;
 import thelm.packagedauto.item.PackageItem;
 import thelm.packagedauto.item.RecipeHolderItem;
 import thelm.packagedauto.network.PacketHandler;
 import thelm.packagedauto.recipe.CraftingPackageRecipeType;
 import thelm.packagedauto.recipe.OrderedProcessingPackageRecipeType;
+import thelm.packagedauto.recipe.PositionedProcessingPackageRecipeType;
 import thelm.packagedauto.recipe.ProcessingPackageRecipeType;
 import thelm.packagedauto.tile.CrafterTile;
+import thelm.packagedauto.tile.DistributorTile;
 import thelm.packagedauto.tile.EncoderTile;
 import thelm.packagedauto.tile.PackagerExtensionTile;
 import thelm.packagedauto.tile.PackagerTile;
@@ -59,6 +64,7 @@ public class CommonEventHandler {
 		registry.register(PackagerBlock.INSTANCE);
 		registry.register(PackagerExtensionBlock.INSTANCE);
 		registry.register(UnpackagerBlock.INSTANCE);
+		registry.register(DistributorBlock.INSTANCE);
 		registry.register(CrafterBlock.INSTANCE);
 	}
 
@@ -69,8 +75,10 @@ public class CommonEventHandler {
 		registry.register(PackagerBlock.ITEM_INSTANCE);
 		registry.register(PackagerExtensionBlock.ITEM_INSTANCE);
 		registry.register(UnpackagerBlock.ITEM_INSTANCE);
+		registry.register(DistributorBlock.ITEM_INSTANCE);
 		registry.register(CrafterBlock.ITEM_INSTANCE);
 		registry.register(RecipeHolderItem.INSTANCE);
+		registry.register(DistributorMarkerItem.INSTANCE);
 		registry.register(PackageItem.INSTANCE);
 		registry.register(MiscItem.PACKAGE_COMPONENT);
 		registry.register(MiscItem.ME_PACKAGE_COMPONENT);
@@ -83,6 +91,7 @@ public class CommonEventHandler {
 		registry.register(PackagerTile.TYPE_INSTANCE);
 		registry.register(PackagerExtensionTile.TYPE_INSTANCE);
 		registry.register(UnpackagerTile.TYPE_INSTANCE);
+		registry.register(DistributorTile.TYPE_INSTANCE);
 		registry.register(CrafterTile.TYPE_INSTANCE);
 	}
 
@@ -93,6 +102,7 @@ public class CommonEventHandler {
 		registry.register(PackagerContainer.TYPE_INSTANCE);
 		registry.register(PackagerExtensionContainer.TYPE_INSTANCE);
 		registry.register(UnpackagerContainer.TYPE_INSTANCE);
+		registry.register(DistributorContainer.TYPE_INSTANCE);
 		registry.register(CrafterContainer.TYPE_INSTANCE);
 	}
 
@@ -100,6 +110,7 @@ public class CommonEventHandler {
 	public void onCommonSetup(FMLCommonSetupEvent event) {
 		ApiImpl.INSTANCE.registerRecipeType(ProcessingPackageRecipeType.INSTANCE);
 		ApiImpl.INSTANCE.registerRecipeType(OrderedProcessingPackageRecipeType.INSTANCE);
+		ApiImpl.INSTANCE.registerRecipeType(PositionedProcessingPackageRecipeType.INSTANCE);
 		ApiImpl.INSTANCE.registerRecipeType(CraftingPackageRecipeType.INSTANCE);
 
 		PacketHandler.registerPackets();

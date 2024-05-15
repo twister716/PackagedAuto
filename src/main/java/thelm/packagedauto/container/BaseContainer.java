@@ -29,12 +29,12 @@ public class BaseContainer<T extends BaseTile> extends Container {
 		addDataSlots(itemHandler);
 	}
 
-	public int getPlayerInvY() {
-		return 84;
-	}
-
 	public int getPlayerInvX() {
 		return 8;
+	}
+
+	public int getPlayerInvY() {
+		return 84;
 	}
 
 	public void setupPlayerInventory() {

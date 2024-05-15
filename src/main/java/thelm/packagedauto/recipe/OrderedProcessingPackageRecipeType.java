@@ -1,5 +1,7 @@
 package thelm.packagedauto.recipe;
 
+import net.minecraft.block.Blocks;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.IFormattableTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
@@ -33,5 +35,10 @@ public class OrderedProcessingPackageRecipeType extends ProcessingPackageRecipeT
 	@Override
 	public boolean isOrdered() {
 		return true;
+	}
+
+	@Override
+	public Object getRepresentation() {
+		return new ItemStack(Blocks.BREWING_STAND);
 	}
 }

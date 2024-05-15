@@ -67,16 +67,15 @@ public abstract class BaseBlock extends Block {
 
 	@Override
 	public void onRemove(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
-		if(state.getBlock() == newState.getBlock()) {
-			return;
-		}
-		TileEntity tileentity = worldIn.getBlockEntity(pos);
-		if(tileentity instanceof BaseTile) {
-			IItemHandler handler = ((BaseTile)tileentity).getItemHandler();
-			for(int i = 0; i < handler.getSlots(); ++i) {
-				ItemStack stack = handler.getStackInSlot(i);
-				if(!stack.isEmpty()) {
-					InventoryHelper.dropItemStack(worldIn, pos.getX(), pos.getY(), pos.getZ(), stack);
+		if(state.getBlock() != newState.getBlock()) {
+			TileEntity tileentity = worldIn.getBlockEntity(pos);
+			if(tileentity instanceof BaseTile) {
+				IItemHandler handler = ((BaseTile)tileentity).getItemHandler();
+				for(int i = 0; i < handler.getSlots(); ++i) {
+					ItemStack stack = handler.getStackInSlot(i);
+					if(!stack.isEmpty()) {
+						InventoryHelper.dropItemStack(worldIn, pos.getX(), pos.getY(), pos.getZ(), stack);
+					}
 				}
 			}
 		}

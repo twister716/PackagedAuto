@@ -14,7 +14,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockReader;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import thelm.packagedauto.PackagedAuto;
 import thelm.packagedauto.api.IPackagePattern;
@@ -37,30 +36,32 @@ public class UnpackagerBlock extends BaseBlock {
 	}
 
 	@Override
-	public void destroy(IWorld worldIn, BlockPos pos, BlockState state) {
-		TileEntity tileentity = worldIn.getBlockEntity(pos);
-		if(tileentity instanceof UnpackagerTile) {
-			for(PackageTracker tracker : ((UnpackagerTile)tileentity).trackers) {
-				if(!tracker.isEmpty()) {
-					if(!tracker.toSend.isEmpty()) {
-						for(ItemStack stack : tracker.toSend) {
-							if(!stack.isEmpty()) {
-								InventoryHelper.dropItemStack((World)worldIn, pos.getX(), pos.getY(), pos.getZ(), stack);
+	public void onRemove(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
+		if(state.getBlock() != newState.getBlock()) {
+			TileEntity tileentity = worldIn.getBlockEntity(pos);
+			if(tileentity instanceof UnpackagerTile) {
+				for(PackageTracker tracker : ((UnpackagerTile)tileentity).trackers) {
+					if(!tracker.isEmpty()) {
+						if(!tracker.toSend.isEmpty()) {
+							for(ItemStack stack : tracker.toSend) {
+								if(!stack.isEmpty()) {
+									InventoryHelper.dropItemStack(worldIn, pos.getX(), pos.getY(), pos.getZ(), stack);
+								}
 							}
 						}
-					}
-					else {
-						List<IPackagePattern> patterns = tracker.recipe.getPatterns();
-						for(int i = 0; i < tracker.received.size() && i < patterns.size(); ++i) {
-							if(tracker.received.getBoolean(i)) {
-								InventoryHelper.dropItemStack((World)worldIn, pos.getX(), pos.getY(), pos.getZ(), patterns.get(i).getOutput());
+						else {
+							List<IPackagePattern> patterns = tracker.recipe.getPatterns();
+							for(int i = 0; i < tracker.received.size() && i < patterns.size(); ++i) {
+								if(tracker.received.getBoolean(i)) {
+									InventoryHelper.dropItemStack(worldIn, pos.getX(), pos.getY(), pos.getZ(), patterns.get(i).getOutput());
+								}
 							}
 						}
 					}
 				}
 			}
 		}
-		super.destroy(worldIn, pos, state);
+		super.onRemove(state, worldIn, pos, newState, isMoving);
 	}
 
 	@Override

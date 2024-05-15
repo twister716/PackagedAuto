@@ -1,5 +1,6 @@
 package thelm.packagedauto.recipe;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -88,37 +89,29 @@ public class ProcessingPackageRecipeType implements IPackageRecipeType {
 	public Int2ObjectMap<ItemStack> getRecipeTransferMap(IRecipeLayoutWrapper recipeLayoutWrapper) {
 		Int2ObjectMap<ItemStack> map = new Int2ObjectOpenHashMap<>();
 		Map<Integer, IGuiIngredientWrapper<ItemStack>> ingredients = recipeLayoutWrapper.getItemStackIngredients();
-		int inputIndex = 0;
-		//TODO uncomment when AE2 support custom details again
-		//int outputIndex = 81;
-		int outputIndex = 82;
+		List<ItemStack> input = new ArrayList<>();
+		List<ItemStack> output = new ArrayList<>();
 		for(Map.Entry<Integer, IGuiIngredientWrapper<ItemStack>> entry : ingredients.entrySet()) {
 			IGuiIngredientWrapper<ItemStack> ingredient = entry.getValue();
-			if(ingredient.isInput()) {
-				if(inputIndex >= 81) {
-					continue;
+			ItemStack displayed = entry.getValue().getDisplayedIngredient();
+			if(displayed != null && !displayed.isEmpty()) {
+				if(ingredient.isInput()) {
+					input.add(displayed);
 				}
-				ItemStack displayed = entry.getValue().getDisplayedIngredient();
-				if(displayed != null && !displayed.isEmpty()) {
-					map.put(inputIndex, displayed);
+				else {
+					output.add(displayed);
 				}
-				++inputIndex;
 			}
-			else {
-				if(outputIndex >= 90) {
-					continue;
-				}
-				ItemStack displayed = entry.getValue().getDisplayedIngredient();
-				if(displayed != null && !displayed.isEmpty()) {
-					map.put(outputIndex, displayed);
-				}
-				//TODO uncomment when AE2 support custom details again
-				//++outputIndex;
-				outputIndex += 3;
-			}
-			if(inputIndex >= 81 && outputIndex >= 90) {
-				break;
-			}
+		}
+		if(!isOrdered()) {
+			input = MiscHelper.INSTANCE.condenseStacks(input);
+		}
+		output = MiscHelper.INSTANCE.condenseStacks(output);
+		for(int i = 0; i < input.size() && i < 81; ++i) {
+			map.put(i, input.get(i));
+		}
+		for(int i = 0; i < output.size() && i < 3; ++i) {
+			map.put(i*3+82, output.get(i));
 		}
 		return map;
 	}

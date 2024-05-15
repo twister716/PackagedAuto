@@ -5,14 +5,15 @@ import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.minecraft.inventory.ItemStackHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.ListNBT;
 import net.minecraft.util.Direction;
 import net.minecraft.util.IIntArray;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemStackHandler;
 import thelm.packagedauto.tile.BaseTile;
+import thelm.packagedauto.util.MiscHelper;
 
 public class BaseItemHandler<T extends BaseTile> extends ItemStackHandler implements IIntArray {
 
@@ -35,11 +36,12 @@ public class BaseItemHandler<T extends BaseTile> extends ItemStackHandler implem
 
 	public void read(CompoundNBT nbt) {
 		stacks.clear();
-		ItemStackHelper.loadAllItems(nbt, stacks);
+		MiscHelper.INSTANCE.loadAllItems(nbt.getList("Items", 10), stacks, "Slot");
 	}
 
 	public CompoundNBT write(CompoundNBT nbt) {
-		return ItemStackHelper.saveAllItems(nbt, stacks);
+		nbt.put("Items", MiscHelper.INSTANCE.saveAllItems(new ListNBT(), stacks, "Slot"));
+		return nbt;
 	}
 
 	public void markDirty() {

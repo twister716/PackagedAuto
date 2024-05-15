@@ -9,6 +9,7 @@ import net.minecraftforge.fml.network.simple.SimpleChannel;
 import thelm.packagedauto.network.packet.ChangeBlockingPacket;
 import thelm.packagedauto.network.packet.ChangePackagingPacket;
 import thelm.packagedauto.network.packet.CycleRecipeTypePacket;
+import thelm.packagedauto.network.packet.DistributorBeamPacket;
 import thelm.packagedauto.network.packet.LoadRecipeListPacket;
 import thelm.packagedauto.network.packet.SaveRecipeListPacket;
 import thelm.packagedauto.network.packet.SetItemStackPacket;
@@ -52,5 +53,8 @@ public class PacketHandler {
 		INSTANCE.registerMessage(id++, ChangePackagingPacket.class,
 				ChangePackagingPacket::encode, ChangePackagingPacket::decode,
 				ChangePackagingPacket::handle, Optional.of(NetworkDirection.PLAY_TO_SERVER));
+		INSTANCE.registerMessage(id++, DistributorBeamPacket.class,
+				DistributorBeamPacket::encode, DistributorBeamPacket::decode,
+				DistributorBeamPacket::handle, Optional.of(NetworkDirection.PLAY_TO_CLIENT));
 	}
 }

@@ -10,6 +10,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.RecipeManager;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
+import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.items.IItemHandler;
 
 public interface IMiscHelper {
@@ -30,7 +31,19 @@ public interface IMiscHelper {
 
 	ListNBT saveAllItems(ListNBT tagList, List<ItemStack> list);
 
+	ListNBT saveAllItems(ListNBT tagList, List<ItemStack> list, String indexKey);
+
 	void loadAllItems(ListNBT tagList, List<ItemStack> list);
+
+	void loadAllItems(ListNBT tagList, List<ItemStack> list, String indexKey);
+
+	CompoundNBT saveItemWithLargeCount(CompoundNBT nbt, ItemStack stack);
+
+	ItemStack loadItemWithLargeCount(CompoundNBT nbt);
+
+	void writeItemWithLargeCount(PacketBuffer buf, ItemStack stack);
+
+	ItemStack readItemWithLargeCount(PacketBuffer buf);
 
 	IPackagePattern getPattern(IPackageRecipeInfo recipeInfo, int index);
 

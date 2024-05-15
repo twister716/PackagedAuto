@@ -48,8 +48,7 @@ public abstract class BaseScreen<C extends BaseContainer<?>> extends ContainerSc
 		if(valid && slot instanceof FalseCopySlot && slot.isActive()) {
 			if(!slot.getItem().isEmpty()) {
 				minecraft.setScreen(new AmountSpecifyingScreen(
-						this, minecraft.player.inventory,
-						slot.index, slot.getItem(),
+						this, minecraft.player.inventory, slot.index, slot.getItem(),
 						Math.min(slot.getMaxStackSize(), slot.getItem().getMaxStackSize())));
 			}
 		}
