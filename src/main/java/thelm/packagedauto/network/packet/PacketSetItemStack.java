@@ -7,9 +7,9 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.WorldServer;
-import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import thelm.packagedauto.api.MiscUtil;
 import thelm.packagedauto.network.ISelfHandleMessage;
 import thelm.packagedauto.slot.SlotFalseCopy;
 
@@ -28,13 +28,13 @@ public class PacketSetItemStack implements ISelfHandleMessage<IMessage> {
 	@Override
 	public void toBytes(ByteBuf buf) {
 		buf.writeShort(containerSlot);
-		ByteBufUtils.writeItemStack(buf, stack);
+		MiscUtil.writeItemWithLargeCount(buf, stack);
 	}
 
 	@Override
 	public void fromBytes(ByteBuf buf) {
 		containerSlot = buf.readShort();
-		stack = ByteBufUtils.readItemStack(buf);
+		stack = MiscUtil.readItemWithLargeCount(buf);
 	}
 
 	@Override

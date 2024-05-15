@@ -61,7 +61,7 @@ public class ItemPackage extends Item implements IPackageItem, IModelRegister {
 			}
 			return new ActionResult<>(EnumActionResult.SUCCESS, stack);
 		}
-		return new ActionResult<>(EnumActionResult.PASS, playerIn.getHeldItem(handIn));
+		return super.onItemRightClick(worldIn, playerIn, handIn);
 	}
 
 	@Override

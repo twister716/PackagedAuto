@@ -9,12 +9,14 @@ import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.inventory.ItemStackHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.wrapper.SidedInvWrapper;
+import thelm.packagedauto.api.MiscUtil;
 import thelm.packagedauto.tile.TileBase;
 
 public class InventoryTileBase implements ISidedInventory {
@@ -156,11 +158,12 @@ public class InventoryTileBase implements ISidedInventory {
 
 	public void readFromNBT(NBTTagCompound nbt) {
 		stacks.clear();
-		ItemStackHelper.loadAllItems(nbt, stacks);
+		MiscUtil.loadAllItems(nbt.getTagList("Items", 10), stacks, "Slot");
 	}
 
 	public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
-		return ItemStackHelper.saveAllItems(nbt, stacks);
+		nbt.setTag("Items", MiscUtil.saveAllItems(new NBTTagList(), stacks, "Slot"));
+		return nbt;
 	}
 
 	public IItemHandlerModifiable getWrapperForDirection(EnumFacing direction) {

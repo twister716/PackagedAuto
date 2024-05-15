@@ -6,12 +6,20 @@ import java.util.List;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import thelm.packagedauto.client.DistributorRenderer;
 import thelm.packagedauto.client.IModelRegister;
 import thelm.packagedauto.client.ModelUtil;
 
 public class ClientProxy extends CommonProxy {
 
 	private static List<IModelRegister> modelRegisterList = new ArrayList<>();
+
+	@Override
+	public void register(FMLPreInitializationEvent event) {
+		super.register(event);
+		DistributorRenderer.INSTANCE.onConstruct();
+	}
 
 	@Override
 	public void registerBlock(Block block) {

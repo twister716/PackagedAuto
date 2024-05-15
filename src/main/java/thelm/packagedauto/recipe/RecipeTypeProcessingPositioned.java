@@ -1,44 +1,29 @@
 package thelm.packagedauto.recipe;
 
-import java.awt.Color;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.IntStream;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.ints.IntRBTreeSet;
-import it.unimi.dsi.fastutil.ints.IntSet;
 import mezz.jei.api.gui.IGuiIngredient;
 import mezz.jei.api.gui.IRecipeLayout;
-import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.translation.I18n;
-import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Optional;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import thelm.packagedauto.api.IRecipeInfo;
-import thelm.packagedauto.api.IRecipeType;
 import thelm.packagedauto.api.MiscUtil;
-import thelm.packagedauto.integration.jei.PackagedAutoJEIPlugin;
+import thelm.packagedauto.block.BlockDistributor;
 
-public class RecipeTypeProcessing implements IRecipeType {
+public class RecipeTypeProcessingPositioned extends RecipeTypeProcessingOrdered {
 
-	public static final RecipeTypeProcessing INSTANCE = new RecipeTypeProcessing();
-	public static final ResourceLocation NAME = new ResourceLocation("packagedauto:processing");
-	public static final IntSet SLOTS;
-	public static final Color COLOR = new Color(139, 139, 139);
+	public static final RecipeTypeProcessingPositioned INSTANCE = new RecipeTypeProcessingPositioned();
+	public static final ResourceLocation NAME = new ResourceLocation("packagedauto:positioned_processing");
 
-	static {
-		SLOTS = new IntRBTreeSet();
-		IntStream.range(0, 90).forEachOrdered(SLOTS::add);
-	}
-
-	protected RecipeTypeProcessing() {}
+	protected RecipeTypeProcessingPositioned() {}
 
 	@Override
 	public ResourceLocation getName() {
@@ -47,38 +32,22 @@ public class RecipeTypeProcessing implements IRecipeType {
 
 	@Override
 	public String getLocalizedName() {
-		return I18n.translateToLocal("recipe.packagedauto.processing");
+		return I18n.translateToLocal("recipe.packagedauto.positioned_processing");
 	}
 
 	@Override
 	public String getLocalizedNameShort() {
-		return I18n.translateToLocal("recipe.packagedauto.processing.short");
+		return I18n.translateToLocal("recipe.packagedauto.positioned_processing.short");
 	}
 
 	@Override
 	public IRecipeInfo getNewRecipeInfo() {
-		return new RecipeInfoProcessing();
-	}
-
-	@Override
-	public IntSet getEnabledSlots() {
-		return SLOTS;
-	}
-
-	@Override
-	public boolean canSetOutput() {
-		return true;
+		return new RecipeInfoProcessingPositioned();
 	}
 
 	@Override
 	public boolean hasMachine() {
-		return false;
-	}
-
-	@Override
-	public List<String> getJEICategories() {
-		return MiscUtil.conditionalSupplier(()->Loader.isModLoaded("jei"),
-				()->PackagedAutoJEIPlugin::getAllRecipeCategories, ()->Collections::<String>emptyList).get();
+		return true;
 	}
 
 	@Optional.Method(modid="jei")
@@ -86,29 +55,29 @@ public class RecipeTypeProcessing implements IRecipeType {
 	public Int2ObjectMap<ItemStack> getRecipeTransferMap(IRecipeLayout recipeLayout, String category) {
 		Int2ObjectMap<ItemStack> map = new Int2ObjectOpenHashMap<>();
 		Map<Integer, ? extends IGuiIngredient<ItemStack>> ingredients = recipeLayout.getItemStacks().getGuiIngredients();
-		List<ItemStack> input = new ArrayList<>();
+		int index = 0;
 		List<ItemStack> output = new ArrayList<>();
 		for(Map.Entry<Integer, ? extends IGuiIngredient<ItemStack>> entry : ingredients.entrySet()) {
 			IGuiIngredient<ItemStack> ingredient = entry.getValue();
+			if(ingredient.isInput() && index >= 81) {
+				continue;
+			}
 			ItemStack displayed = entry.getValue().getDisplayedIngredient();
 			if(displayed != null && !displayed.isEmpty()) {
 				if(ingredient.isInput()) {
-					input.add(displayed);
+					map.put(index, displayed);
 				}
 				else {
 					output.add(displayed);
 				}
 			}
-		}
-		if(!isOrdered()) {
-			input = MiscUtil.condenseStacks(input);
+			if(ingredient.isInput()) {
+				index++;
+			}
 		}
 		output = MiscUtil.condenseStacks(output, true);
-		for(int i = 0; i < input.size() && i < 81; ++i) {
-			map.put(i, input.get(i));
-		}
-		for(int i = 0; i < output.size() && i < 9; ++i) {
-			map.put(i+81, output.get(i));
+		for(int i = 0; i < output.size() && i < 3; ++i) {
+			map.put(i*3+82, output.get(i));
 		}
 		return map;
 	}
@@ -116,12 +85,6 @@ public class RecipeTypeProcessing implements IRecipeType {
 	@SideOnly(Side.CLIENT)
 	@Override
 	public Object getRepresentation() {
-		return new ItemStack(Blocks.FURNACE);
-	}
-
-	@SideOnly(Side.CLIENT)
-	@Override
-	public Color getSlotColor(int slot) {
-		return COLOR;
+		return new ItemStack(BlockDistributor.INSTANCE);
 	}
 }

@@ -21,6 +21,7 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Lists;
 
+import io.netty.buffer.ByteBuf;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntRBTreeMap;
 import it.unimi.dsi.fastutil.objects.ObjectRBTreeSet;
@@ -31,6 +32,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
 
@@ -114,6 +116,10 @@ public class MiscUtil {
 	}
 
 	public static NBTTagList saveAllItems(NBTTagList tagList, List<ItemStack> list) {
+		return saveAllItems(tagList, list, "Index");
+	}
+
+	public static NBTTagList saveAllItems(NBTTagList tagList, List<ItemStack> list, String indexKey) {
 		for(int i = 0; i < list.size(); ++i) {
 			ItemStack stack = list.get(i);
 			boolean empty = stack.isEmpty();
@@ -123,8 +129,8 @@ public class MiscUtil {
 					stack = new ItemStack((Item)null);
 				}
 				NBTTagCompound nbt = new NBTTagCompound();
-				nbt.setByte("Index", (byte)i);
-				stack.writeToNBT(nbt);
+				nbt.setByte(indexKey, (byte)i);
+				saveItemWithLargeCount(nbt, stack);
 				tagList.appendTag(nbt);
 			}
 		}
@@ -132,18 +138,74 @@ public class MiscUtil {
 	}
 
 	public static void loadAllItems(NBTTagList tagList, List<ItemStack> list) {
+		loadAllItems(tagList, list, "Index");
+	}
+
+	public static void loadAllItems(NBTTagList tagList, List<ItemStack> list, String indexKey) {
 		list.clear();
-		for(int i = 0; i < tagList.tagCount(); ++i) {
-			NBTTagCompound nbt = tagList.getCompoundTagAt(i);
-			int j = nbt.getByte("Index") & 255;
-			while(j >= list.size()) {
-				list.add(ItemStack.EMPTY);
-			}
-			if(j >= 0)  {
-				ItemStack stack = new ItemStack(nbt);
-				list.set(j, stack.isEmpty() ? ItemStack.EMPTY : stack);
+		try {
+			for(int i = 0; i < tagList.tagCount(); ++i) {
+				NBTTagCompound nbt = tagList.getCompoundTagAt(i);
+				int j = nbt.getByte(indexKey) & 255;
+				while(j >= list.size()) {
+					list.add(ItemStack.EMPTY);
+				}
+				if(j >= 0)  {
+					ItemStack stack = loadItemWithLargeCount(nbt);
+					list.set(j, stack.isEmpty() ? ItemStack.EMPTY : stack);
+				}
 			}
 		}
+		catch(UnsupportedOperationException | IndexOutOfBoundsException e) {}
+	}
+
+	public static NBTTagCompound saveItemWithLargeCount(NBTTagCompound nbt, ItemStack stack) {
+		stack.writeToNBT(nbt);
+		int count = stack.getCount();
+		if((byte)count == count) {
+			nbt.setByte("Count", (byte)count);
+		}
+		else if((short)count == count) {
+			nbt.setShort("Count", (short)count);
+		}
+		else {
+			nbt.setInteger("Count", (short)count);
+		}
+		return nbt;
+	}
+
+	public static ItemStack loadItemWithLargeCount(NBTTagCompound nbt) {
+		ItemStack stack = new ItemStack(nbt);
+		stack.setCount(nbt.getInteger("Count"));
+		return stack;
+	}
+
+	public static void writeItemWithLargeCount(ByteBuf buf, ItemStack stack) {
+		if(stack.isEmpty()) {
+			buf.writeBoolean(false);
+			return;
+		}
+		buf.writeBoolean(true);
+		ByteBufUtils.writeVarInt(buf, Item.getIdFromItem(stack.getItem()), 5);
+		ByteBufUtils.writeVarInt(buf, stack.getCount(), 5);
+		buf.writeShort(stack.getMetadata());
+		NBTTagCompound nbt = null;
+		if(stack.getItem().isDamageable() || stack.getItem().getShareTag()) {
+			nbt = stack.getItem().getNBTShareTag(stack);
+		}
+		ByteBufUtils.writeTag(buf, nbt);
+	}
+
+	public static ItemStack readItemWithLargeCount(ByteBuf buf) {
+		if(!buf.readBoolean()) {
+			return ItemStack.EMPTY;
+		}
+		int id = ByteBufUtils.readVarInt(buf, 5);
+		int count = ByteBufUtils.readVarInt(buf, 5);
+		int meta = buf.readShort();
+		ItemStack stack = new ItemStack(Item.getItemById(id), count, meta);
+		stack.getItem().readNBTShareTag(stack, ByteBufUtils.readTag(buf));
+		return stack;
 	}
 
 	public static IPackagePattern getPatternHelper(IRecipeInfo recipeInfo, int index) {

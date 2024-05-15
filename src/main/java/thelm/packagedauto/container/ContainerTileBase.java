@@ -30,12 +30,12 @@ public class ContainerTileBase<TILE extends TileBase> extends Container {
 		this.inventory = tile != null ? tile.getInventory() : new InventoryTileBase(null, 0);
 	}
 
-	public int getPlayerInvY() {
-		return 84;
-	}
-
 	public int getPlayerInvX() {
 		return 8;
+	}
+
+	public int getPlayerInvY() {
+		return 84;
 	}
 
 	public void setupPlayerInventory() {

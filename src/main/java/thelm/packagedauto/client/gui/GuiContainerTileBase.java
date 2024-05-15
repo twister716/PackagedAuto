@@ -44,9 +44,8 @@ public abstract class GuiContainerTileBase<CONTAINER extends ContainerTileBase<?
 		if(valid && slot instanceof SlotFalseCopy && slot.isEnabled()) {
 			if(!slot.getStack().isEmpty()) {
 				mc.displayGuiScreen(new GuiAmountSpecifying(
-						this, mc.player.inventory,
-						slot.slotNumber, slot.getStack(),
-						Math.min(slot.getSlotStackLimit(), slot.getStack().getMaxStackSize())));
+						this, mc.player.inventory, slot.slotNumber, slot.getStack(),
+						slot.slotNumber >= 81 ? 999 : Math.min(slot.getSlotStackLimit(), slot.getStack().getMaxStackSize())));
 			}
 		}
 		else {

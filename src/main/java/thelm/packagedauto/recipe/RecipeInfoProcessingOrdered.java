@@ -76,7 +76,7 @@ public class RecipeInfoProcessingOrdered implements IRecipeInfo {
 		this.input.clear();
 		this.input.addAll(removeEmptyStacks(input));
 		this.output.clear();
-		this.output.addAll(removeEmptyStacks(output));
+		this.output.addAll(MiscUtil.condenseStacks(output, true));
 		patterns.clear();
 		for(int i = 0; i*9 < this.input.size(); ++i) {
 			patterns.add(new PatternHelper(this, i, true));

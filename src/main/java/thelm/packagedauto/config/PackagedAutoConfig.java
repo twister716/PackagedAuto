@@ -2,6 +2,8 @@ package thelm.packagedauto.config;
 
 import java.io.File;
 
+import com.google.common.collect.ImmutableSet;
+
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent.OnConfigChangedEvent;
@@ -29,6 +31,8 @@ public class PackagedAutoConfig {
 		String category;
 		category = "blocks.encoder";
 		TileEncoder.patternSlots = config.get(category, "pattern_slots", TileEncoder.patternSlots, "How many pattern slots should the Package Recipe Encoder have.", 1, 20).getInt();
+		String[] disabledRecipeTypes = config.get(category, "disabled_recipe_types", new String[0], "The list of recipe types to disable in the Package Recipe Encoder.").getStringList();
+		TileEncoder.disabledRecipeTypes = ImmutableSet.copyOf(disabledRecipeTypes);
 		category = "blocks.packager";
 		TilePackager.energyCapacity = config.get(category, "energy_capacity", TilePackager.energyCapacity, "How much FE the Packager should hold.", 0, Integer.MAX_VALUE).getInt();
 		TilePackager.energyReq = config.get(category, "energy_req", TilePackager.energyReq, "How much FE the Packager should use.", 0, Integer.MAX_VALUE).getInt();

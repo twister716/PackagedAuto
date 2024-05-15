@@ -10,6 +10,7 @@ import thelm.packagedauto.PackagedAuto;
 import thelm.packagedauto.network.packet.PacketChangeBlocking;
 import thelm.packagedauto.network.packet.PacketChangePackaging;
 import thelm.packagedauto.network.packet.PacketCycleRecipeType;
+import thelm.packagedauto.network.packet.PacketDistributorBeam;
 import thelm.packagedauto.network.packet.PacketLoadRecipeList;
 import thelm.packagedauto.network.packet.PacketSaveRecipeList;
 import thelm.packagedauto.network.packet.PacketSetItemStack;
@@ -32,6 +33,7 @@ public class PacketHandler<REQ extends ISelfHandleMessage<? extends IMessage>> i
 		INSTANCE.registerMessage(get(), PacketChangeBlocking.class, id++, Side.SERVER);
 		INSTANCE.registerMessage(get(), PacketSetItemStack.class, id++, Side.SERVER);
 		INSTANCE.registerMessage(get(), PacketChangePackaging.class, id++, Side.SERVER);
+		INSTANCE.registerMessage(get(), PacketDistributorBeam.class, id++, Side.CLIENT);
 	}
 
 	public static <REQ extends ISelfHandleMessage<? extends IMessage>> PacketHandler<REQ> get() {

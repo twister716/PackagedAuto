@@ -10,11 +10,13 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import thelm.packagedauto.PackagedAuto;
 import thelm.packagedauto.api.RecipeTypeRegistry;
 import thelm.packagedauto.block.BlockCrafter;
+import thelm.packagedauto.block.BlockDistributor;
 import thelm.packagedauto.block.BlockEncoder;
 import thelm.packagedauto.block.BlockPackager;
 import thelm.packagedauto.block.BlockPackagerExtension;
 import thelm.packagedauto.block.BlockUnpackager;
 import thelm.packagedauto.config.PackagedAutoConfig;
+import thelm.packagedauto.item.ItemDistributorMarker;
 import thelm.packagedauto.item.ItemMisc;
 import thelm.packagedauto.item.ItemPackage;
 import thelm.packagedauto.item.ItemRecipeHolder;
@@ -23,7 +25,9 @@ import thelm.packagedauto.network.PacketHandler;
 import thelm.packagedauto.recipe.RecipeTypeCrafting;
 import thelm.packagedauto.recipe.RecipeTypeProcessing;
 import thelm.packagedauto.recipe.RecipeTypeProcessingOrdered;
+import thelm.packagedauto.recipe.RecipeTypeProcessingPositioned;
 import thelm.packagedauto.tile.TileCrafter;
+import thelm.packagedauto.tile.TileDistributor;
 import thelm.packagedauto.tile.TileEncoder;
 import thelm.packagedauto.tile.TilePackager;
 import thelm.packagedauto.tile.TilePackagerExtension;
@@ -58,6 +62,7 @@ public class CommonProxy {
 		registerBlock(BlockEncoder.INSTANCE);
 		registerBlock(BlockUnpackager.INSTANCE);
 		registerBlock(BlockPackagerExtension.INSTANCE);
+		registerBlock(BlockDistributor.INSTANCE);
 		if(TileCrafter.enabled) {
 			registerBlock(BlockCrafter.INSTANCE);
 		}
@@ -68,11 +73,13 @@ public class CommonProxy {
 		registerItem(BlockEncoder.ITEM_INSTANCE);
 		registerItem(BlockUnpackager.ITEM_INSTANCE);
 		registerItem(BlockPackagerExtension.ITEM_INSTANCE);
+		registerItem(BlockDistributor.ITEM_INSTANCE);
 		if(TileCrafter.enabled) {
 			registerItem(BlockCrafter.ITEM_INSTANCE);
 		}
 
 		registerItem(ItemRecipeHolder.INSTANCE);
+		registerItem(ItemDistributorMarker.INSTANCE);
 		registerItem(ItemPackage.INSTANCE);
 		registerItem(ItemMisc.PACKAGE_COMPONENT);
 		registerItem(ItemMisc.ME_PACKAGE_COMPONENT);
@@ -85,6 +92,7 @@ public class CommonProxy {
 		GameRegistry.registerTileEntity(TileEncoder.class, new ResourceLocation("packagedauto:encoder"));
 		GameRegistry.registerTileEntity(TileUnpackager.class, new ResourceLocation("packagedauto:unpackager"));
 		GameRegistry.registerTileEntity(TilePackagerExtension.class, new ResourceLocation("packagedauto:packager_extension"));
+		GameRegistry.registerTileEntity(TileDistributor.class, new ResourceLocation("packagedauto:distributor"));
 		if(TileCrafter.enabled) {
 			GameRegistry.registerTileEntity(TileCrafter.class, new ResourceLocation("packagedauto:crafter"));
 		}
@@ -93,6 +101,7 @@ public class CommonProxy {
 	protected void registerRecipeTypes() {
 		RecipeTypeRegistry.registerRecipeType(RecipeTypeProcessing.INSTANCE);
 		RecipeTypeRegistry.registerRecipeType(RecipeTypeProcessingOrdered.INSTANCE);
+		RecipeTypeRegistry.registerRecipeType(RecipeTypeProcessingPositioned.INSTANCE);
 		if(TileCrafter.enabled) {
 			RecipeTypeRegistry.registerRecipeType(RecipeTypeCrafting.INSTANCE);
 		}

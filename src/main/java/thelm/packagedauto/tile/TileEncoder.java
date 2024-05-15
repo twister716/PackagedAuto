@@ -1,7 +1,9 @@
 package thelm.packagedauto.tile;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.entity.player.EntityPlayer;
@@ -24,6 +26,7 @@ import thelm.packagedauto.recipe.RecipeTypeProcessing;
 public class TileEncoder extends TileBase {
 
 	public static int patternSlots = 20;
+	public static Set<String> disabledRecipeTypes = Collections.emptySet();
 
 	public final InventoryEncoderPattern[] patternInventories = new InventoryEncoderPattern[patternSlots];
 	public int patternIndex;

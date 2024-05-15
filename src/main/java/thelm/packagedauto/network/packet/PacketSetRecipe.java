@@ -6,9 +6,9 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.WorldServer;
-import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import thelm.packagedauto.api.MiscUtil;
 import thelm.packagedauto.container.ContainerEncoder;
 import thelm.packagedauto.network.ISelfHandleMessage;
 
@@ -32,7 +32,7 @@ public class PacketSetRecipe implements ISelfHandleMessage<IMessage> {
 		buf.writeByte(map.size());
 		for(Int2ObjectMap.Entry<ItemStack> entry : map.int2ObjectEntrySet()) {
 			buf.writeByte(entry.getIntKey());
-			ByteBufUtils.writeItemStack(buf, entry.getValue());
+			MiscUtil.writeItemWithLargeCount(buf, entry.getValue());
 		}
 	}
 
@@ -42,7 +42,7 @@ public class PacketSetRecipe implements ISelfHandleMessage<IMessage> {
 		int size = buf.readByte();
 		for(int i = 0; i < size; ++i) {
 			int index = buf.readByte();
-			ItemStack stack = ByteBufUtils.readItemStack(buf);
+			ItemStack stack = MiscUtil.readItemWithLargeCount(buf);
 			map.put(index, stack);
 		}
 	}

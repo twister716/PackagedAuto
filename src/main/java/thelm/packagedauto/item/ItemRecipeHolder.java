@@ -48,7 +48,7 @@ public class ItemRecipeHolder extends Item implements IRecipeListItem, IModelReg
 		if(!worldIn.isRemote && playerIn.isSneaking()) {
 			return new ActionResult<>(EnumActionResult.SUCCESS, new ItemStack(INSTANCE, playerIn.getHeldItem(handIn).getCount()));
 		}
-		return new ActionResult<>(EnumActionResult.PASS, playerIn.getHeldItem(handIn));
+		return super.onItemRightClick(worldIn, playerIn, handIn);
 	}
 
 	@Override
