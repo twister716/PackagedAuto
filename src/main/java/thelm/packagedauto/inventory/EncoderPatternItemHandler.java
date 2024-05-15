@@ -111,7 +111,11 @@ public class EncoderPatternItemHandler extends BaseItemHandler<EncoderBlockEntit
 
 	public void cycleRecipeType(boolean reverse) {
 		validateRecipeType();
-		recipeType = ApiImpl.INSTANCE.getNextRecipeType(recipeType, reverse);
+		do {
+			recipeType = ApiImpl.INSTANCE.getNextRecipeType(recipeType, reverse);
+		}
+		while(recipeType != null && recipeType != ProcessingPackageRecipeType.INSTANCE &&
+				EncoderBlockEntity.disabledRecipeTypes.contains(recipeType.getName().toString()));
 		validateRecipeType();
 		IntSet enabledSlots = recipeType.getEnabledSlots();
 		for(int i = 0; i < 90; ++i) {

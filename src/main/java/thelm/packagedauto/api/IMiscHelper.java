@@ -9,6 +9,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeManager;
@@ -33,7 +34,19 @@ public interface IMiscHelper {
 
 	ListTag saveAllItems(ListTag tagList, List<ItemStack> list);
 
+	ListTag saveAllItems(ListTag tagList, List<ItemStack> list, String indexKey);
+
 	void loadAllItems(ListTag tagList, List<ItemStack> list);
+
+	void loadAllItems(ListTag tagList, List<ItemStack> list, String indexKey);
+
+	CompoundTag saveItemWithLargeCount(CompoundTag nbt, ItemStack stack);
+
+	ItemStack loadItemWithLargeCount(CompoundTag nbt);
+
+	void writeItemWithLargeCount(FriendlyByteBuf buf, ItemStack stack);
+
+	ItemStack readItemWithLargeCount(FriendlyByteBuf buf);
 
 	IPackagePattern getPattern(IPackageRecipeInfo recipeInfo, int index);
 

@@ -1,5 +1,6 @@
 package thelm.packagedauto.recipe;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
 
@@ -20,7 +21,6 @@ import thelm.packagedauto.api.IRecipeSlotViewWrapper;
 import thelm.packagedauto.api.IRecipeSlotsViewWrapper;
 import thelm.packagedauto.integration.emi.PackagedAutoEMIPlugin;
 import thelm.packagedauto.integration.jei.PackagedAutoJEIPlugin;
-import thelm.packagedauto.item.VolumePackageItem;
 import thelm.packagedauto.util.MiscHelper;
 
 public class ProcessingPackageRecipeType implements IPackageRecipeType {
@@ -29,7 +29,7 @@ public class ProcessingPackageRecipeType implements IPackageRecipeType {
 	public static final ResourceLocation NAME = new ResourceLocation("packagedauto:processing");
 	public static final IntSet SLOTS;
 	public static final Vec3i COLOR = new Vec3i(139, 139, 139);
-	public static final Vec3i COLOR_HIGHLIGHT =new Vec3i(139, 139, 179);
+	public static final Vec3i COLOR_HIGHLIGHT = new Vec3i(139, 139, 179);
 
 	static {
 		SLOTS = new IntRBTreeSet();
@@ -94,46 +94,29 @@ public class ProcessingPackageRecipeType implements IPackageRecipeType {
 	public Int2ObjectMap<ItemStack> getRecipeTransferMap(IRecipeSlotsViewWrapper recipeLayoutWrapper) {
 		Int2ObjectMap<ItemStack> map = new Int2ObjectOpenHashMap<>();
 		List<IRecipeSlotViewWrapper> slotViews = recipeLayoutWrapper.getRecipeSlotViews();
-		int inputIndex = 0;
-		int outputIndex = 81;
+		List<ItemStack> input = new ArrayList<>();
+		List<ItemStack> output = new ArrayList<>();
 		for(IRecipeSlotViewWrapper slotView : slotViews) {
-			if(slotView.isInput()) {
-				if(inputIndex >= 81) {
-					continue;
+			Object displayed = slotView.getDisplayedIngredient().orElse(null);
+			ItemStack stack = displayed instanceof ItemStack item ? item : MiscHelper.INSTANCE.tryMakeVolumePackage(displayed);
+			if(!stack.isEmpty()) {
+				if(slotView.isInput()) {
+					input.add(stack);
 				}
-				Object displayed = slotView.getDisplayedIngredient().orElse(null);
-				if(displayed instanceof ItemStack stack && !stack.isEmpty()) {
-					map.put(inputIndex, stack);
-					++inputIndex;
-				}
-				else if(displayed != null) {
-					ItemStack stack = MiscHelper.INSTANCE.tryMakeVolumePackage(displayed);
-					if(!stack.isEmpty()) {
-						map.put(inputIndex, stack);
-						++inputIndex;
-					}
+				else if(slotView.isOutput()) {
+					output.add(stack);
 				}
 			}
-			else if(slotView.isOutput()) {
-				if(outputIndex >= 90) {
-					continue;
-				}
-				Object displayed = slotView.getDisplayedIngredient().orElse(null);
-				if(displayed instanceof ItemStack stack && !stack.isEmpty()) {
-					map.put(outputIndex, stack);
-					++outputIndex;
-				}
-				else {
-					ItemStack stack = VolumePackageItem.tryMakeVolumePackage(displayed);
-					if(!stack.isEmpty()) {
-						map.put(outputIndex, stack);
-						++outputIndex;
-					}
-				}
-			}
-			if(inputIndex >= 81 && outputIndex >= 90) {
-				break;
-			}
+		}
+		if(!isOrdered()) {
+			input = MiscHelper.INSTANCE.condenseStacks(input);
+		}
+		output = MiscHelper.INSTANCE.condenseStacks(output, true);
+		for(int i = 0; i < input.size() && i < 81; ++i) {
+			map.put(i, input.get(i));
+		}
+		for(int i = 0; i < output.size() && i < 9; ++i) {
+			map.put(i+81, output.get(i));
 		}
 		return map;
 	}

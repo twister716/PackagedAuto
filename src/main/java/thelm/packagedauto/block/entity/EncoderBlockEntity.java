@@ -2,6 +2,7 @@ package thelm.packagedauto.block.entity;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -28,6 +29,7 @@ public class EncoderBlockEntity extends BaseBlockEntity {
 			of(EncoderBlockEntity::new, EncoderBlock.INSTANCE).build(null);
 
 	public static int patternSlots = 20;
+	public static Set<String> disabledRecipeTypes = Set.of();
 
 	public final EncoderPatternItemHandler[] patternItemHandlers = new EncoderPatternItemHandler[patternSlots];
 	public int patternIndex;
