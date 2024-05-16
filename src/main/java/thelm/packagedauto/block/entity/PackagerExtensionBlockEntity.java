@@ -192,7 +192,10 @@ public class PackagerExtensionBlockEntity extends BaseBlockEntity {
 					ItemStack listStack = packager.itemHandler.getStackInSlot(10);
 					listStackItemHandler.setStackInSlot(0, listStack);
 					if(listStack.getItem() instanceof IPackageRecipeListItem listItem) {
-						listItem.getRecipeList(level, listStack).getRecipeList().forEach(recipe->recipe.getPatterns().forEach(patternList::add));
+						listItem.getRecipeList(level, listStack).getRecipeList().forEach(recipe->{
+							recipe.getPatterns().forEach(patternList::add);
+							recipe.getExtraPatterns().forEach(patternList::add);
+						});
 					}
 					else if(listStack.getItem() instanceof IPackageItem packageItem) {
 						IPackageRecipeInfo recipe = packageItem.getRecipeInfo(listStack);

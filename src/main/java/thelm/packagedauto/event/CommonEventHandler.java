@@ -63,6 +63,7 @@ import thelm.packagedauto.packet.SetItemStackPacket;
 import thelm.packagedauto.packet.SetPatternIndexPacket;
 import thelm.packagedauto.packet.SetRecipePacket;
 import thelm.packagedauto.packet.SyncEnergyPacket;
+import thelm.packagedauto.packet.TrackerCountPacket;
 import thelm.packagedauto.recipe.CraftingPackageRecipeType;
 import thelm.packagedauto.recipe.OrderedProcessingPackageRecipeType;
 import thelm.packagedauto.recipe.PositionedProcessingPackageRecipeType;
@@ -206,6 +207,7 @@ public class CommonEventHandler {
 		registrar.play(ChangeBlockingPacket.ID, ChangeBlockingPacket::read, builder->builder.server(ChangeBlockingPacket::handle));
 		registrar.play(SetFluidAmountPacket.ID, SetFluidAmountPacket::read, builder->builder.server(SetFluidAmountPacket::handle));
 		registrar.play(ChangePackagingPacket.ID, ChangePackagingPacket::read, builder->builder.server(ChangePackagingPacket::handle));
+		registrar.play(TrackerCountPacket.ID, TrackerCountPacket::read, builder->builder.server(TrackerCountPacket::handle));
 		registrar.play(DistributorBeamPacket.ID, DistributorBeamPacket::read, builder->builder.client(DistributorBeamPacket::handle));
 	}
 
