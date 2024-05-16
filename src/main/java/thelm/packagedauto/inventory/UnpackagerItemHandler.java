@@ -62,7 +62,8 @@ public class UnpackagerItemHandler extends BaseItemHandler<UnpackagerBlockEntity
 		}
 		return switch(id) {
 		case 10 -> blockEntity.blocking ? 1 : 0;
-		case 11 -> blockEntity.getEnergyStorage().getEnergyStored();
+		case 11 -> blockEntity.trackerCount;
+		case 12 -> blockEntity.getEnergyStorage().getEnergyStored();
 		default -> 0;
 		};
 	}
@@ -74,13 +75,14 @@ public class UnpackagerItemHandler extends BaseItemHandler<UnpackagerBlockEntity
 		}
 		switch(id) {
 		case 10 -> blockEntity.blocking = value != 0;
-		case 11 -> blockEntity.getEnergyStorage().setEnergyStored(value);
+		case 11 -> blockEntity.trackerCount = value;
+		case 12 -> blockEntity.getEnergyStorage().setEnergyStored(value);
 		}
 	}
 
 	@Override
 	public int getCount() {
-		return 12;
+		return 13;
 	}
 
 	public void updateRecipeList() {

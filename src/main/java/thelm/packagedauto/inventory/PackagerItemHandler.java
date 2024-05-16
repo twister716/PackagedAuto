@@ -91,7 +91,10 @@ public class PackagerItemHandler extends BaseItemHandler<PackagerBlockEntity> {
 		blockEntity.patternList.clear();
 		ItemStack listStack = getStackInSlot(10);
 		if(listStack.getItem() instanceof IPackageRecipeListItem listItem) {
-			listItem.getRecipeList(blockEntity.getLevel(), listStack).getRecipeList().forEach(recipe->recipe.getPatterns().forEach(blockEntity.patternList::add));
+			listItem.getRecipeList(blockEntity.getLevel(), listStack).getRecipeList().forEach(recipe->{
+				recipe.getPatterns().forEach(blockEntity.patternList::add);
+				recipe.getExtraPatterns().forEach(blockEntity.patternList::add);
+			});
 		}
 		else if(listStack.getItem() instanceof IPackageItem packageItem) {
 			IPackageRecipeInfo recipe = packageItem.getRecipeInfo(listStack);

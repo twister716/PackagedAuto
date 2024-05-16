@@ -85,9 +85,12 @@ public class DistributorBlockEntity extends BaseBlockEntity implements IPackageC
 				if(!level.isLoaded(pos)) {
 					return false;
 				}
+				BlockEntity blockEntity = level.getBlockEntity(pos);
+				if(blockEntity == null) {
+					return false;
+				}
 				ItemStack stack = entry.getValue().copy();
 				Direction dir = positions.get(entry.getIntKey()).direction();
-				BlockEntity blockEntity = level.getBlockEntity(pos);
 				IItemHandler itemHandler = blockEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, dir).orElse(null);
 				if(stack.getItem() instanceof IVolumePackageItem vPackage &&
 						vPackage.getVolumeType(stack) != null &&
@@ -135,9 +138,13 @@ public class DistributorBlockEntity extends BaseBlockEntity implements IPackageC
 			if(!level.isLoaded(pos)) {
 				continue;
 			}
+			BlockEntity blockEntity = level.getBlockEntity(pos);
+			if(blockEntity == null) {
+				ejectItems();
+				return;
+			}
 			ItemStack stack = pending.get(i);
 			Direction dir = positions.get(i).direction();
-			BlockEntity blockEntity = level.getBlockEntity(pos);
 			IItemHandler itemHandler = blockEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, dir).orElse(null);
 			ItemStack stackRem = stack;
 			if(stack.getItem() instanceof IVolumePackageItem vPackage &&

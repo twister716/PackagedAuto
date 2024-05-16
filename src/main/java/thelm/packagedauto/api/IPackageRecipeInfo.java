@@ -22,6 +22,10 @@ public interface IPackageRecipeInfo {
 
 	List<IPackagePattern> getPatterns();
 
+	default List<IPackagePattern> getExtraPatterns() {
+		return List.of();
+	}
+
 	List<ItemStack> getInputs();
 
 	List<ItemStack> getOutputs();
