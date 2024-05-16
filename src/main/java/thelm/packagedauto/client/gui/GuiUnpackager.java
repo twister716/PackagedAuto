@@ -10,6 +10,7 @@ import net.minecraft.util.text.translation.I18n;
 import thelm.packagedauto.container.ContainerUnpackager;
 import thelm.packagedauto.network.PacketHandler;
 import thelm.packagedauto.network.packet.PacketChangeBlocking;
+import thelm.packagedauto.network.packet.PacketTrackerCount;
 import thelm.packagedauto.tile.TileUnpackager.PackageTracker;
 
 public class GuiUnpackager extends GuiContainerTileBase<ContainerUnpackager> {
@@ -30,6 +31,8 @@ public class GuiUnpackager extends GuiContainerTileBase<ContainerUnpackager> {
 		buttonList.clear();
 		super.initGui();
 		addButton(new GuiButtonChangeBlocking(0, guiLeft+98, guiTop+16));
+		addButton(new GuiButtonTrackerCount(0, guiLeft+98, guiTop+34));
+		addButton(new GuiButtonTrackerCount(1, guiLeft+106, guiTop+34));
 	}
 
 	@Override
@@ -39,12 +42,20 @@ public class GuiUnpackager extends GuiContainerTileBase<ContainerUnpackager> {
 		drawTexturedModalRect(guiLeft+10, guiTop+10+40-scaledEnergy, 176, 40-scaledEnergy, 12, scaledEnergy);
 		for(int i = 0; i < container.tile.trackers.length; ++i) {
 			PackageTracker tracker = container.tile.trackers[i];
-			for(int j = 0; j < tracker.amount; ++j) {
-				if(tracker.received.getBoolean(j)) {
-					drawTexturedModalRect(guiLeft+115+6*j, guiTop+16+6*i, 176, 45, 6, 5);
+			for(int j = 0; j < 9; ++j) {
+				if(j < tracker.amount) {
+					if(tracker.received.getBoolean(j)) {
+						drawTexturedModalRect(guiLeft+115+6*j, guiTop+16+6*i, 176, 45, 6, 5);
+					}
+					else {
+						drawTexturedModalRect(guiLeft+115+6*j, guiTop+16+6*i, 176, 40, 6, 5);
+					}
+				}
+				else if(i < container.tile.trackerCount) {
+					drawTexturedModalRect(guiLeft+115+6*j, guiTop+16+6*i, 182, 45, 6, 5);
 				}
 				else {
-					drawTexturedModalRect(guiLeft+115+6*j, guiTop+16+6*i, 176, 40, 6, 5);
+					drawTexturedModalRect(guiLeft+115+6*j, guiTop+16+6*i, 182, 40, 6, 5);
 				}
 			}
 		}
@@ -72,6 +83,9 @@ public class GuiUnpackager extends GuiContainerTileBase<ContainerUnpackager> {
 		if(button instanceof GuiButtonChangeBlocking) {
 			PacketHandler.INSTANCE.sendToServer(new PacketChangeBlocking());
 		}
+		if(button instanceof GuiButtonTrackerCount) {
+			PacketHandler.INSTANCE.sendToServer(new PacketTrackerCount(button.id == 0));
+		}
 	}
 
 	class GuiButtonChangeBlocking extends GuiButton {
@@ -91,6 +105,26 @@ public class GuiUnpackager extends GuiContainerTileBase<ContainerUnpackager> {
 		@Override
 		public void drawButtonForegroundLayer(int mouseX, int mouseY) {
 			drawHoveringText(I18n.translateToLocal("tile.packagedauto.unpackager.blocking."+container.tile.blocking), mouseX, mouseY);
+		}
+	}
+
+	class GuiButtonTrackerCount extends GuiButton {
+
+		public GuiButtonTrackerCount(int buttonId, int x, int y) {
+			super(buttonId, x, y, 8, 18, "");
+		}
+
+		@Override
+		public void drawButton(Minecraft mc, int mouseX, int mouseY, float partialTicks) {
+			super.drawButton(mc, mouseX, mouseY, partialTicks);
+			GlStateManager.color(1, 1, 1, 1);
+			mc.renderEngine.bindTexture(BACKGROUND);
+			drawTexturedModalRect(x+1, y+2, id == 0 ? 176 : 182, 78, 6, 14);
+		}
+
+		@Override
+		public void drawButtonForegroundLayer(int mouseX, int mouseY) {
+			drawHoveringText(I18n.translateToLocal("tile.packagedauto.unpackager.tracker."+(id == 0 ? "decrease" : "increase")), mouseX, mouseY);
 		}
 	}
 }

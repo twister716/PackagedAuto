@@ -17,6 +17,7 @@ import thelm.packagedauto.network.packet.PacketSetItemStack;
 import thelm.packagedauto.network.packet.PacketSetPatternIndex;
 import thelm.packagedauto.network.packet.PacketSetRecipe;
 import thelm.packagedauto.network.packet.PacketSyncEnergy;
+import thelm.packagedauto.network.packet.PacketTrackerCount;
 
 public class PacketHandler<REQ extends ISelfHandleMessage<? extends IMessage>> implements IMessageHandler<REQ, IMessage> {
 
@@ -33,6 +34,7 @@ public class PacketHandler<REQ extends ISelfHandleMessage<? extends IMessage>> i
 		INSTANCE.registerMessage(get(), PacketChangeBlocking.class, id++, Side.SERVER);
 		INSTANCE.registerMessage(get(), PacketSetItemStack.class, id++, Side.SERVER);
 		INSTANCE.registerMessage(get(), PacketChangePackaging.class, id++, Side.SERVER);
+		INSTANCE.registerMessage(get(), PacketTrackerCount.class, id++, Side.SERVER);
 		INSTANCE.registerMessage(get(), PacketDistributorBeam.class, id++, Side.CLIENT);
 	}
 

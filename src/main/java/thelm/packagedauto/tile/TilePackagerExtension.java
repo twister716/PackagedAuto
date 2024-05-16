@@ -225,7 +225,10 @@ public class TilePackagerExtension extends TileBase implements ITickable, IGridH
 					ItemStack listStack = packager.inventory.getStackInSlot(10);
 					listStackInventory.setInventorySlotContents(0, listStack);
 					if(listStack.getItem() instanceof IRecipeListItem) {
-						((IRecipeListItem)listStack.getItem()).getRecipeList(listStack).getRecipeList().forEach(recipe->recipe.getPatterns().forEach(patternList::add));
+						((IRecipeListItem)listStack.getItem()).getRecipeList(listStack).getRecipeList().forEach(recipe->{
+							recipe.getPatterns().forEach(patternList::add);
+							recipe.getExtraPatterns().forEach(patternList::add);
+						});
 					}
 					else if(listStack.getItem() instanceof IPackageItem) {
 						IPackageItem packageItem = (IPackageItem)listStack.getItem();

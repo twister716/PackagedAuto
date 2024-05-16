@@ -14,6 +14,8 @@ tile.packagedauto.packager_extension.name=Расширение упаковщи�
 tile.packagedauto.unpackager.name=Распаковщик
 tile.packagedauto.unpackager.blocking.false=Режим блокировки: Отключено
 tile.packagedauto.unpackager.blocking.true=Режим блокировки: Включено
+tile.packagedauto.unpackager.tracker.decrease=Decrease Tracker Count
+tile.packagedauto.unpackager.tracker.increase=Increase Tracker Count
 tile.packagedauto.distributor.name=Positioned Package Distributor
 tile.packagedauto.crafter.name=Изготовитель программы
 

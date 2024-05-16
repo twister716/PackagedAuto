@@ -119,7 +119,10 @@ public class InventoryPackager extends InventoryTileBase {
 		tile.patternList.clear();
 		ItemStack listStack = getStackInSlot(10);
 		if(listStack.getItem() instanceof IRecipeListItem) {
-			((IRecipeListItem)listStack.getItem()).getRecipeList(listStack).getRecipeList().forEach(recipe->recipe.getPatterns().forEach(tile.patternList::add));
+			((IRecipeListItem)listStack.getItem()).getRecipeList(listStack).getRecipeList().forEach(recipe->{
+				recipe.getPatterns().forEach(tile.patternList::add);
+				recipe.getExtraPatterns().forEach(tile.patternList::add);
+			});
 		}
 		else if(listStack.getItem() instanceof IPackageItem) {
 			IPackageItem packageItem = (IPackageItem)listStack.getItem();

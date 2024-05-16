@@ -91,9 +91,12 @@ public class TileDistributor extends TileBase implements ITickable, IPackageCraf
 				if(!world.isBlockLoaded(pos)) {
 					return false;
 				}
+				TileEntity tile = world.getTileEntity(pos);
+				if(tile == null) {
+					return false;
+				}
 				ItemStack stack = entry.getValue().copy();
 				EnumFacing dir = positions.get(entry.getIntKey()).direction();
-				TileEntity tile = world.getTileEntity(pos);
 				IItemHandler itemHandler = tile.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, dir);
 				if(itemHandler != null) {
 					if(blocking && !MiscUtil.isEmpty(itemHandler)) {
@@ -131,9 +134,13 @@ public class TileDistributor extends TileBase implements ITickable, IPackageCraf
 			if(!world.isBlockLoaded(pos)) {
 				continue;
 			}
+			TileEntity tile = world.getTileEntity(pos);
+			if(tile == null) {
+				ejectItems();
+				return;
+			}
 			ItemStack stack = pending.get(i);
 			EnumFacing dir = positions.get(i).direction();
-			TileEntity tile = world.getTileEntity(pos);
 			IItemHandler itemHandler = tile.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, dir);
 			ItemStack stackRem = stack;
 			if(itemHandler != null) {

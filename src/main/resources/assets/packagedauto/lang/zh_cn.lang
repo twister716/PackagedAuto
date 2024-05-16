@@ -14,6 +14,8 @@ tile.packagedauto.packager_extension.name=封包机拓展
 tile.packagedauto.unpackager.name=解包机
 tile.packagedauto.unpackager.blocking.false=阻挡模式已禁用
 tile.packagedauto.unpackager.blocking.true=阻挡模式已启用
+tile.packagedauto.unpackager.tracker.decrease=减少追踪器数量
+tile.packagedauto.unpackager.tracker.increase=增加追踪器数量
 tile.packagedauto.distributor.name=定位封包分配器
 tile.packagedauto.crafter.name=封包合成器
 

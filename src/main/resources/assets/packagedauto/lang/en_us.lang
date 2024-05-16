@@ -14,6 +14,8 @@ tile.packagedauto.packager_extension.name=Packager Extension
 tile.packagedauto.unpackager.name=Unpackager
 tile.packagedauto.unpackager.blocking.false=Blocking Mode Disabled
 tile.packagedauto.unpackager.blocking.true=Blocking Mode Enabled
+tile.packagedauto.unpackager.tracker.decrease=Decrease Tracker Count
+tile.packagedauto.unpackager.tracker.increase=Increase Tracker Count
 tile.packagedauto.distributor.name=Positioned Package Distributor
 tile.packagedauto.crafter.name=Package Crafter
 

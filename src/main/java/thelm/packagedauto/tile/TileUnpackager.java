@@ -29,6 +29,7 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.translation.I18n;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.fml.common.Loader;
@@ -65,6 +66,7 @@ public class TileUnpackager extends TileBase implements ITickable, IGridHost, IA
 	public List<IRecipeInfo> recipeList = new ArrayList<>();
 	public boolean powered = false;
 	public boolean blocking = false;
+	public int trackerCount = 6;
 
 	public TileUnpackager() {
 		setInventory(new InventoryUnpackager(this));
@@ -102,7 +104,7 @@ public class TileUnpackager extends TileBase implements ITickable, IGridHost, IA
 	}
 
 	protected void fillTrackers() {
-		List<PackageTracker> emptyTrackers = Arrays.stream(trackers).filter(t->t.isEmpty()).collect(Collectors.toList());
+		List<PackageTracker> emptyTrackers = Arrays.stream(trackers).limit(trackerCount).filter(t->t.isEmpty()).collect(Collectors.toList());
 		List<PackageTracker> nonEmptyTrackers = Arrays.stream(trackers).filter(t->!t.isEmpty()).filter(t->!t.isFilled()).collect(Collectors.toList());
 		for(int i = 0; i < 9; ++i) {
 			if(energyStorage.getEnergyStored() >= energyUsage) {
@@ -366,6 +368,7 @@ public class TileUnpackager extends TileBase implements ITickable, IGridHost, IA
 	public void readFromNBT(NBTTagCompound nbt) {
 		super.readFromNBT(nbt);
 		blocking = nbt.getBoolean("Blocking");
+		trackerCount = nbt.hasKey("Trackers") ? nbt.getByte("Trackers") : 6;
 		powered = nbt.getBoolean("Powered");
 		for(int i = 0; i < trackers.length; ++i) {
 			trackers[i].readFromNBT(nbt.getCompoundTag(String.format("Tracker%02d", i)));
@@ -379,6 +382,7 @@ public class TileUnpackager extends TileBase implements ITickable, IGridHost, IA
 	public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
 		super.writeToNBT(nbt);
 		nbt.setBoolean("Blocking", blocking);
+		nbt.setByte("Trackers", (byte)trackerCount);
 		nbt.setBoolean("Powered", powered);
 		for(int i = 0; i < trackers.length; ++i) {
 			NBTTagCompound subNBT = new NBTTagCompound();
@@ -393,6 +397,11 @@ public class TileUnpackager extends TileBase implements ITickable, IGridHost, IA
 
 	public void changeBlockingMode() {
 		blocking = !blocking;
+		markDirty();
+	}
+
+	public void changeTrackerCount(boolean decrease) {
+		trackerCount = MathHelper.clamp(trackerCount + (decrease ? -1 : 1), 1, 10);
 		markDirty();
 	}
 
