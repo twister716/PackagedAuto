@@ -17,6 +17,7 @@ import thelm.packagedauto.network.packet.SetItemStackPacket;
 import thelm.packagedauto.network.packet.SetPatternIndexPacket;
 import thelm.packagedauto.network.packet.SetRecipePacket;
 import thelm.packagedauto.network.packet.SyncEnergyPacket;
+import thelm.packagedauto.network.packet.TrackerCountPacket;
 
 public class PacketHandler {
 
@@ -57,6 +58,9 @@ public class PacketHandler {
 		INSTANCE.registerMessage(id++, ChangePackagingPacket.class,
 				ChangePackagingPacket::encode, ChangePackagingPacket::decode,
 				ChangePackagingPacket::handle, Optional.of(NetworkDirection.PLAY_TO_SERVER));
+		INSTANCE.registerMessage(id++, TrackerCountPacket.class,
+				TrackerCountPacket::encode, TrackerCountPacket::decode,
+				TrackerCountPacket::handle, Optional.of(NetworkDirection.PLAY_TO_SERVER));
 		INSTANCE.registerMessage(id++, DistributorBeamPacket.class,
 				DistributorBeamPacket::encode, DistributorBeamPacket::decode,
 				DistributorBeamPacket::handle, Optional.of(NetworkDirection.PLAY_TO_CLIENT));
