@@ -15,6 +15,8 @@
 	"block.packagedauto.unpackager": "解包机",
 	"block.packagedauto.unpackager.blocking.false": "阻挡模式已禁用",
 	"block.packagedauto.unpackager.blocking.true": "阻挡模式已启用",
+	"block.packagedauto.unpackager.tracker.decrease": "减少追踪器数量",
+	"block.packagedauto.unpackager.tracker.increase": "增加追踪器数量",
 	"block.packagedauto.distributor": "定位封包分配器",
 	"block.packagedauto.crafter": "封包合成器",
 

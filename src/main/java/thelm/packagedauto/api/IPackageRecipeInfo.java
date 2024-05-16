@@ -1,5 +1,6 @@
 package thelm.packagedauto.api;
 
+import java.util.Collections;
 import java.util.List;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
@@ -21,6 +22,10 @@ public interface IPackageRecipeInfo {
 	boolean isValid();
 
 	List<IPackagePattern> getPatterns();
+
+	default List<IPackagePattern> getExtraPatterns() {
+		return Collections.emptyList();
+	}
 
 	List<ItemStack> getInputs();
 

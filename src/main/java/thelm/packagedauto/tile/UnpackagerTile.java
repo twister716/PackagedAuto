@@ -20,6 +20,7 @@ import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.Direction;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.energy.CapabilityEnergy;
@@ -53,6 +54,7 @@ public class UnpackagerTile extends BaseTile implements ITickableTileEntity {
 	public List<IPackageRecipeInfo> recipeList = new ArrayList<>();
 	public boolean powered = false;
 	public boolean blocking = false;
+	public int trackerCount = 6;
 
 	public UnpackagerTile() {
 		super(TYPE_INSTANCE);
@@ -87,7 +89,7 @@ public class UnpackagerTile extends BaseTile implements ITickableTileEntity {
 	}
 
 	protected void fillTrackers() {
-		List<PackageTracker> emptyTrackers = Arrays.stream(trackers).filter(t->t.isEmpty()).collect(Collectors.toList());
+		List<PackageTracker> emptyTrackers = Arrays.stream(trackers).limit(trackerCount).filter(t->t.isEmpty()).collect(Collectors.toList());
 		List<PackageTracker> nonEmptyTrackers = Arrays.stream(trackers).filter(t->!t.isEmpty()).filter(t->!t.isFilled()).collect(Collectors.toList());
 		for(int i = 0; i < 9; ++i) {
 			if(energyStorage.getEnergyStored() >= energyUsage) {
@@ -264,6 +266,7 @@ public class UnpackagerTile extends BaseTile implements ITickableTileEntity {
 	public void load(BlockState blockState, CompoundNBT nbt) {
 		super.load(blockState, nbt);
 		blocking = nbt.getBoolean("Blocking");
+		trackerCount = nbt.contains("Trackers") ? nbt.getByte("Trackers") : 6;
 		powered = nbt.getBoolean("Powered");
 		for(int i = 0; i < trackers.length; ++i) {
 			trackers[i].read(nbt.getCompound(String.format("Tracker%02d", i)));
@@ -274,6 +277,7 @@ public class UnpackagerTile extends BaseTile implements ITickableTileEntity {
 	public CompoundNBT save(CompoundNBT nbt) {
 		super.save(nbt);
 		nbt.putBoolean("Blocking", blocking);
+		nbt.putByte("Trackers", (byte)trackerCount);
 		nbt.putBoolean("Powered", powered);
 		for(int i = 0; i < trackers.length; ++i) {
 			CompoundNBT subNBT = new CompoundNBT();
@@ -285,6 +289,11 @@ public class UnpackagerTile extends BaseTile implements ITickableTileEntity {
 
 	public void changeBlockingMode() {
 		blocking = !blocking;
+		setChanged();
+	}
+
+	public void changeTrackerCount(boolean decrease) {
+		trackerCount = MathHelper.clamp(trackerCount + (decrease ? -1 : 1), 1, 10);
 		setChanged();
 	}
 

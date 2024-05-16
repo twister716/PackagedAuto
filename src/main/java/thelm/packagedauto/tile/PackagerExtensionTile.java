@@ -195,7 +195,9 @@ public class PackagerExtensionTile extends BaseTile implements ITickableTileEnti
 					ItemStack listStack = packager.itemHandler.getStackInSlot(10);
 					listStackItemHandler.setStackInSlot(0, listStack);
 					if(listStack.getItem() instanceof IPackageRecipeListItem) {
-						((IPackageRecipeListItem)listStack.getItem()).getRecipeList(level, listStack).getRecipeList().forEach(recipe->recipe.getPatterns().forEach(patternList::add));
+						((IPackageRecipeListItem)listStack.getItem()).getRecipeList(level, listStack).getRecipeList().forEach(recipe->{
+							recipe.getPatterns().forEach(patternList::add);
+						});
 					}
 					else if(listStack.getItem() instanceof IPackageItem) {
 						IPackageItem packageItem = (IPackageItem)listStack.getItem();

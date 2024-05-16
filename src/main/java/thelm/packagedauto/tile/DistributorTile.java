@@ -85,9 +85,12 @@ public class DistributorTile extends BaseTile implements ITickableTileEntity, IP
 				if(!level.isLoaded(pos)) {
 					return false;
 				}
+				TileEntity tile = level.getBlockEntity(pos);
+				if(tile == null) {
+					return false;
+				}
 				ItemStack stack = entry.getValue().copy();
 				Direction dir = positions.get(entry.getIntKey()).direction();
-				TileEntity tile = level.getBlockEntity(pos);
 				IItemHandler itemHandler = tile.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, dir).orElse(null);
 				if(itemHandler != null) {
 					if(blocking && !MiscHelper.INSTANCE.isEmpty(itemHandler)) {
@@ -125,9 +128,13 @@ public class DistributorTile extends BaseTile implements ITickableTileEntity, IP
 			if(!level.isLoaded(pos)) {
 				continue;
 			}
+			TileEntity tile = level.getBlockEntity(pos);
+			if(tile == null) {
+				ejectItems();
+				return;
+			}
 			ItemStack stack = pending.get(i);
 			Direction dir = positions.get(i).direction();
-			TileEntity tile = level.getBlockEntity(pos);
 			IItemHandler itemHandler = tile.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, dir).orElse(null);
 			ItemStack stackRem = stack;
 			if(itemHandler != null) {

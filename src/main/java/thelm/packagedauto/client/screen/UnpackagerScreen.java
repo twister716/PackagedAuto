@@ -12,6 +12,7 @@ import net.minecraft.util.text.TranslationTextComponent;
 import thelm.packagedauto.container.UnpackagerContainer;
 import thelm.packagedauto.network.PacketHandler;
 import thelm.packagedauto.network.packet.ChangeBlockingPacket;
+import thelm.packagedauto.network.packet.TrackerCountPacket;
 import thelm.packagedauto.tile.UnpackagerTile.PackageTracker;
 
 public class UnpackagerScreen extends BaseScreen<UnpackagerContainer> {
@@ -32,6 +33,8 @@ public class UnpackagerScreen extends BaseScreen<UnpackagerContainer> {
 		buttons.clear();
 		super.init();
 		addButton(new ButtonChangeBlocking(leftPos+98, topPos+16));
+		addButton(new ButtonTrackerCount(true, leftPos+98, topPos+34));
+		addButton(new ButtonTrackerCount(false, leftPos+106, topPos+34));
 	}
 
 	@Override
@@ -41,12 +44,20 @@ public class UnpackagerScreen extends BaseScreen<UnpackagerContainer> {
 		blit(matrixStack, leftPos+10, topPos+10+40-scaledEnergy, 176, 40-scaledEnergy, 12, scaledEnergy);
 		for(int i = 0; i < menu.tile.trackers.length; ++i) {
 			PackageTracker tracker = menu.tile.trackers[i];
-			for(int j = 0; j < tracker.amount; ++j) {
-				if(tracker.received.getBoolean(j)) {
-					blit(matrixStack, leftPos+115+6*j, topPos+16+6*i, 176, 45, 6, 5);
+			for(int j = 0; j < 9; ++j) {
+				if(j < tracker.amount) {
+					if(tracker.received.getBoolean(j)) {
+						blit(matrixStack, leftPos+115+6*j, topPos+16+6*i, 176, 45, 6, 5);
+					}
+					else {
+						blit(matrixStack, leftPos+115+6*j, topPos+16+6*i, 176, 40, 6, 5);
+					}
+				}
+				else if(i < menu.tile.trackerCount) {
+					blit(matrixStack, leftPos+115+6*j, topPos+16+6*i, 182, 45, 6, 5);
 				}
 				else {
-					blit(matrixStack, leftPos+115+6*j, topPos+16+6*i, 176, 40, 6, 5);
+					blit(matrixStack, leftPos+115+6*j, topPos+16+6*i, 182, 40, 6, 5);
 				}
 			}
 		}
@@ -90,6 +101,34 @@ public class UnpackagerScreen extends BaseScreen<UnpackagerContainer> {
 		@Override
 		public void onClick(double mouseX, double mouseY) {
 			PacketHandler.INSTANCE.sendToServer(new ChangeBlockingPacket());
+		}
+	}
+
+	class ButtonTrackerCount extends Widget {
+
+		boolean decrease;
+
+		public ButtonTrackerCount(boolean decrease, int x, int y) {
+			super(x, y, 8, 18, StringTextComponent.EMPTY);
+			this.decrease = decrease;
+		}
+
+		@Override
+		public void renderButton(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+			super.renderButton(matrixStack, mouseX, mouseY, partialTicks);
+			RenderSystem.color4f(1F, 1F, 1F, 1F);
+			minecraft.getTextureManager().bind(BACKGROUND);
+			blit(matrixStack, x+1, y+2, decrease ? 176 : 182, 78, 6, 14);
+		}
+
+		@Override
+		public void renderToolTip(MatrixStack matrixStack, int mouseX, int mouseY) {
+			renderTooltip(matrixStack, new TranslationTextComponent("block.packagedauto.unpackager.tracker."+(decrease ? "decrease" : "increase")), mouseX, mouseY);
+		}
+
+		@Override
+		public void onClick(double mouseX, double mouseY) {
+			PacketHandler.INSTANCE.sendToServer(new TrackerCountPacket(decrease));
 		}
 	}
 }

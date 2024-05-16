@@ -202,6 +202,7 @@ public class DistributorRenderer {
 	}
 
 	public static class BeamInfo {
+
 		private Vector3d source;
 		private Vector3d delta;
 		private int startTick;
@@ -230,6 +231,7 @@ public class DistributorRenderer {
 	}
 
 	public static class RenderTypeHelper extends RenderType {
+
 		private RenderTypeHelper(String name, VertexFormat format, int mode, int bufferSize, boolean affectsCrumbling, boolean sortOnUpload, Runnable setupState, Runnable clearState) {
 			super(name, format, mode, bufferSize, affectsCrumbling, sortOnUpload, setupState, clearState);
 		}
