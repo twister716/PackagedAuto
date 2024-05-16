@@ -83,9 +83,12 @@ public class DistributorBlockEntity extends BaseBlockEntity implements IPackageC
 				if(!level.isLoaded(pos)) {
 					return false;
 				}
+				BlockEntity blockEntity = level.getBlockEntity(pos);
+				if(blockEntity == null) {
+					return false;
+				}
 				ItemStack stack = entry.getValue().copy();
 				Direction dir = positions.get(entry.getIntKey()).direction();
-				BlockEntity blockEntity = level.getBlockEntity(pos);
 				IItemHandler itemHandler = blockEntity.getCapability(ForgeCapabilities.ITEM_HANDLER, dir).orElse(null);
 				if(stack.getItem() instanceof IVolumePackageItem vPackage &&
 						vPackage.getVolumeType(stack) != null &&
@@ -133,9 +136,13 @@ public class DistributorBlockEntity extends BaseBlockEntity implements IPackageC
 			if(!level.isLoaded(pos)) {
 				continue;
 			}
+			BlockEntity blockEntity = level.getBlockEntity(pos);
+			if(blockEntity == null) {
+				ejectItems();
+				return;
+			}
 			ItemStack stack = pending.get(i);
 			Direction dir = positions.get(i).direction();
-			BlockEntity blockEntity = level.getBlockEntity(pos);
 			IItemHandler itemHandler = blockEntity.getCapability(ForgeCapabilities.ITEM_HANDLER, dir).orElse(null);
 			ItemStack stackRem = stack;
 			if(stack.getItem() instanceof IVolumePackageItem vPackage &&
@@ -151,8 +158,8 @@ public class DistributorBlockEntity extends BaseBlockEntity implements IPackageC
 				return;
 			}
 			if(!level.isClientSide && stackRem.getCount() < stack.getCount()) {
-				Vec3 source = worldPosition.getCenter();
-				Vec3 target = pos.getCenter().add(dir.getStepX()*0.5, dir.getStepY()*0.5, dir.getStepZ()*0.5);
+				Vec3 source = Vec3.atCenterOf(worldPosition);
+				Vec3 target = Vec3.atCenterOf(pos).add(dir.getStepX()*0.5, dir.getStepY()*0.5, dir.getStepZ()*0.5);
 				DistributorBeamPacket.sendBeam(source, target.subtract(source), level.dimension(), 32);
 			}
 			if(stackRem.isEmpty()) {
@@ -161,8 +168,8 @@ public class DistributorBlockEntity extends BaseBlockEntity implements IPackageC
 			else {
 				pending.put(i, stackRem);
 			}
-			setChanged();
 		}
+		setChanged();
 	}
 
 	protected void ejectItems() {

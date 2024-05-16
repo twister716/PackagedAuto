@@ -13,6 +13,7 @@ import thelm.packagedauto.block.entity.UnpackagerBlockEntity.PackageTracker;
 import thelm.packagedauto.menu.UnpackagerMenu;
 import thelm.packagedauto.network.PacketHandler;
 import thelm.packagedauto.network.packet.ChangeBlockingPacket;
+import thelm.packagedauto.network.packet.TrackerCountPacket;
 
 public class UnpackagerScreen extends BaseScreen<UnpackagerMenu> {
 
@@ -32,6 +33,8 @@ public class UnpackagerScreen extends BaseScreen<UnpackagerMenu> {
 		clearWidgets();
 		super.init();
 		addRenderableWidget(new ButtonChangeBlocking(leftPos+98, topPos+16));
+		addRenderableWidget(new ButtonTrackerCount(true, leftPos+98, topPos+34));
+		addRenderableWidget(new ButtonTrackerCount(false, leftPos+106, topPos+34));
 	}
 
 	@Override
@@ -40,12 +43,20 @@ public class UnpackagerScreen extends BaseScreen<UnpackagerMenu> {
 		graphics.blit(BACKGROUND, leftPos+10, topPos+10+40-scaledEnergy, 176, 40-scaledEnergy, 12, scaledEnergy);
 		for(int i = 0; i < menu.blockEntity.trackers.length; ++i) {
 			PackageTracker tracker = menu.blockEntity.trackers[i];
-			for(int j = 0; j < tracker.amount; ++j) {
-				if(tracker.received.getBoolean(j)) {
-					graphics.blit(BACKGROUND, leftPos+115+6*j, topPos+16+6*i, 176, 45, 6, 5);
+			for(int j = 0; j < 9; ++j) {
+				if(j < tracker.amount) {
+					if(tracker.received.getBoolean(j)) {
+						graphics.blit(BACKGROUND, leftPos+115+6*j, topPos+16+6*i, 176, 45, 6, 5);
+					}
+					else {
+						graphics.blit(BACKGROUND, leftPos+115+6*j, topPos+16+6*i, 176, 40, 6, 5);
+					}
+				}
+				else if(i < menu.blockEntity.trackerCount) {
+					graphics.blit(BACKGROUND, leftPos+115+6*j, topPos+16+6*i, 182, 45, 6, 5);
 				}
 				else {
-					graphics.blit(BACKGROUND, leftPos+115+6*j, topPos+16+6*i, 176, 40, 6, 5);
+					graphics.blit(BACKGROUND, leftPos+115+6*j, topPos+16+6*i, 182, 40, 6, 5);
 				}
 			}
 		}
@@ -91,6 +102,33 @@ public class UnpackagerScreen extends BaseScreen<UnpackagerMenu> {
 		@Override
 		public void onPress() {
 			PacketHandler.INSTANCE.sendToServer(new ChangeBlockingPacket());
+		}
+	}
+
+	class ButtonTrackerCount extends AbstractButton {
+
+		boolean decrease;
+
+		public ButtonTrackerCount(boolean decrease, int x, int y) {
+			super(x, y, 8, 18, Component.empty());
+			this.decrease = decrease;
+			setTooltip(Tooltip.create(Component.translatable("block.packagedauto.unpackager.tracker."+(decrease ? "decrease" : "increase"))));
+		}
+
+		@Override
+		public void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
+			super.renderWidget(graphics, mouseX, mouseY, partialTicks);
+			RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
+			RenderSystem.setShaderTexture(0, BACKGROUND);
+			graphics.blit(BACKGROUND, getX()+1, getY()+2, decrease ? 176 : 182, 78, 6, 14);
+		}
+
+		@Override
+		public void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {}
+
+		@Override
+		public void onPress() {
+			PacketHandler.INSTANCE.sendToServer(new TrackerCountPacket(decrease));
 		}
 	}
 }

@@ -15,6 +15,8 @@
 	"block.packagedauto.unpackager": "Распаковщик",
 	"block.packagedauto.unpackager.blocking.false": "Режим блокировки: Отключено",
 	"block.packagedauto.unpackager.blocking.true": "Режим блокировки: Включено",
+	"block.packagedauto.unpackager.tracker.decrease": "Decrease Tracker Count",
+	"block.packagedauto.unpackager.tracker.increase": "Increase Tracker Count",
 	"block.packagedauto.distributor": "Positioned Package Distributor",
 	"block.packagedauto.crafter": "Изготовитель программы",
 	"block.packagedauto.fluid_package_filler": "Fluid Package Filler",

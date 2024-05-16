@@ -216,6 +216,7 @@ public class DistributorRenderer {
 	}
 
 	public static record BeamInfo(Vec3 source, Vec3 delta, int startTick) {
+
 		public BeamInfo(Vec3 source, Vec3 delta) {
 			this(source, delta, RenderTimer.INSTANCE.getTicks());
 		}
@@ -238,6 +239,7 @@ public class DistributorRenderer {
 	}
 
 	public static class RenderTypeHelper extends RenderType {
+
 		private RenderTypeHelper(String name, VertexFormat format, Mode mode, int bufferSize, boolean affectsCrumbling, boolean sortOnUpload, Runnable setupState, Runnable clearState) {
 			super(name, format, mode, bufferSize, affectsCrumbling, sortOnUpload, setupState, clearState);
 		}

@@ -14,6 +14,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -53,6 +54,7 @@ public class UnpackagerBlockEntity extends BaseBlockEntity {
 	public List<IPackageRecipeInfo> recipeList = new ArrayList<>();
 	public boolean powered = false;
 	public boolean blocking = false;
+	public int trackerCount = 6;
 
 	public UnpackagerBlockEntity(BlockPos pos, BlockState state) {
 		super(TYPE_INSTANCE, pos, state);
@@ -87,7 +89,7 @@ public class UnpackagerBlockEntity extends BaseBlockEntity {
 	}
 
 	protected void fillTrackers() {
-		List<PackageTracker> emptyTrackers = Arrays.stream(trackers).filter(t->t.isEmpty()).collect(Collectors.toList());
+		List<PackageTracker> emptyTrackers = Arrays.stream(trackers).limit(trackerCount).filter(t->t.isEmpty()).collect(Collectors.toList());
 		List<PackageTracker> nonEmptyTrackers = Arrays.stream(trackers).filter(t->!t.isEmpty()).filter(t->!t.isFilled()).collect(Collectors.toList());
 		for(int i = 0; i < 9; ++i) {
 			if(energyStorage.getEnergyStored() >= energyUsage) {
@@ -291,6 +293,7 @@ public class UnpackagerBlockEntity extends BaseBlockEntity {
 	public void load(CompoundTag nbt) {
 		super.load(nbt);
 		blocking = nbt.getBoolean("Blocking");
+		trackerCount = nbt.contains("Trackers") ? nbt.getByte("Trackers") : 6;
 		powered = nbt.getBoolean("Powered");
 		for(int i = 0; i < trackers.length; ++i) {
 			trackers[i].load(nbt.getCompound(String.format("Tracker%02d", i)));
@@ -301,6 +304,7 @@ public class UnpackagerBlockEntity extends BaseBlockEntity {
 	public void saveAdditional(CompoundTag nbt) {
 		super.saveAdditional(nbt);
 		nbt.putBoolean("Blocking", blocking);
+		nbt.putByte("Trackers", (byte)trackerCount);
 		nbt.putBoolean("Powered", powered);
 		for(int i = 0; i < trackers.length; ++i) {
 			CompoundTag subNBT = new CompoundTag();
@@ -311,6 +315,11 @@ public class UnpackagerBlockEntity extends BaseBlockEntity {
 
 	public void changeBlockingMode() {
 		blocking = !blocking;
+		setChanged();
+	}
+
+	public void changeTrackerCount(boolean decrease) {
+		trackerCount = Mth.clamp(trackerCount + (decrease ? -1 : 1), 1, 10);
 		setChanged();
 	}
 
