@@ -76,8 +76,8 @@ public class RecipeTypeProcessingPositioned extends RecipeTypeProcessingOrdered 
 			}
 		}
 		output = MiscUtil.condenseStacks(output, true);
-		for(int i = 0; i < output.size() && i < 3; ++i) {
-			map.put(i*3+82, output.get(i));
+		for(int i = 0; i < output.size() && i < 9; ++i) {
+			map.put(i+81, output.get(i));
 		}
 		return map;
 	}
