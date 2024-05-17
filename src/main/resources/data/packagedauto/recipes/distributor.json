@@ -5,9 +5,9 @@
 		"count": 1
 	},
 	"pattern": [
-		"ICI",
+		"ECE",
 		"SMS",
-		"ICI"
+		"EIE"
 	],
 	"key": {
 		"C": {
@@ -19,8 +19,11 @@
 		"S": {
 			"item": "minecraft:shulker_shell"
 		},
+		"E": {
+			"tag": "forge:ender_pearls"
+		},
 		"I": {
-			"tag": "forge:ingots/iron"
+			"tag": "forge:storage_blocks/iron"
 		}
 	}
 }
