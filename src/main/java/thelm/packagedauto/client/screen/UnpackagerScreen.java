@@ -75,8 +75,8 @@ public class UnpackagerScreen extends BaseScreen<UnpackagerMenu> {
 
 	class ButtonChangeBlocking extends AbstractButton {
 
-		private static final Tooltip TRUE_TOOLTIP = Tooltip.create(Component.translatable("block.packagedauto.unpackager.blocking.true"));
-		private static final Tooltip FALSE_TOOLTIP = Tooltip.create(Component.translatable("block.packagedauto.unpackager.blocking.false"));
+		final Tooltip trueTooltip = Tooltip.create(Component.translatable("block.packagedauto.unpackager.blocking.true"));
+		final Tooltip falseTooltip = Tooltip.create(Component.translatable("block.packagedauto.unpackager.blocking.false"));
 
 		public ButtonChangeBlocking(int x, int y) {
 			super(x, y, 16, 18, Component.empty());
@@ -84,7 +84,7 @@ public class UnpackagerScreen extends BaseScreen<UnpackagerMenu> {
 
 		@Override
 		public void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
-			setTooltip(menu.blockEntity.blocking ? TRUE_TOOLTIP : FALSE_TOOLTIP);
+			setTooltip(menu.blockEntity.blocking ? trueTooltip : falseTooltip);
 			super.renderWidget(graphics, mouseX, mouseY, partialTicks);
 			RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
 			RenderSystem.setShaderTexture(0, BACKGROUND);
