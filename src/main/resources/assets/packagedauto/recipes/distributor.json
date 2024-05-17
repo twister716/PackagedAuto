@@ -5,9 +5,9 @@
 		"count": 1
 	},
 	"pattern": [
-		"ICI",
+		"ECE",
 		"SMS",
-		"ICI"
+		"EIE"
 	],
 	"key": {
 		"C": {
@@ -19,9 +19,13 @@
 		"S": {
 			"item": "minecraft:shulker_shell"
 		},
+		"E": {
+			"type": "forge:ore_dict",
+			"ore": "enderpearl"
+		},
 		"I": {
 			"type": "forge:ore_dict",
-			"ore": "ingotIron"
+			"ore": "blockIron"
 		}
 	}
 }
