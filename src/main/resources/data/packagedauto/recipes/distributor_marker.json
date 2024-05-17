@@ -2,7 +2,7 @@
 	"type": "minecraft:crafting_shapeless",
 	"result": {
 		"item": "packagedauto:distributor_marker",
-		"count": 8
+		"count": 4
 	},
 	"ingredients": [
 		{
