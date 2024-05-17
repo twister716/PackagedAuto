@@ -54,9 +54,9 @@ public class PackagerExtensionScreen extends BaseScreen<PackagerExtensionMenu> {
 
 	class ButtonChangePackaging extends AbstractButton {
 
-		private static final Tooltip EXACT_TOOLTIP = Tooltip.create(PackagerBlockEntity.Mode.EXACT.getTooltip());
-		private static final Tooltip DISJOINT_TOOLTIP = Tooltip.create(PackagerBlockEntity.Mode.DISJOINT.getTooltip());
-		private static final Tooltip FIRST_TOOLTIP = Tooltip.create(PackagerBlockEntity.Mode.FIRST.getTooltip());
+		final Tooltip exactTooltip = Tooltip.create(PackagerBlockEntity.Mode.EXACT.getTooltip());
+		final Tooltip disjointTooltip = Tooltip.create(PackagerBlockEntity.Mode.DISJOINT.getTooltip());
+		final Tooltip firstTooltip = Tooltip.create(PackagerBlockEntity.Mode.FIRST.getTooltip());
 
 		public ButtonChangePackaging(int x, int y) {
 			super(x, y, 16, 18, Component.empty());
@@ -85,9 +85,9 @@ public class PackagerExtensionScreen extends BaseScreen<PackagerExtensionMenu> {
 
 		private Tooltip currentTooltip() {
 			return switch(menu.blockEntity.mode) {
-			case EXACT -> EXACT_TOOLTIP;
-			case DISJOINT -> DISJOINT_TOOLTIP;
-			case FIRST -> FIRST_TOOLTIP;
+			case EXACT -> exactTooltip;
+			case DISJOINT -> disjointTooltip;
+			case FIRST -> firstTooltip;
 			};
 		}
 	}

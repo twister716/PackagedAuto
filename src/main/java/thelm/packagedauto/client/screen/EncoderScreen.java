@@ -156,7 +156,7 @@ public class EncoderScreen extends BaseScreen<EncoderMenu> {
 
 	class ButtonSavePatterns extends AbstractButton {
 
-		private static final Tooltip TOOLTIP = Tooltip.create(Component.translatable("block.packagedauto.encoder.save_single"));
+		final Tooltip tooltip = Tooltip.create(Component.translatable("block.packagedauto.encoder.save_single"));
 
 		ButtonSavePatterns(int x, int y, Component text) {
 			super(x, y, 38, 18, text);
@@ -164,7 +164,7 @@ public class EncoderScreen extends BaseScreen<EncoderMenu> {
 
 		@Override
 		public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-			setTooltip(hasShiftDown() ? TOOLTIP : null);
+			setTooltip(hasShiftDown() ? tooltip : null);
 			super.render(graphics, mouseX, mouseY, partialTick);
 		}
 

@@ -8,4 +8,5 @@ Changed representation of ordered processing to brewing stand
 Add config to disable encoding certain recipe types  
 Disable automation access to encoder  
 Fix unpackager item drops  
+Fixed some button tooltips not getting updated when changing language  
 Rearrange language keys  
