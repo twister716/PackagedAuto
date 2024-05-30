@@ -64,6 +64,9 @@ public class EncoderPatternItemHandler extends BaseItemHandler<EncoderBlockEntit
 
 	public void updateRecipeInfo(boolean mark) {
 		validateRecipeType();
+		if(blockEntity.hasLevel()) {
+			return;
+		}
 		IPackageRecipeInfo info = recipeType.getNewRecipeInfo();
 		info.generateFromStacks(stacks.subList(0, 81), recipeType.canSetOutput() ? stacks.subList(81, 90) : List.of(), blockEntity.getLevel());
 		if(info.isValid()) {
