@@ -66,6 +66,9 @@ public class EncoderPatternItemHandler extends BaseItemHandler<EncoderTile> {
 
 	public void updateRecipeInfo(boolean mark) {
 		validateRecipeType();
+		if(!tile.hasLevel()) {
+			return;
+		}
 		IPackageRecipeInfo info = recipeType.getNewRecipeInfo();
 		info.generateFromStacks(stacks.subList(0, 81), recipeType.canSetOutput() ? stacks.subList(81, 90) : Collections.emptyList(), tile.getLevel());
 		if(info.isValid()) {
