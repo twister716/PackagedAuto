@@ -67,6 +67,9 @@ public class InventoryEncoderPattern extends InventoryTileBase {
 
 	public void updateRecipeInfo(boolean mark) {
 		validateRecipeType();
+		if(!tile.hasWorld()) {
+			return;
+		}
 		IRecipeInfo info = recipeType.getNewRecipeInfo();
 		info.generateFromStacks(stacks.subList(0, 81), recipeType.canSetOutput() ? stacks.subList(81, 90) : Collections.emptyList(), tile.getWorld());
 		if(info.isValid()) {
