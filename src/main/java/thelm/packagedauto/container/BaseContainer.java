@@ -165,42 +165,31 @@ public class BaseContainer<T extends BaseTile> extends Container {
 
 	@Override
 	public ItemStack clicked(int slotId, int mouseButton, ClickType clickType, PlayerEntity player) {
-		Slot slot = slotId < 0 ? null : slots.get(slotId);
-		Out:if(slot instanceof FalseCopySlot) {
-			ItemStack stack = slot.getItem().copy();
-			switch(mouseButton) {
-			case 0:
-				slot.set(player.inventory.getCarried().isEmpty() ? ItemStack.EMPTY : player.inventory.getCarried().copy());
-				break;
-			case 1:
-				if(!player.inventory.getCarried().isEmpty()) {
-					ItemStack toPut = player.inventory.getCarried().copy();
-					if(stack.getItem() == toPut.getItem() &&
+		if(slotId >= 0 && !player.inventory.getCarried().isEmpty()) {
+			Slot slot = slots.get(slotId);
+			if(slot instanceof FalseCopySlot) {
+				ItemStack toPut = player.inventory.getCarried().copy();
+				ItemStack stack = slot.getItem().copy();
+				switch(mouseButton) {
+				case 0: {
+					slot.set(toPut);
+					break;
+				}
+				case 1: {
+					if(stack.isEmpty()) {
+						toPut.setCount(1);
+						slot.set(toPut);
+					}
+					else if(stack.getItem() == toPut.getItem() &&
 							ItemStack.tagMatches(stack, toPut) && stack.getCount() < stack.getMaxStackSize()) {
 						stack.grow(1);
 						slot.set(stack);
 					}
-					else {
-						toPut.setCount(1);
-						slot.set(toPut);
-					}
+					break;
 				}
-				else if(!stack.isEmpty()) {
-					stack.shrink(1);
-					slot.set(stack);
 				}
-				break;
-			case 2:
-				if(player.isCreative()) {
-					break Out;
-				}
-				if(!stack.isEmpty() && stack.getCount() < stack.getMaxStackSize()) {
-					stack.grow(1);
-					slot.set(stack);
-				}
-				break;
+				return player.inventory.getCarried();
 			}
-			return player.inventory.getCarried();
 		}
 		return super.clicked(slotId, mouseButton, clickType, player);
 	}

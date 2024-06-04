@@ -8,6 +8,7 @@ import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.container.PlayerContainer;
+import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.vector.Vector3i;
@@ -21,7 +22,9 @@ import thelm.packagedauto.network.packet.CycleRecipeTypePacket;
 import thelm.packagedauto.network.packet.LoadRecipeListPacket;
 import thelm.packagedauto.network.packet.SaveRecipeListPacket;
 import thelm.packagedauto.network.packet.SetPatternIndexPacket;
+import yalter.mousetweaks.api.MouseTweaksDisableWheelTweak;
 
+@MouseTweaksDisableWheelTweak
 public class EncoderScreen extends BaseScreen<EncoderContainer> {
 
 	public static final ResourceLocation BACKGROUND = new ResourceLocation("packagedauto:textures/gui/encoder.png");
@@ -84,6 +87,11 @@ public class EncoderScreen extends BaseScreen<EncoderContainer> {
 				break;
 			}
 		}
+	}
+
+	@Override
+	public int getItemAmountSpecificationLimit(Slot slot) {
+		return slot.getItem().getMaxStackSize();
 	}
 
 	class ButtonPatternSlot extends Widget {

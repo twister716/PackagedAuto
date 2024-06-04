@@ -41,7 +41,7 @@
 	"recipe.packagedauto.crafting": "Изготовление",
 	"recipe.packagedauto.crafting.short": "Изготовление",
 
-	"gui.packagedauto.amount_specifying": "Item amount",
+	"gui.packagedauto.item_amount_specifying": "Item amount",
 
 	"misc.packagedauto.set": "Set",
 	"misc.packagedauto.down": "Down",

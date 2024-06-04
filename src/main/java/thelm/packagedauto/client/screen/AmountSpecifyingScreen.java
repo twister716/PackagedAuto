@@ -8,51 +8,34 @@ import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.client.util.InputMappings;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
-import thelm.packagedauto.container.AmountSpecifyingContainer;
-import thelm.packagedauto.network.PacketHandler;
-import thelm.packagedauto.network.packet.SetItemStackPacket;
+import thelm.packagedauto.container.BaseContainer;
 
 // Code from Refined Storage
-public class AmountSpecifyingScreen extends BaseScreen<AmountSpecifyingContainer> {
+public abstract class AmountSpecifyingScreen<C extends BaseContainer<?>> extends BaseScreen<C> {
 
 	public static final ResourceLocation BACKGROUND = new ResourceLocation("packagedauto:textures/gui/amount_specifying.png");
 
 	private BaseScreen<?> parent;
-	private int containerSlot;
-	private ItemStack stack;
-	private int maxAmount;
 
 	protected TextFieldWidget amountField;
 
-	public AmountSpecifyingScreen(BaseScreen<?> parent, PlayerInventory playerInventory, int containerSlot, ItemStack stack, int maxAmount) {
-		super(new AmountSpecifyingContainer(playerInventory, stack), playerInventory, new TranslationTextComponent("gui.packagedauto.amount_specifying"));
+	public AmountSpecifyingScreen(BaseScreen<?> parent, C container, PlayerInventory playerInventory, ITextComponent title) {
+		super(container, playerInventory, title);
 		imageWidth = 172;
 		imageHeight = 99;
 		this.parent = parent;
-		this.containerSlot = containerSlot;
-		this.stack = stack;
-		this.maxAmount = maxAmount;
 	}
 
-	protected int getDefaultAmount() {
-		return stack.getCount();
-	}
+	protected abstract int getDefaultAmount();
 
-	protected int getMaxAmount() {
-		return maxAmount;
-	}
+	protected abstract int getMaxAmount();
 
-	protected int[] getIncrements() {
-		return new int[] {
-				1, 10, 64,
-		};
-	}
+	protected abstract int[] getIncrements();
 
 	@Override
 	protected ResourceLocation getBackgroundTexture() {
@@ -111,6 +94,7 @@ public class AmountSpecifyingScreen extends BaseScreen<AmountSpecifyingContainer
 	@Override
 	protected void renderLabels(MatrixStack matrixStack, int x, int y) {
 		font.draw(matrixStack, getTitle().getString(), 7, 7, 0x404040);
+		super.renderLabels(matrixStack, x, y);
 	}
 
 	@Override
@@ -145,18 +129,7 @@ public class AmountSpecifyingScreen extends BaseScreen<AmountSpecifyingContainer
 		amountField.setValue(String.valueOf(newAmount));
 	}
 
-	protected void onOkButtonPressed(boolean shiftDown) {
-		try {
-			int amount = MathHelper.clamp(Integer.parseInt(amountField.getValue()), 0, maxAmount);
-			ItemStack newStack = stack.copy();
-			newStack.setCount(amount);
-			PacketHandler.INSTANCE.sendToServer(new SetItemStackPacket((short)containerSlot, newStack));
-			close();
-		}
-		catch(NumberFormatException e) {
-			// NO OP
-		}
-	}
+	protected abstract void onOkButtonPressed(boolean shiftDown);
 
 	public void close() {
 		minecraft.setScreen(parent);

@@ -7,9 +7,9 @@ import net.minecraftforge.items.ItemStackHandler;
 import thelm.packagedauto.slot.PreviewSlot;
 import thelm.packagedauto.tile.BaseTile;
 
-public class AmountSpecifyingContainer extends BaseContainer<BaseTile> {
+public class ItemAmountSpecifyingContainer extends BaseContainer<BaseTile> {
 
-	public AmountSpecifyingContainer(PlayerInventory playerInventory, ItemStack stack) {
+	public ItemAmountSpecifyingContainer(PlayerInventory playerInventory, ItemStack stack) {
 		super(null, 0, playerInventory, null);
 		ItemStackHandler itemInventory = new ItemStackHandler(1);
 		itemInventory.setStackInSlot(0, ItemHandlerHelper.copyStackWithSize(stack, 1));

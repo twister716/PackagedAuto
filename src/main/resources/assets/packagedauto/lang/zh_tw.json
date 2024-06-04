@@ -41,7 +41,7 @@
 	"recipe.packagedauto.crafting": "合成",
 	"recipe.packagedauto.crafting.short": "合成",
 
-	"gui.packagedauto.amount_specifying": "物品數量",
+	"gui.packagedauto.item_amount_specifying": "物品數量",
 
 	"misc.packagedauto.set": "設置",
 	"misc.packagedauto.down": "下",
