@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.stream.IntStream;
 
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Items;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.inventory.ItemStackHelper;
 import net.minecraft.item.ItemStack;
@@ -76,7 +77,7 @@ public class InventoryTileBase implements ISidedInventory {
 
 	@Override
 	public int getInventoryStackLimit() {
-		return 64;
+		return Items.AIR.getItemStackLimit();
 	}
 
 	@Override

@@ -159,42 +159,31 @@ public class ContainerTileBase<TILE extends TileBase> extends Container {
 
 	@Override
 	public ItemStack slotClick(int slotId, int mouseButton, ClickType clickType, EntityPlayer player) {
-		Slot slot = slotId < 0 ? null : inventorySlots.get(slotId);
-		Out:if(slot instanceof SlotFalseCopy) {
-			ItemStack stack = slot.getStack().copy();
-			switch(mouseButton) {
-			case 0:
-				slot.putStack(player.inventory.getItemStack().isEmpty() ? ItemStack.EMPTY : player.inventory.getItemStack().copy());
-				break;
-			case 1:
-				if(!player.inventory.getItemStack().isEmpty()) {
-					ItemStack toPut = player.inventory.getItemStack().copy();
-					if(stack.getItem() == toPut.getItem() && stack.getItemDamage() == toPut.getItemDamage() &&
+		if(slotId >= 0 && !player.inventory.getItemStack().isEmpty()) {
+			Slot slot = inventorySlots.get(slotId);
+			if(slot instanceof SlotFalseCopy) {
+				ItemStack toPut = player.inventory.getItemStack().copy();
+				ItemStack stack = slot.getStack().copy();
+				switch(mouseButton) {
+				case 0: {
+					slot.putStack(toPut);
+					break;
+				}
+				case 1: {
+					if(stack.isEmpty()) {
+						toPut.setCount(1);
+						slot.putStack(toPut);
+					}
+					else if(stack.getItem() == toPut.getItem() && stack.getItemDamage() == toPut.getItemDamage() &&
 							ItemStack.areItemStackShareTagsEqual(stack, toPut) && stack.getCount() < stack.getMaxStackSize()) {
 						stack.grow(1);
 						slot.putStack(stack);
 					}
-					else {
-						toPut.setCount(1);
-						slot.putStack(toPut);
-					}
+					break;
 				}
-				else if(!stack.isEmpty()) {
-					stack.shrink(1);
-					slot.putStack(stack);
 				}
-				break;
-			case 2:
-				if(player.capabilities.isCreativeMode) {
-					break Out;
-				}
-				if(!stack.isEmpty() && stack.getCount() < stack.getMaxStackSize()) {
-					stack.grow(1);
-					slot.putStack(stack);
-				}
-				break;
+				return player.inventory.getItemStack();
 			}
-			return player.inventory.getItemStack();
 		}
 		return super.slotClick(slotId, mouseButton, clickType, player);
 	}

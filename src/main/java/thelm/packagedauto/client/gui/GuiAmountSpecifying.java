@@ -6,50 +6,32 @@ import org.lwjgl.input.Keyboard;
 
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiTextField;
-import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.translation.I18n;
-import thelm.packagedauto.container.ContainerAmountSpecifying;
-import thelm.packagedauto.network.PacketHandler;
-import thelm.packagedauto.network.packet.PacketSetItemStack;
+import thelm.packagedauto.container.ContainerTileBase;
 
 // Code from Refined Storage
-public class GuiAmountSpecifying extends GuiContainerTileBase<ContainerAmountSpecifying> {
+public abstract class GuiAmountSpecifying<C extends ContainerTileBase<?>> extends GuiContainerTileBase<C> {
 
 	public static final ResourceLocation BACKGROUND = new ResourceLocation("packagedauto:textures/gui/amount_specifying.png");
 
 	private GuiContainerTileBase<?> parent;
-	private int containerSlot;
-	private ItemStack stack;
-	private int maxAmount;
 
 	protected GuiTextField amountField;
 
-	public GuiAmountSpecifying(GuiContainerTileBase<?> parent, InventoryPlayer playerInventory, int containerSlot, ItemStack stack, int maxAmount) {
-		super(new ContainerAmountSpecifying(playerInventory, stack));
+	public GuiAmountSpecifying(GuiContainerTileBase<?> parent, C container) {
+		super(container);
 		xSize = 172;
 		ySize = 99;
 		this.parent = parent;
-		this.containerSlot = containerSlot;
-		this.stack = stack;
-		this.maxAmount = maxAmount;
 	}
 
-	protected int getDefaultAmount() {
-		return stack.getCount();
-	}
+	protected abstract int getDefaultAmount();
 
-	protected int getMaxAmount() {
-		return maxAmount;
-	}
+	protected abstract int getMaxAmount();
 
-	protected int[] getIncrements() {
-		return new int[] {
-				1, 10, 64,
-		};
-	}
+	protected abstract int[] getIncrements();
 
 	@Override
 	protected ResourceLocation getBackgroundTexture() {
@@ -60,6 +42,7 @@ public class GuiAmountSpecifying extends GuiContainerTileBase<ContainerAmountSpe
 	public void initGui() {
 		buttonList.clear();
 		super.initGui();
+		mc.player.openContainer = parent.inventorySlots;
 
 		addButton(new ButtonSet(0, guiLeft+114, guiTop+22, I18n.translateToLocal("misc.packagedauto.set")));
 		addButton(new ButtonCancel(0, guiLeft+114, guiTop+22+24, I18n.translateToLocal("gui.cancel")));
@@ -102,11 +85,6 @@ public class GuiAmountSpecifying extends GuiContainerTileBase<ContainerAmountSpe
 	protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
 		super.drawGuiContainerBackgroundLayer(partialTicks, mouseX, mouseY);
 		amountField.drawTextBox();
-	}
-
-	@Override
-	protected void drawGuiContainerForegroundLayer(int x, int y) {
-		fontRenderer.drawString(I18n.translateToLocal("gui.packagedauto.amount_specifying"), 7, 7, 0x404040);
 	}
 
 	@Override
@@ -160,18 +138,7 @@ public class GuiAmountSpecifying extends GuiContainerTileBase<ContainerAmountSpe
 		amountField.setText(String.valueOf(newAmount));
 	}
 
-	protected void onOkButtonPressed(boolean shiftDown) {
-		try {
-			int amount = MathHelper.clamp(Integer.parseInt(amountField.getText()), 0, maxAmount);
-			ItemStack newStack = stack.copy();
-			newStack.setCount(amount);
-			PacketHandler.INSTANCE.sendToServer(new PacketSetItemStack((short)containerSlot, newStack));
-			close();
-		}
-		catch(NumberFormatException e) {
-			// NO OP
-		}
-	}
+	protected abstract void onOkButtonPressed(boolean shiftDown);
 
 	public void close() {
 		mc.displayGuiScreen(parent);
@@ -181,21 +148,21 @@ public class GuiAmountSpecifying extends GuiContainerTileBase<ContainerAmountSpe
 		return parent;
 	}
 
-	class ButtonSet extends GuiButton {
+	static class ButtonSet extends GuiButton {
 
 		public ButtonSet(int buttonId, int x, int y, String text) {
 			super(buttonId, x, y, 50, 20, text);
 		}
 	}
 
-	class ButtonCancel extends GuiButton {
+	static class ButtonCancel extends GuiButton {
 
 		public ButtonCancel(int buttonId, int x, int y, String text) {
 			super(buttonId, x, y, 50, 20, text);
 		}
 	}
 
-	class ButtonIncrement extends GuiButton {
+	static class ButtonIncrement extends GuiButton {
 
 		public ButtonIncrement(int buttonId, int x, int y, String text) {
 			super(buttonId, x, y, 34, 20, text);

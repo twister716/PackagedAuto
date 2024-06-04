@@ -9,6 +9,7 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
+import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.translation.I18n;
@@ -22,7 +23,9 @@ import thelm.packagedauto.network.packet.PacketCycleRecipeType;
 import thelm.packagedauto.network.packet.PacketLoadRecipeList;
 import thelm.packagedauto.network.packet.PacketSaveRecipeList;
 import thelm.packagedauto.network.packet.PacketSetPatternIndex;
+import yalter.mousetweaks.api.MouseTweaksDisableWheelTweak;
 
+@MouseTweaksDisableWheelTweak
 public class GuiEncoder extends GuiContainerTileBase<ContainerEncoder> {
 
 	public static final ResourceLocation BACKGROUND = new ResourceLocation("packagedauto:textures/gui/encoder.png");
@@ -89,6 +92,12 @@ public class GuiEncoder extends GuiContainerTileBase<ContainerEncoder> {
 				break;
 			}
 		}
+	}
+
+	@Override
+	public int getItemAmountSpecificationLimit(Slot slot) {
+		int stackLimit = slot.getStack().getMaxStackSize();
+		return slot.slotNumber > 81 ? Math.max(stackLimit, 999) : stackLimit;
 	}
 
 	@Override

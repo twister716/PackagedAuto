@@ -40,7 +40,7 @@ recipe.packagedauto.positioned_processing.short=定位
 recipe.packagedauto.crafting=合成
 recipe.packagedauto.crafting.short=合成
 
-gui.packagedauto.amount_specifying=物品数量
+gui.packagedauto.item_amount_specifying=物品数量
 
 misc.packagedauto.set=设置
 misc.packagedauto.down=下
