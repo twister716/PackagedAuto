@@ -1,7 +1,6 @@
 package thelm.packagedauto.client.screen;
 
 import net.minecraft.network.chat.TranslatableComponent;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Inventory;
 import thelm.packagedauto.api.IVolumeStackWrapper;
@@ -12,16 +11,12 @@ import thelm.packagedauto.util.MiscHelper;
 
 public class VolumeAmountSpecifyingScreen extends AmountSpecifyingScreen<VolumeAmountSpecifyingMenu> {
 
-	public static final ResourceLocation BACKGROUND = new ResourceLocation("packagedauto:textures/gui/amount_specifying.png");
-
 	private int containerSlot;
 	private IVolumeStackWrapper stack;
 	private int maxAmount;
 
 	public VolumeAmountSpecifyingScreen(BaseScreen<?> parent, Inventory inventory, int containerSlot, IVolumeStackWrapper stack, int maxAmount) {
 		super(parent, new VolumeAmountSpecifyingMenu(inventory, stack), inventory, new TranslatableComponent("gui.packagedauto.volume_amount_specifying"));
-		imageWidth = 172;
-		imageHeight = 99;
 		this.containerSlot = containerSlot;
 		this.stack = stack;
 		this.maxAmount = maxAmount;
@@ -42,11 +37,6 @@ public class VolumeAmountSpecifyingScreen extends AmountSpecifyingScreen<VolumeA
 		return new int[] {
 				100, 500, 1000,
 		};
-	}
-
-	@Override
-	protected ResourceLocation getBackgroundTexture() {
-		return BACKGROUND;
 	}
 
 	@Override

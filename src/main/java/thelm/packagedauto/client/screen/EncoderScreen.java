@@ -14,6 +14,7 @@ import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.InventoryMenu;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import thelm.packagedauto.api.IPackageRecipeType;
 import thelm.packagedauto.menu.EncoderMenu;
@@ -22,7 +23,9 @@ import thelm.packagedauto.network.packet.CycleRecipeTypePacket;
 import thelm.packagedauto.network.packet.LoadRecipeListPacket;
 import thelm.packagedauto.network.packet.SaveRecipeListPacket;
 import thelm.packagedauto.network.packet.SetPatternIndexPacket;
+import yalter.mousetweaks.api.MouseTweaksDisableWheelTweak;
 
+@MouseTweaksDisableWheelTweak
 public class EncoderScreen extends BaseScreen<EncoderMenu> {
 
 	public static final ResourceLocation BACKGROUND = new ResourceLocation("packagedauto:textures/gui/encoder.png");
@@ -86,6 +89,12 @@ public class EncoderScreen extends BaseScreen<EncoderMenu> {
 				break;
 			}
 		}
+	}
+
+	@Override
+	public int getItemAmountSpecificationLimit(Slot slot) {
+		int stackLimit = slot.getItem().getMaxStackSize();
+		return slot.index > 81 ? Math.max(stackLimit, 999) : stackLimit;
 	}
 
 	class ButtonPatternSlot extends AbstractWidget {
