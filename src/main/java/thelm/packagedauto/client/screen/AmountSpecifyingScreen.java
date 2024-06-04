@@ -9,6 +9,7 @@ import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Inventory;
 import thelm.packagedauto.menu.BaseMenu;
@@ -16,12 +17,16 @@ import thelm.packagedauto.menu.BaseMenu;
 // Code from Refined Storage
 public abstract class AmountSpecifyingScreen<C extends BaseMenu<?>> extends BaseScreen<C> {
 
+	public static final ResourceLocation BACKGROUND = new ResourceLocation("packagedauto:textures/gui/amount_specifying.png");
+
 	private BaseScreen<?> parent;
 
 	protected EditBox amountField;
 
 	public AmountSpecifyingScreen(BaseScreen<?> parent, C menu, Inventory inventory, Component title) {
 		super(menu, inventory, title);
+		imageWidth = 172;
+		imageHeight = 99;
 		this.parent = parent;
 	}
 
@@ -30,6 +35,11 @@ public abstract class AmountSpecifyingScreen<C extends BaseMenu<?>> extends Base
 	protected abstract int getMaxAmount();
 
 	protected abstract int[] getIncrements();
+
+	@Override
+	protected ResourceLocation getBackgroundTexture() {
+		return BACKGROUND;
+	}
 
 	@Override
 	protected void init() {

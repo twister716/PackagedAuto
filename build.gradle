@@ -77,7 +77,7 @@ def specVersion = "3"
 def vendor = "thelm"
 
 group = "thelm.packagedauto"
-version = "3.2.9.31"
+version = "3.2.9.32"
 
 archivesBaseName = "${modName}-${mcVersion}"
 
@@ -119,6 +119,7 @@ dependencies {
 	modImplementation "dev.emi:emi-forge:1.1.4+1.19.2"
 	modImplementation "appeng:appliedenergistics2-forge:12.9.8"
 	modImplementation "vazkii.patchouli:Patchouli:1.19.2-77"
+	modImplementation "curse.maven:mouse-tweaks-60089:3871353"
 
 	// Testing
 	modImplementation "curse.maven:cucumber-272335:4773184"
