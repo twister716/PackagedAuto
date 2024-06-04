@@ -1,5 +1,6 @@
 package thelm.packagedauto.menu;
 
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -165,43 +166,26 @@ public class BaseMenu<T extends BaseBlockEntity> extends AbstractContainerMenu {
 
 	@Override
 	public void clicked(int slotId, int mouseButton, ClickType clickType, Player player) {
-		Slot slot = slotId < 0 ? null : slots.get(slotId);
-		Out:if(slot instanceof FalseCopySlot) {
+		if(slotId >= 0 && !getCarried().isEmpty() && slots.get(slotId) instanceof FalseCopySlot slot) {
+			ItemStack toPut = getCarried().copy();
 			ItemStack stack = slot.getItem().copy();
 			switch(mouseButton) {
-			case 0 -> {
-				slot.set(getCarried().isEmpty() ? ItemStack.EMPTY : getCarried().copy());
-			}
+			case 0 -> slot.set(toPut);
 			case 1 -> {
-				if(!getCarried().isEmpty()) {
-					ItemStack toPut = getCarried().copy();
-					if(ItemStack.isSameItemSameTags(stack, toPut) && stack.getCount() < stack.getMaxStackSize()) {
-						stack.grow(1);
-						slot.set(stack);
-					}
-					else {
-						toPut.setCount(1);
-						slot.set(toPut);
-					}
+				if(stack.isEmpty()) {
+					toPut.setCount(1);
+					slot.set(toPut);
 				}
-				else if(!stack.isEmpty()) {
-					stack.shrink(1);
-					slot.set(stack);
-				}
-			}
-			case 2 -> {
-				if(player.isCreative()) {
-					break Out;
-				}
-				if(!stack.isEmpty() && stack.getCount() < stack.getMaxStackSize()) {
+				else if(ItemStack.isSameItemSameTags(stack, toPut) && stack.getCount() < stack.getMaxStackSize()) {
 					stack.grow(1);
 					slot.set(stack);
 				}
 			}
 			}
-			return;
 		}
-		super.clicked(slotId, mouseButton, clickType, player);
+		else {
+			super.clicked(slotId, mouseButton, clickType, player);
+		}
 	}
 
 	@Override
