@@ -11,6 +11,7 @@ import net.minecraft.core.Vec3i;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.network.PacketDistributor;
 import thelm.packagedauto.api.IPackageRecipeType;
@@ -19,7 +20,9 @@ import thelm.packagedauto.packet.CycleRecipeTypePacket;
 import thelm.packagedauto.packet.LoadRecipeListPacket;
 import thelm.packagedauto.packet.SaveRecipeListPacket;
 import thelm.packagedauto.packet.SetPatternIndexPacket;
+import yalter.mousetweaks.api.MouseTweaksDisableWheelTweak;
 
+@MouseTweaksDisableWheelTweak
 public class EncoderScreen extends BaseScreen<EncoderMenu> {
 
 	public static final ResourceLocation BACKGROUND = new ResourceLocation("packagedauto:textures/gui/encoder.png");
@@ -77,6 +80,12 @@ public class EncoderScreen extends BaseScreen<EncoderMenu> {
 		String str = menu.patternItemHandler.recipeType.getShortDisplayName().getString();
 		graphics.drawString(font, str, 212 - font.width(str)/2, 64, 0x404040, false);
 		super.renderLabels(graphics, mouseX, mouseY);
+	}
+
+	@Override
+	public int getItemAmountSpecificationLimit(Slot slot) {
+		int stackLimit = slot.getItem().getMaxStackSize();
+		return slot.index > 81 ? Math.max(stackLimit, 999) : stackLimit;
 	}
 
 	class ButtonPatternSlot extends AbstractButton {

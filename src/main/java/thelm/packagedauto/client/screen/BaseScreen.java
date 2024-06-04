@@ -81,23 +81,26 @@ public abstract class BaseScreen<C extends BaseMenu<?>> extends AbstractContaine
 
 	@Override
 	protected void slotClicked(Slot slot, int slotId, int mouseButton, ClickType type) {
-		boolean valid = type != ClickType.QUICK_MOVE && minecraft.player.containerMenu.getCarried().isEmpty();
-		if(valid && slot instanceof FalseCopySlot fSlot && slot.isActive()) {
-			if(!slot.getItem().isEmpty()) {
-				if(!hasControlDown() && slot.getItem().getItem() instanceof IVolumePackageItem vPackage) {
-					minecraft.setScreen(new VolumeAmountSpecifyingScreen(
-							this, minecraft.player.getInventory(), slot.index, vPackage.getVolumeStack(slot.getItem()), 1000000));
-				}
-				else {
-					minecraft.setScreen(new ItemAmountSpecifyingScreen(
-							this, minecraft.player.getInventory(), slot.index, slot.getItem(),
-							slot.index >= 81 ? 999 : Math.min(slot.getMaxStackSize(), slot.getItem().getMaxStackSize())));
-				}
+		if(type != ClickType.QUICK_MOVE && (type != ClickType.CLONE || !minecraft.player.isCreative()) &&
+				menu.getCarried().isEmpty() && slot instanceof FalseCopySlot && slot.isActive() && !slot.getItem().isEmpty()) {
+			if(!hasControlDown() && slot.getItem().getItem() instanceof IVolumePackageItem vPackage) {
+				minecraft.setScreen(new VolumeAmountSpecifyingScreen(
+						this, minecraft.player.getInventory(), slot.index, vPackage.getVolumeStack(slot.getItem()), getVolumeAmountSpecificationLimit(slot)));
+			}
+			else {
+				minecraft.setScreen(new ItemAmountSpecifyingScreen(
+						this, minecraft.player.getInventory(), slot.index, slot.getItem(), getItemAmountSpecificationLimit(slot)));
 			}
 		}
-		else {
-			super.slotClicked(slot, slotId, mouseButton, type);
-		}
+		super.slotClicked(slot, slotId, mouseButton, type);
+	}
+
+	public int getItemAmountSpecificationLimit(Slot slot) {
+		return Math.min(slot.getMaxStackSize(), slot.getItem().getMaxStackSize());
+	}
+
+	public int getVolumeAmountSpecificationLimit(Slot slot) {
+		return 1000000;
 	}
 
 	public boolean inBounds(int x, int y, int w, int h, double ox, double oy) {
