@@ -94,7 +94,6 @@ public abstract class AmountSpecifyingScreen<C extends BaseContainer<?>> extends
 	@Override
 	protected void renderLabels(MatrixStack matrixStack, int x, int y) {
 		font.draw(matrixStack, getTitle().getString(), 7, 7, 0x404040);
-		super.renderLabels(matrixStack, x, y);
 	}
 
 	@Override

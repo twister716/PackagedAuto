@@ -15,8 +15,6 @@ public class ItemAmountSpecifyingScreen extends AmountSpecifyingScreen<ItemAmoun
 	private ItemStack stack;
 	private int maxAmount;
 
-	protected TextFieldWidget amountField;
-
 	public ItemAmountSpecifyingScreen(BaseScreen<?> parent, PlayerInventory playerInventory, int containerSlot, ItemStack stack, int maxAmount) {
 		super(parent, new ItemAmountSpecifyingContainer(playerInventory, stack), playerInventory, new TranslationTextComponent("gui.packagedauto.item_amount_specifying"));
 		this.containerSlot = containerSlot;
