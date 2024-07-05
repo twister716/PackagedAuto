@@ -1,6 +1,6 @@
 package thelm.packagedauto.menu;
 
-import net.minecraft.util.Mth;
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -190,6 +190,10 @@ public class BaseMenu<T extends BaseBlockEntity> extends AbstractContainerMenu {
 
 	@Override
 	public boolean stillValid(Player player) {
+		if(blockEntity != null) {
+			BlockPos pos = blockEntity.getBlockPos();
+			return blockEntity.getLevel().getBlockEntity(pos) == blockEntity && blockEntity.getBlockPos().distToCenterSqr(player.position()) <= 64;
+		}
 		return true;
 	}
 }
