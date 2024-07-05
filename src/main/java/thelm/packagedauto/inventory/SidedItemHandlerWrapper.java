@@ -60,7 +60,7 @@ public abstract class SidedItemHandlerWrapper<H extends IItemHandlerModifiable> 
 	@Override
 	public void setStackInSlot(int slot, ItemStack stack) {
 		int i = getSlot(slot, direction);
-		if(i == -1) {
+		if(i != -1) {
 			itemHandler.setStackInSlot(i, stack);
 		}
 	}
