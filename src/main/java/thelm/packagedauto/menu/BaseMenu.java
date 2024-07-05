@@ -1,6 +1,6 @@
 package thelm.packagedauto.menu;
 
-import net.minecraft.util.Mth;
+import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -190,6 +190,9 @@ public class BaseMenu<T extends BaseBlockEntity> extends AbstractContainerMenu {
 
 	@Override
 	public boolean stillValid(Player player) {
+		if(blockEntity != null) {
+			return Container.stillValidBlockEntity(blockEntity, player);
+		}
 		return true;
 	}
 }
