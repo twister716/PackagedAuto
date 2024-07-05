@@ -8,6 +8,7 @@ import net.minecraft.inventory.container.ContainerType;
 import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIntArray;
+import net.minecraft.util.math.BlockPos;
 import thelm.packagedauto.inventory.BaseItemHandler;
 import thelm.packagedauto.slot.FalseCopySlot;
 import thelm.packagedauto.tile.BaseTile;
@@ -196,6 +197,10 @@ public class BaseContainer<T extends BaseTile> extends Container {
 
 	@Override
 	public boolean stillValid(PlayerEntity player) {
+		if(tile != null) {
+			BlockPos pos = tile.getBlockPos();
+			return tile.getLevel().getBlockEntity(pos) == tile && tile.getBlockPos().distSqr(player.position(), true) <= 64;
+		}
 		return true;
 	}
 }
