@@ -13,6 +13,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.items.IItemHandlerModifiable;
@@ -95,7 +96,11 @@ public class InventoryTileBase implements ISidedInventory {
 
 	@Override
 	public boolean isUsableByPlayer(EntityPlayer player) {
-		return tile != null && player.getDistanceSq(tile.getPos().getX()+0.5D, tile.getPos().getY()+0.5D, tile.getPos().getZ()+0.5D) <= 64D;
+		if(tile != null) {
+			BlockPos pos = tile.getPos();
+			return tile.getWorld().getTileEntity(pos) == tile && pos.distanceSqToCenter(player.posX, player.posY, player.posZ) <= 64;
+		}
+		return true;
 	}
 
 	@Override
