@@ -1,1 +1,1 @@
-Ensure tile validity in container validity check  
+Fix distributor marker render range  

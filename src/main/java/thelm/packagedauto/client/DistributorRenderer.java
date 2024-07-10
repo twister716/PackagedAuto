@@ -76,7 +76,7 @@ public class DistributorRenderer {
 		double distX = viewerPosX-blockPos.getX()-0.5;
 		double distY = viewerPosY-blockPos.getY()-0.5;
 		double distZ = viewerPosZ-blockPos.getZ()-0.5;
-		if(Doubles.max(distX, distY, distZ) > range) {
+		if(Doubles.max(Math.abs(distX), Math.abs(distY), Math.abs(distZ)) > range) {
 			return;
 		}
 
