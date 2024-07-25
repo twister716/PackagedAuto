@@ -88,7 +88,7 @@ public class MiscHelper implements IMiscHelper {
 
 	@Override
 	public List<ItemStack> condenseStacks(Stream<ItemStack> stacks) {
-		return condenseStacks(stacks.collect(Collectors.toList()));
+		return condenseStacks(stacks.toList());
 	}
 
 	@Override
@@ -255,12 +255,12 @@ public class MiscHelper implements IMiscHelper {
 
 	@Override
 	public List<ItemStack> getRemainingItems(Container container) {
-		return getRemainingItems(IntStream.range(0, container.getContainerSize()).mapToObj(container::getItem).collect(Collectors.toList()));
+		return getRemainingItems(IntStream.range(0, container.getContainerSize()).mapToObj(container::getItem).toList());
 	}
 
 	@Override
 	public List<ItemStack> getRemainingItems(Container container, int minInclusive, int maxExclusive) {
-		return getRemainingItems(IntStream.range(minInclusive, maxExclusive).mapToObj(container::getItem).collect(Collectors.toList()));
+		return getRemainingItems(IntStream.range(minInclusive, maxExclusive).mapToObj(container::getItem).toList());
 	}
 
 	@Override
