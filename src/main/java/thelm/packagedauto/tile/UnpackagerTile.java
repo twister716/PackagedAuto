@@ -419,7 +419,7 @@ public class UnpackagerTile extends BaseTile implements ITickableTileEntity {
 			}
 			nbt.put("ToSend", MiscHelper.INSTANCE.saveAllItems(new ListNBT(), toSend));
 			if(direction != null) {
-				nbt.putByte("Facing", (byte)direction.get3DDataValue());
+				nbt.putByte("Direction", (byte)direction.get3DDataValue());
 			}
 			return nbt;
 		}
