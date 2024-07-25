@@ -3,7 +3,6 @@ package thelm.packagedauto.block.entity;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import com.google.common.collect.Lists;
 
@@ -33,6 +32,7 @@ import thelm.packagedauto.api.IPackageRecipeInfo;
 import thelm.packagedauto.api.IPackageRecipeType;
 import thelm.packagedauto.api.IVolumePackageItem;
 import thelm.packagedauto.block.PackagerBlock;
+import thelm.packagedauto.block.PackagerExtensionBlock;
 import thelm.packagedauto.block.UnpackagerBlock;
 import thelm.packagedauto.energy.EnergyStorage;
 import thelm.packagedauto.integration.appeng.blockentity.AEUnpackagerBlockEntity;
@@ -92,8 +92,8 @@ public class UnpackagerBlockEntity extends BaseBlockEntity {
 	}
 
 	protected void fillTrackers() {
-		List<PackageTracker> emptyTrackers = Arrays.stream(trackers).limit(trackerCount).filter(t->t.isEmpty()).collect(Collectors.toList());
-		List<PackageTracker> nonEmptyTrackers = Arrays.stream(trackers).filter(t->!t.isEmpty()).filter(t->!t.isFilled()).collect(Collectors.toList());
+		List<PackageTracker> emptyTrackers = Arrays.stream(trackers).limit(trackerCount).filter(t->t.isEmpty()).toList();
+		List<PackageTracker> nonEmptyTrackers = Arrays.stream(trackers).filter(t->!t.isEmpty()).filter(t->!t.isFilled()).toList();
 		for(int i = 0; i < 9; ++i) {
 			if(energyStorage.getEnergyStored() >= energyUsage) {
 				ItemStack stack = itemHandler.getStackInSlot(i);
@@ -174,7 +174,9 @@ public class UnpackagerBlockEntity extends BaseBlockEntity {
 			}
 			BlockPos offsetPos = worldPosition.relative(direction);
 			Block block = level.getBlockState(offsetPos).getBlock();
-			if(block == PackagerBlock.INSTANCE || block == UnpackagerBlock.INSTANCE) {
+			if(block == PackagerBlock.INSTANCE ||
+					block == PackagerExtensionBlock.INSTANCE ||
+					block == UnpackagerBlock.INSTANCE) {
 				trackerToEmpty.direction = null;
 				continue;
 			}
@@ -213,7 +215,9 @@ public class UnpackagerBlockEntity extends BaseBlockEntity {
 			}
 			BlockPos offsetPos = worldPosition.relative(direction);
 			Block block = level.getBlockState(offsetPos).getBlock();
-			if(block == PackagerBlock.INSTANCE || block == UnpackagerBlock.INSTANCE) {
+			if(block == PackagerBlock.INSTANCE ||
+					block == PackagerExtensionBlock.INSTANCE ||
+					block == UnpackagerBlock.INSTANCE) {
 				continue;
 			}
 			BlockEntity blockEntity = level.getBlockEntity(worldPosition.relative(direction));
@@ -463,7 +467,7 @@ public class UnpackagerBlockEntity extends BaseBlockEntity {
 			}
 			nbt.put("ToSend", MiscHelper.INSTANCE.saveAllItems(new ListTag(), toSend));
 			if(direction != null) {
-				nbt.putByte("Facing", (byte)direction.get3DDataValue());
+				nbt.putByte("Direction", (byte)direction.get3DDataValue());
 			}
 		}
 

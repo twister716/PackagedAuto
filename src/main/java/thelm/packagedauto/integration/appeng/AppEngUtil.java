@@ -3,6 +3,7 @@ package thelm.packagedauto.integration.appeng;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -31,8 +32,8 @@ public class AppEngUtil {
 		return null;
 	}
 
-	public static GenericStack[] condenseStacks(GenericStack[] stacks) {
-		GenericStack[] merged = Arrays.stream(stacks).filter(Objects::nonNull).
+	public static GenericStack[] condenseStacks(List<GenericStack> stacks) {
+		GenericStack[] merged = stacks.stream().filter(Objects::nonNull).
 				collect(Collectors.toMap(GenericStack::what, Functions.identity(), GenericStack::sum, LinkedHashMap::new)).
 				values().stream().toArray(GenericStack[]::new);
 		if(merged.length == 0) {
@@ -41,7 +42,7 @@ public class AppEngUtil {
 		return merged;
 	}
 
-	public static IInput[] toInputs(GenericStack[] stacks) {
+	public static IInput[] toInputs(List<GenericStack> stacks) {
 		return toInputs(null, stacks);
 	}
 
@@ -49,6 +50,14 @@ public class AppEngUtil {
 		IInput[] inputs = new IInput[stacks.length];
 		for(int i = 0; i < stacks.length; ++i) {
 			inputs[i] = new SimpleInput(recipe, stacks[i]);
+		}
+		return inputs;
+	}
+
+	public static IInput[] toInputs(IPackageRecipeInfo recipe, List<GenericStack> stacks) {
+		IInput[] inputs = new IInput[stacks.size()];
+		for(int i = 0; i < stacks.size(); ++i) {
+			inputs[i] = new SimpleInput(recipe, stacks.get(i));
 		}
 		return inputs;
 	}

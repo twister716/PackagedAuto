@@ -139,8 +139,6 @@ public abstract class BaseBlockEntity extends BlockEntity implements Nameable, M
 	@Override
 	public CompoundTag getUpdateTag() {
 		CompoundTag nbt = super.getUpdateTag();
-		nbt.remove("ForgeData");
-		nbt.remove("ForgeCaps");
 		saveSync(nbt);
 		return nbt;
 	}
