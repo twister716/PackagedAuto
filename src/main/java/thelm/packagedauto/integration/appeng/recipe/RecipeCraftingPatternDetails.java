@@ -1,5 +1,7 @@
 package thelm.packagedauto.integration.appeng.recipe;
 
+import java.util.List;
+
 import appeng.api.crafting.IPatternDetails;
 import appeng.api.stacks.AEItemKey;
 import appeng.api.stacks.AEKey;
@@ -16,17 +18,14 @@ public class RecipeCraftingPatternDetails implements IPatternDetails {
 
 	public final AEItemKey recipeHolder;
 	public final IPackageRecipeInfo recipe;
-	public final GenericStack[] sparseInputs;
-	public final GenericStack[] sparseOutputs;
 	public final IInput[] inputs;
 	public final GenericStack[] outputs;
-	private int priority = 0;
 
 	public RecipeCraftingPatternDetails(ItemStack recipeHolder, IPackageRecipeInfo recipe) {
 		this.recipeHolder = AEItemKey.of(recipeHolder);
 		this.recipe = recipe;
-		sparseInputs = recipe.getPatterns().stream().map(IPackagePattern::getOutput).map(GenericStack::fromItemStack).toArray(GenericStack[]::new);
-		sparseOutputs = recipe.getOutputs().stream().map(this::getGenericOutput).toArray(GenericStack[]::new);
+		List<GenericStack> sparseInputs = recipe.getPatterns().stream().map(IPackagePattern::getOutput).map(GenericStack::fromItemStack).toList();
+		List<GenericStack> sparseOutputs = recipe.getOutputs().stream().map(this::getGenericOutput).toList();
 		inputs = AppEngUtil.toInputs(sparseInputs);
 		outputs = AppEngUtil.condenseStacks(sparseOutputs);
 	}
@@ -34,14 +33,6 @@ public class RecipeCraftingPatternDetails implements IPatternDetails {
 	@Override
 	public AEItemKey getDefinition() {
 		return recipeHolder;
-	}
-
-	public GenericStack[] getSparseInputs() {
-		return sparseInputs;
-	}
-
-	public GenericStack[] getSparseOutputs() {
-		return sparseOutputs;
 	}
 
 	@Override

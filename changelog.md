@@ -1,2 +1,3 @@
-Fix fluid renderer tiling  
-Ensure block entity validity in menu validity check  
+Fix unpackager tracker direction saving  
+Fix distributor network representation  
+Removed unused fields in crafting pattern details  

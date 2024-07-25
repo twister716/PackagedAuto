@@ -115,7 +115,7 @@ public class PackagerExtensionBlockEntity extends BaseBlockEntity {
 		if(currentPattern == null) {
 			return false;
 		}
-		List<ItemStack> input = itemHandler.getStacks().subList(0, 9).stream().filter(stack->!stack.isEmpty()).collect(Collectors.toList());
+		List<ItemStack> input = itemHandler.getStacks().subList(0, 9).stream().filter(stack->!stack.isEmpty()).toList();
 		if(input.isEmpty()) {
 			return false;
 		}
@@ -161,7 +161,7 @@ public class PackagerExtensionBlockEntity extends BaseBlockEntity {
 		if(powered) {
 			return;
 		}
-		List<ItemStack> input = itemHandler.getStacks().subList(0, 9).stream().filter(stack->!stack.isEmpty()).collect(Collectors.toList());
+		List<ItemStack> input = itemHandler.getStacks().subList(0, 9).stream().filter(stack->!stack.isEmpty()).toList();
 		if(input.isEmpty()) {
 			return;
 		}
@@ -230,7 +230,7 @@ public class PackagerExtensionBlockEntity extends BaseBlockEntity {
 			endProcess();
 			return;
 		}
-		List<ItemStack> input = itemHandler.getStacks().subList(0, 9).stream().filter(stack->!stack.isEmpty()).collect(Collectors.toList());
+		List<ItemStack> input = itemHandler.getStacks().subList(0, 9).stream().filter(stack->!stack.isEmpty()).toList();
 		if(input.isEmpty()) {
 			endProcess();
 			return;

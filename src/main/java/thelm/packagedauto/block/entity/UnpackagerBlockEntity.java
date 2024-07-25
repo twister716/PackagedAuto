@@ -89,8 +89,8 @@ public class UnpackagerBlockEntity extends BaseBlockEntity {
 	}
 
 	protected void fillTrackers() {
-		List<PackageTracker> emptyTrackers = Arrays.stream(trackers).limit(trackerCount).filter(t->t.isEmpty()).collect(Collectors.toList());
-		List<PackageTracker> nonEmptyTrackers = Arrays.stream(trackers).filter(t->!t.isEmpty()).filter(t->!t.isFilled()).collect(Collectors.toList());
+		List<PackageTracker> emptyTrackers = Arrays.stream(trackers).limit(trackerCount).filter(t->t.isEmpty()).toList();
+		List<PackageTracker> nonEmptyTrackers = Arrays.stream(trackers).filter(t->!t.isEmpty()).filter(t->!t.isFilled()).toList();
 		for(int i = 0; i < 9; ++i) {
 			if(energyStorage.getEnergyStored() >= energyUsage) {
 				ItemStack stack = itemHandler.getStackInSlot(i);
@@ -170,7 +170,11 @@ public class UnpackagerBlockEntity extends BaseBlockEntity {
 				ordered = recipeType.isOrdered();
 			}
 			BlockEntity blockEntity = level.getBlockEntity(worldPosition.relative(direction));
-			if(blockEntity == null || blockEntity instanceof PackagerBlockEntity || blockEntity instanceof UnpackagerBlockEntity || isPatternProvider(blockEntity, direction.getOpposite())) {
+			if(blockEntity == null ||
+					blockEntity instanceof PackagerBlockEntity ||
+					blockEntity instanceof PackagerExtensionBlockEntity ||
+					blockEntity instanceof UnpackagerBlockEntity ||
+					isPatternProvider(blockEntity, direction.getOpposite())) {
 				trackerToEmpty.direction = null;
 				continue;
 			}
@@ -203,7 +207,11 @@ public class UnpackagerBlockEntity extends BaseBlockEntity {
 				continue;
 			}
 			BlockEntity blockEntity = level.getBlockEntity(worldPosition.relative(direction));
-			if(blockEntity == null || blockEntity instanceof PackagerBlockEntity || blockEntity instanceof UnpackagerBlockEntity || isPatternProvider(blockEntity, direction.getOpposite())) {
+			if(blockEntity == null ||
+					blockEntity instanceof PackagerBlockEntity ||
+					blockEntity instanceof PackagerExtensionBlockEntity ||
+					blockEntity instanceof UnpackagerBlockEntity ||
+					isPatternProvider(blockEntity, direction.getOpposite())) {
 				continue;
 			}
 			if(trackerToEmpty.toSend.isEmpty()) {
@@ -448,7 +456,7 @@ public class UnpackagerBlockEntity extends BaseBlockEntity {
 			}
 			nbt.put("ToSend", MiscHelper.INSTANCE.saveAllItems(new ListTag(), toSend));
 			if(direction != null) {
-				nbt.putByte("Facing", (byte)direction.get3DDataValue());
+				nbt.putByte("Direction", (byte)direction.get3DDataValue());
 			}
 		}
 

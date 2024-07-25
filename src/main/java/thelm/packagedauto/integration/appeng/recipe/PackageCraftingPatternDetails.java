@@ -1,5 +1,6 @@
 package thelm.packagedauto.integration.appeng.recipe;
 
+import java.util.List;
 import java.util.Objects;
 
 import appeng.api.crafting.IPatternDetails;
@@ -13,15 +14,13 @@ public class PackageCraftingPatternDetails implements IPatternDetails {
 
 	public final AEItemKey recipeHolder;
 	public final IPackagePattern pattern;
-	public final GenericStack[] sparseInputs;
 	public final IInput[] inputs;
 	public final GenericStack[] outputs;
-	private int priority = 0;
 
 	public PackageCraftingPatternDetails(ItemStack recipeHolder, IPackagePattern pattern) {
 		this.recipeHolder = AEItemKey.of(recipeHolder);
 		this.pattern = pattern;
-		sparseInputs = pattern.getInputs().stream().map(GenericStack::fromItemStack).toArray(GenericStack[]::new);
+		List<GenericStack> sparseInputs = pattern.getInputs().stream().map(GenericStack::fromItemStack).toList();
 		inputs = AppEngUtil.toInputs(pattern.getRecipeInfo(), AppEngUtil.condenseStacks(sparseInputs));
 		outputs = new GenericStack[] {GenericStack.fromItemStack(pattern.getOutput())};
 	}
@@ -29,14 +28,6 @@ public class PackageCraftingPatternDetails implements IPatternDetails {
 	@Override
 	public AEItemKey getDefinition() {
 		return recipeHolder;
-	}
-
-	public GenericStack[] getSparseInputs() {
-		return sparseInputs;
-	}
-
-	public GenericStack[] getSparseOutputs() {
-		return outputs;
 	}
 
 	@Override

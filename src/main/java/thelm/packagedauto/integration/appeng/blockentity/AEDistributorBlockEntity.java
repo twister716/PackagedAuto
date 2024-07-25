@@ -22,7 +22,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
-import thelm.packagedauto.block.CrafterBlock;
+import thelm.packagedauto.block.DistributorBlock;
 import thelm.packagedauto.block.entity.DistributorBlockEntity;
 
 public class AEDistributorBlockEntity extends DistributorBlockEntity implements IInWorldGridNodeHost, IGridNodeListener<AEDistributorBlockEntity>, IActionHost {
@@ -80,7 +80,7 @@ public class AEDistributorBlockEntity extends DistributorBlockEntity implements 
 		if(gridNode == null) {
 			gridNode = GridHelper.createManagedNode(this, this);
 			gridNode.setTagName("Node");
-			gridNode.setVisualRepresentation(CrafterBlock.INSTANCE);
+			gridNode.setVisualRepresentation(DistributorBlock.INSTANCE);
 			gridNode.setGridColor(AEColor.TRANSPARENT);
 			gridNode.setIdlePowerUsage(1);
 			gridNode.setInWorldNode(true);
