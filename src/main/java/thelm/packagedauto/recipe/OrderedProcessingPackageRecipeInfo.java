@@ -67,7 +67,7 @@ public class OrderedProcessingPackageRecipeInfo implements IPackageRecipeInfo {
 	}
 
 	private static List<ItemStack> removeEmptyStacks(List<ItemStack> stacks) {
-		return stacks.stream().filter(stack -> !stack.isEmpty()).collect(Collectors.toList());
+		return stacks.stream().filter(stack -> !stack.isEmpty()).toList();
 	}
 
 	@Override
