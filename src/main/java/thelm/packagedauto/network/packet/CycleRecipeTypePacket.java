@@ -15,20 +15,20 @@ public class CycleRecipeTypePacket {
 		this.reverse = reverse;
 	}
 
-	public static void encode(CycleRecipeTypePacket pkt, PacketBuffer buf) {
-		buf.writeBoolean(pkt.reverse);
+	public void encode(PacketBuffer buf) {
+		buf.writeBoolean(reverse);
 	}
 
 	public static CycleRecipeTypePacket decode(PacketBuffer buf) {
 		return new CycleRecipeTypePacket(buf.readBoolean());
 	}
 
-	public static void handle(CycleRecipeTypePacket pkt, Supplier<NetworkEvent.Context> ctx) {
+	public void handle(Supplier<NetworkEvent.Context> ctx) {
 		ServerPlayerEntity player = ctx.get().getSender();
 		ctx.get().enqueueWork(()->{
 			if(player.containerMenu instanceof EncoderContainer) {
 				EncoderContainer container = (EncoderContainer)player.containerMenu;
-				container.patternItemHandler.cycleRecipeType(pkt.reverse);
+				container.patternItemHandler.cycleRecipeType(reverse);
 				container.setupSlots();
 			}
 		});

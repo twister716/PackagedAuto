@@ -22,7 +22,6 @@ import thelm.packagedauto.block.EncoderBlock;
 import thelm.packagedauto.container.EncoderContainer;
 import thelm.packagedauto.inventory.EncoderItemHandler;
 import thelm.packagedauto.inventory.EncoderPatternItemHandler;
-import thelm.packagedauto.recipe.ProcessingPackageRecipeType;
 
 public class EncoderTile extends BaseTile {
 
@@ -108,12 +107,26 @@ public class EncoderTile extends BaseTile {
 		}
 	}
 
-	public void loadRecipeList() {
+	public void loadRecipeList(boolean single) {
 		ItemStack stack = itemHandler.getStackInSlot(0);
 		if(stack.getItem() instanceof IPackageRecipeListItem) {
 			IPackageRecipeList recipeListItem = ((IPackageRecipeListItem)stack.getItem()).getRecipeList(level, stack);
 			List<IPackageRecipeInfo> recipeList = recipeListItem.getRecipeList();
-			for(int i = 0; i < patternItemHandlers.length; ++i) {
+			if(single) {
+				EncoderPatternItemHandler inv = patternItemHandlers[patternIndex];
+				if(!recipeList.isEmpty()) {
+					int i = recipeList.size() > patternIndex ? patternIndex : 0;
+					IPackageRecipeInfo recipe = recipeList.get(i);
+					inv.recipeType = recipe.getRecipeType();
+					if(recipe.isValid()) {
+						inv.setRecipe(recipe.getEncoderStacks());
+					}
+				}
+				else {
+					inv.setRecipe(null);
+				}
+			}
+			else for(int i = 0; i < patternItemHandlers.length; ++i) {
 				EncoderPatternItemHandler inv = patternItemHandlers[i];
 				if(i < recipeList.size()) {
 					IPackageRecipeInfo recipe = recipeList.get(i);
@@ -123,16 +136,15 @@ public class EncoderTile extends BaseTile {
 					}
 				}
 				else {
-					inv.recipeType = ProcessingPackageRecipeType.INSTANCE;
 					inv.setRecipe(null);
 				}
 			}
 		}
-		else {
-			for(EncoderPatternItemHandler inv : patternItemHandlers) {
-				inv.recipeType = ProcessingPackageRecipeType.INSTANCE;
-				inv.setRecipe(null);
-			}
+		else if(single) {
+			patternItemHandlers[patternIndex].setRecipe(null);
+		}
+		else for(EncoderPatternItemHandler inv : patternItemHandlers) {
+			inv.setRecipe(null);
 		}
 	}
 

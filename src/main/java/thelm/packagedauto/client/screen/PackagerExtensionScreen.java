@@ -77,7 +77,7 @@ public class PackagerExtensionScreen extends BaseScreen<PackagerExtensionContain
 
 		@Override
 		public void onClick(double mouseX, double mouseY) {
-			PacketHandler.INSTANCE.sendToServer(new ChangePackagingPacket());
+			PacketHandler.INSTANCE.sendToServer(ChangePackagingPacket.INSTANCE);
 		}
 	}
 }

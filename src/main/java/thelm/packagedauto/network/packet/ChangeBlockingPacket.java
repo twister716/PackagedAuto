@@ -9,15 +9,15 @@ import thelm.packagedauto.container.UnpackagerContainer;
 
 public class ChangeBlockingPacket {
 
-	public ChangeBlockingPacket() {}
+	public static final ChangeBlockingPacket INSTANCE = new ChangeBlockingPacket();
 
-	public static void encode(ChangeBlockingPacket pkt, PacketBuffer buf) {}
+	public void encode(PacketBuffer buf) {}
 
 	public static ChangeBlockingPacket decode(PacketBuffer buf) {
-		return new ChangeBlockingPacket();
+		return INSTANCE;
 	}
 
-	public static void handle(ChangeBlockingPacket pkt, Supplier<NetworkEvent.Context> ctx) {
+	public void handle(Supplier<NetworkEvent.Context> ctx) {
 		ServerPlayerEntity player = ctx.get().getSender();
 		ctx.get().enqueueWork(()->{
 			if(player.containerMenu instanceof UnpackagerContainer) {

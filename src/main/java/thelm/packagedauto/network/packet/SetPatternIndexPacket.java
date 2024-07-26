@@ -15,20 +15,20 @@ public class SetPatternIndexPacket {
 		this.index = index;
 	}
 
-	public static void encode(SetPatternIndexPacket pkt, PacketBuffer buf) {
-		buf.writeByte(pkt.index);
+	public void encode(PacketBuffer buf) {
+		buf.writeByte(index);
 	}
 
 	public static SetPatternIndexPacket decode(PacketBuffer buf) {
 		return new SetPatternIndexPacket(buf.readByte());
 	}
 
-	public static void handle(SetPatternIndexPacket pkt, Supplier<NetworkEvent.Context> ctx) {
+	public void handle(Supplier<NetworkEvent.Context> ctx) {
 		ServerPlayerEntity player = ctx.get().getSender();
 		ctx.get().enqueueWork(()->{
 			if(player.containerMenu instanceof EncoderContainer) {
 				EncoderContainer container = (EncoderContainer)player.containerMenu;
-				container.tile.setPatternIndex(pkt.index);
+				container.tile.setPatternIndex(index);
 				container.setupSlots();
 			}
 		});

@@ -15,20 +15,20 @@ public class TrackerCountPacket {
 		this.decrease = decrease;
 	}
 
-	public static void encode(TrackerCountPacket pkt, PacketBuffer buf) {
-		buf.writeBoolean(pkt.decrease);
+	public void encode(PacketBuffer buf) {
+		buf.writeBoolean(decrease);
 	}
 
 	public static TrackerCountPacket decode(PacketBuffer buf) {
 		return new TrackerCountPacket(buf.readBoolean());
 	}
 
-	public static void handle(TrackerCountPacket pkt, Supplier<NetworkEvent.Context> ctx) {
+	public void handle(Supplier<NetworkEvent.Context> ctx) {
 		ServerPlayerEntity player = ctx.get().getSender();
 		ctx.get().enqueueWork(()->{
 			if(player.containerMenu instanceof UnpackagerContainer) {
 				UnpackagerContainer container = (UnpackagerContainer)player.containerMenu;
-				container.tile.changeTrackerCount(pkt.decrease);
+				container.tile.changeTrackerCount(decrease);
 			}
 		});
 		ctx.get().setPacketHandled(true);

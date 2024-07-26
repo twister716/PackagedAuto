@@ -22,25 +22,25 @@ public class SetItemStackPacket {
 		this.stack = stack;
 	}
 
-	public static void encode(SetItemStackPacket pkt, PacketBuffer buf) {
-		buf.writeShort(pkt.containerSlot);
-		MiscHelper.INSTANCE.writeItemWithLargeCount(buf, pkt.stack);
+	public void encode(PacketBuffer buf) {
+		buf.writeShort(containerSlot);
+		MiscHelper.INSTANCE.writeItemWithLargeCount(buf, stack);
 	}
 
 	public static SetItemStackPacket decode(PacketBuffer buf) {
 		return new SetItemStackPacket(buf.readShort(), MiscHelper.INSTANCE.readItemWithLargeCount(buf));
 	}
 
-	public static void handle(SetItemStackPacket pkt, Supplier<NetworkEvent.Context> ctx) {
+	public void handle(Supplier<NetworkEvent.Context> ctx) {
 		ServerPlayerEntity player = ctx.get().getSender();
 		ctx.get().enqueueWork(()->{
 			Container container = player.containerMenu;
 			if(container != null) {
-				if(pkt.containerSlot >= 0 && pkt.containerSlot < container.slots.size()) {
-					Slot slot = container.getSlot(pkt.containerSlot);
+				if(containerSlot >= 0 && containerSlot < container.slots.size()) {
+					Slot slot = container.getSlot(containerSlot);
 					if(slot instanceof FalseCopySlot) {
 						ItemStackHandler handler = (ItemStackHandler)((FalseCopySlot)slot).getItemHandler();
-						handler.setStackInSlot(slot.getSlotIndex(), pkt.stack);
+						handler.setStackInSlot(slot.getSlotIndex(), stack);
 					}
 				}
 			}

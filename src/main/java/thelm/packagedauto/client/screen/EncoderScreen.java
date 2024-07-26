@@ -206,9 +206,17 @@ public class EncoderScreen extends BaseScreen<EncoderContainer> {
 		}
 
 		@Override
+		public void renderToolTip(MatrixStack matrixStack, int mouseX, int mouseY) {
+			if(hasShiftDown()) {
+				renderTooltip(matrixStack, new TranslationTextComponent("block.packagedauto.encoder.load_single"), mouseX, mouseY);
+			}
+		}
+
+		@Override
 		public void onClick(double mouseX, double mouseY) {
-			PacketHandler.INSTANCE.sendToServer(new LoadRecipeListPacket());
-			menu.tile.loadRecipeList();
+			boolean single = hasShiftDown();
+			PacketHandler.INSTANCE.sendToServer(new LoadRecipeListPacket(single));
+			menu.tile.loadRecipeList(single);
 			menu.setupSlots();
 		}
 	}

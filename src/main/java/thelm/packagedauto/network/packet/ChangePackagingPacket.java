@@ -10,15 +10,15 @@ import thelm.packagedauto.container.PackagerExtensionContainer;
 
 public class ChangePackagingPacket {
 
-	public ChangePackagingPacket() {}
+	public static final ChangePackagingPacket INSTANCE = new ChangePackagingPacket();
 
-	public static void encode(ChangePackagingPacket pkt, PacketBuffer buf) {}
+	public void encode(PacketBuffer buf) {}
 
 	public static ChangePackagingPacket decode(PacketBuffer buf) {
-		return new ChangePackagingPacket();
+		return INSTANCE;
 	}
 
-	public static void handle(ChangePackagingPacket pkt, Supplier<NetworkEvent.Context> ctx) {
+	public void handle(Supplier<NetworkEvent.Context> ctx) {
 		ServerPlayerEntity player = ctx.get().getSender();
 		ctx.get().enqueueWork(()->{
 			if(player.containerMenu instanceof PackagerContainer) {

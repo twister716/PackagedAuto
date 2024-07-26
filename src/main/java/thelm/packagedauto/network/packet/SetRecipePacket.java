@@ -24,9 +24,9 @@ public class SetRecipePacket {
 		return this;
 	}
 
-	public static void encode(SetRecipePacket pkt, PacketBuffer buf) {
-		buf.writeByte(pkt.map.size());
-		for(Int2ObjectMap.Entry<ItemStack> entry : pkt.map.int2ObjectEntrySet()) {
+	public void encode(PacketBuffer buf) {
+		buf.writeByte(map.size());
+		for(Int2ObjectMap.Entry<ItemStack> entry : map.int2ObjectEntrySet()) {
 			buf.writeByte(entry.getIntKey());
 			MiscHelper.INSTANCE.writeItemWithLargeCount(buf, entry.getValue());
 		}
@@ -43,13 +43,13 @@ public class SetRecipePacket {
 		return new SetRecipePacket(map);
 	}
 
-	public static void handle(SetRecipePacket pkt, Supplier<NetworkEvent.Context> ctx) {
+	public void handle(Supplier<NetworkEvent.Context> ctx) {
 		ServerPlayerEntity player = ctx.get().getSender();
 		ctx.get().enqueueWork(()->{
 			if(player.containerMenu instanceof EncoderContainer) {
 				if(player.containerMenu instanceof EncoderContainer) {
 					EncoderContainer container = (EncoderContainer)player.containerMenu;
-					container.patternItemHandler.setRecipe(pkt.map);
+					container.patternItemHandler.setRecipe(map);
 				}
 			}
 		});

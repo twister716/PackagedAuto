@@ -15,20 +15,20 @@ public class SaveRecipeListPacket {
 		this.single = single;
 	}
 
-	public static void encode(SaveRecipeListPacket pkt, PacketBuffer buf) {
-		buf.writeBoolean(pkt.single);
+	public void encode(PacketBuffer buf) {
+		buf.writeBoolean(single);
 	}
 
 	public static SaveRecipeListPacket decode(PacketBuffer buf) {
 		return new SaveRecipeListPacket(buf.readBoolean());
 	}
 
-	public static void handle(SaveRecipeListPacket pkt, Supplier<NetworkEvent.Context> ctx) {
+	public void handle(Supplier<NetworkEvent.Context> ctx) {
 		ServerPlayerEntity player = ctx.get().getSender();
 		ctx.get().enqueueWork(()->{
 			if(player.containerMenu instanceof EncoderContainer) {
 				EncoderContainer container = (EncoderContainer)player.containerMenu;
-				container.tile.saveRecipeList(pkt.single);
+				container.tile.saveRecipeList(single);
 			}
 		});
 		ctx.get().setPacketHandled(true);

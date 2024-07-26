@@ -25,22 +25,22 @@ public class SyncEnergyPacket {
 		this.energy = energy;
 	}
 
-	public static void encode(SyncEnergyPacket pkt, PacketBuffer buf) {
-		buf.writeBlockPos(pkt.pos);
-		buf.writeInt(pkt.energy);
+	public void encode(PacketBuffer buf) {
+		buf.writeBlockPos(pos);
+		buf.writeInt(energy);
 	}
 
 	public static SyncEnergyPacket decode(PacketBuffer buf) {
 		return new SyncEnergyPacket(buf.readBlockPos(), buf.readInt());
 	}
 
-	public static void handle(SyncEnergyPacket pkt, Supplier<NetworkEvent.Context> ctx) {
+	public void handle(Supplier<NetworkEvent.Context> ctx) {
 		ctx.get().enqueueWork(()->{
 			ClientWorld world = Minecraft.getInstance().level;
-			if(world.isLoaded(pkt.pos)) {
-				TileEntity te = world.getBlockEntity(pkt.pos);
+			if(world.isLoaded(pos)) {
+				TileEntity te = world.getBlockEntity(pos);
 				if(te instanceof BaseTile) {
-					((BaseTile)te).getEnergyStorage().setEnergyStored(pkt.energy);
+					((BaseTile)te).getEnergyStorage().setEnergyStored(energy);
 				}
 			}
 		});
