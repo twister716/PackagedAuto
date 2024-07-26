@@ -1,4 +1,5 @@
-Disallow activating fluid package filler when working
+Allow loading of invalid recipes and add validity checks  
+Disallow activating fluid package filler when working  
 Disallow changing amount setting of fluid package filler when working  
 Fix recipe conditions  
 Fix unpackager tracker direction saving  

@@ -379,7 +379,7 @@ public class UnpackagerBlockEntity extends BaseBlockEntity {
 			}
 			IPackageRecipeInfo recipe = packageItem.getRecipeInfo(stack);
 			int index = packageItem.getIndex(stack);
-			if(recipe != null && recipe.validPatternIndex(index)) {
+			if(recipe != null && recipe.isValid() && recipe.validPatternIndex(index)) {
 				if(this.recipe == null) {
 					this.recipe = recipe;
 					amount = recipe.getPatterns().size();
