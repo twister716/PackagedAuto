@@ -15,32 +15,24 @@ import net.minecraftforge.network.PacketDistributor.TargetPoint;
 import thelm.packagedauto.block.entity.BaseBlockEntity;
 import thelm.packagedauto.network.PacketHandler;
 
-public class SyncEnergyPacket {
+public record SyncEnergyPacket(BlockPos pos, int energy) {
 
-	private BlockPos pos;
-	private int energy;
-
-	public SyncEnergyPacket(BlockPos pos, int energy) {
-		this.pos = pos;
-		this.energy = energy;
-	}
-
-	public static void encode(SyncEnergyPacket pkt, FriendlyByteBuf buf) {
-		buf.writeBlockPos(pkt.pos);
-		buf.writeInt(pkt.energy);
+	public void encode(FriendlyByteBuf buf) {
+		buf.writeBlockPos(pos);
+		buf.writeInt(energy);
 	}
 
 	public static SyncEnergyPacket decode(FriendlyByteBuf buf) {
 		return new SyncEnergyPacket(buf.readBlockPos(), buf.readInt());
 	}
 
-	public static void handle(SyncEnergyPacket pkt, Supplier<NetworkEvent.Context> ctx) {
+	public void handle(Supplier<NetworkEvent.Context> ctx) {
 		ctx.get().enqueueWork(()->{
 			ClientLevel level = Minecraft.getInstance().level;
-			if(level.isLoaded(pkt.pos)) {
-				BlockEntity be = level.getBlockEntity(pkt.pos);
+			if(level.isLoaded(pos)) {
+				BlockEntity be = level.getBlockEntity(pos);
 				if(be instanceof BaseBlockEntity bbe) {
-					bbe.getEnergyStorage().setEnergyStored(pkt.energy);
+					bbe.getEnergyStorage().setEnergyStored(energy);
 				}
 			}
 		});

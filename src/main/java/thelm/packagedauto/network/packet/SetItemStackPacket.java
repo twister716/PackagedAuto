@@ -12,35 +12,27 @@ import net.minecraftforge.network.NetworkEvent;
 import thelm.packagedauto.slot.FalseCopySlot;
 import thelm.packagedauto.util.MiscHelper;
 
-public class SetItemStackPacket {
+public record SetItemStackPacket(short containerSlot, ItemStack stack) {
 
-	private short containerSlot;
-	private ItemStack stack;
-
-	public SetItemStackPacket(short containerSlot, ItemStack stack) {
-		this.containerSlot = containerSlot;
-		this.stack = stack;
-	}
-
-	public static void encode(SetItemStackPacket pkt, FriendlyByteBuf buf) {
-		buf.writeShort(pkt.containerSlot);
-		MiscHelper.INSTANCE.writeItemWithLargeCount(buf, pkt.stack);
+	public void encode(FriendlyByteBuf buf) {
+		buf.writeShort(containerSlot);
+		MiscHelper.INSTANCE.writeItemWithLargeCount(buf, stack);
 	}
 
 	public static SetItemStackPacket decode(FriendlyByteBuf buf) {
 		return new SetItemStackPacket(buf.readShort(), MiscHelper.INSTANCE.readItemWithLargeCount(buf));
 	}
 
-	public static void handle(SetItemStackPacket pkt, Supplier<NetworkEvent.Context> ctx) {
+	public void handle(Supplier<NetworkEvent.Context> ctx) {
 		ServerPlayer player = ctx.get().getSender();
 		ctx.get().enqueueWork(()->{
 			AbstractContainerMenu container = player.containerMenu;
 			if(container != null) {
-				if(pkt.containerSlot >= 0 && pkt.containerSlot < container.slots.size()) {
-					Slot slot = container.getSlot(pkt.containerSlot);
+				if(containerSlot >= 0 && containerSlot < container.slots.size()) {
+					Slot slot = container.getSlot(containerSlot);
 					if(slot instanceof FalseCopySlot fSlot) {
 						ItemStackHandler handler = (ItemStackHandler)fSlot.getItemHandler();
-						handler.setStackInSlot(slot.getSlotIndex(), pkt.stack);
+						handler.setStackInSlot(slot.getSlotIndex(), stack);
 					}
 				}
 			}

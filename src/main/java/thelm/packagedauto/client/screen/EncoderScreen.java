@@ -20,7 +20,6 @@ import thelm.packagedauto.api.IPackageRecipeType;
 import thelm.packagedauto.menu.EncoderMenu;
 import thelm.packagedauto.network.PacketHandler;
 import thelm.packagedauto.network.packet.CycleRecipeTypePacket;
-import thelm.packagedauto.network.packet.LoadRecipeListPacket;
 import thelm.packagedauto.network.packet.SaveRecipeListPacket;
 import thelm.packagedauto.network.packet.SetPatternIndexPacket;
 import yalter.mousetweaks.api.MouseTweaksDisableWheelTweak;
@@ -214,9 +213,17 @@ public class EncoderScreen extends BaseScreen<EncoderMenu> {
 		}
 
 		@Override
+		public void renderToolTip(PoseStack poseStack, int mouseX, int mouseY) {
+			if(hasShiftDown()) {
+				renderTooltip(poseStack, new TranslatableComponent("block.packagedauto.encoder.load_single"), mouseX, mouseY);
+			}
+		}
+
+		@Override
 		public void onClick(double mouseX, double mouseY) {
-			PacketHandler.INSTANCE.sendToServer(new LoadRecipeListPacket());
-			menu.blockEntity.loadRecipeList();
+			boolean single = hasShiftDown();
+			PacketHandler.INSTANCE.sendToServer(new SaveRecipeListPacket(single));
+			menu.blockEntity.loadRecipeList(single);
 			menu.setupSlots();
 		}
 

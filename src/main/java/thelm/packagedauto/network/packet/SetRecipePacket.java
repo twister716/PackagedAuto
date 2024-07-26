@@ -11,22 +11,16 @@ import net.minecraftforge.network.NetworkEvent;
 import thelm.packagedauto.menu.EncoderMenu;
 import thelm.packagedauto.util.MiscHelper;
 
-public class SetRecipePacket {
-
-	private Int2ObjectMap<ItemStack> map;
-
-	public SetRecipePacket(Int2ObjectMap<ItemStack> map) {
-		this.map = map;
-	}
+public record SetRecipePacket(Int2ObjectMap<ItemStack> map) {
 
 	public SetRecipePacket addItem(int index, ItemStack stack) {
 		map.put(index, stack);
 		return this;
 	}
 
-	public static void encode(SetRecipePacket pkt, FriendlyByteBuf buf) {
-		buf.writeByte(pkt.map.size());
-		for(Int2ObjectMap.Entry<ItemStack> entry : pkt.map.int2ObjectEntrySet()) {
+	public void encode(FriendlyByteBuf buf) {
+		buf.writeByte(map.size());
+		for(Int2ObjectMap.Entry<ItemStack> entry : map.int2ObjectEntrySet()) {
 			buf.writeByte(entry.getIntKey());
 			MiscHelper.INSTANCE.writeItemWithLargeCount(buf, entry.getValue());
 		}
@@ -43,11 +37,11 @@ public class SetRecipePacket {
 		return new SetRecipePacket(map);
 	}
 
-	public static void handle(SetRecipePacket pkt, Supplier<NetworkEvent.Context> ctx) {
+	public void handle(Supplier<NetworkEvent.Context> ctx) {
 		ServerPlayer player = ctx.get().getSender();
 		ctx.get().enqueueWork(()->{
 			if(player.containerMenu instanceof EncoderMenu menu) {
-				menu.patternItemHandler.setRecipe(pkt.map);
+				menu.patternItemHandler.setRecipe(map);
 			}
 		});
 		ctx.get().setPacketHandled(true);

@@ -79,7 +79,7 @@ public class PackagerScreen extends BaseScreen<PackagerMenu> {
 
 		@Override
 		public void onClick(double mouseX, double mouseY) {
-			PacketHandler.INSTANCE.sendToServer(new ChangePackagingPacket());
+			PacketHandler.INSTANCE.sendToServer(ChangePackagingPacket.INSTANCE);
 		}
 
 		@Override

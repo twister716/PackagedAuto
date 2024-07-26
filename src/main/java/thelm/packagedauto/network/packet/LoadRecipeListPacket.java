@@ -7,21 +7,21 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkEvent;
 import thelm.packagedauto.menu.EncoderMenu;
 
-public class LoadRecipeListPacket {
+public record LoadRecipeListPacket(boolean single) {
 
-	public LoadRecipeListPacket() {}
-
-	public static void encode(LoadRecipeListPacket pkt, FriendlyByteBuf buf) {}
-
-	public static LoadRecipeListPacket decode(FriendlyByteBuf buf) {
-		return new LoadRecipeListPacket();
+	public void encode(FriendlyByteBuf buf) {
+		buf.writeBoolean(single);
 	}
 
-	public static void handle(LoadRecipeListPacket pkt, Supplier<NetworkEvent.Context> ctx) {
+	public static LoadRecipeListPacket decode(FriendlyByteBuf buf) {
+		return new LoadRecipeListPacket(buf.readBoolean());
+	}
+
+	public void handle(Supplier<NetworkEvent.Context> ctx) {
 		ServerPlayer player = ctx.get().getSender();
 		ctx.get().enqueueWork(()->{
 			if(player.containerMenu instanceof EncoderMenu menu) {
-				menu.blockEntity.loadRecipeList();
+				menu.blockEntity.loadRecipeList(single);
 			}
 		});
 		ctx.get().setPacketHandled(true);

@@ -143,13 +143,11 @@ public class EncoderPatternItemHandler extends BaseItemHandler<EncoderBlockEntit
 	}
 
 	public void setRecipe(Int2ObjectMap<ItemStack> map) {
-		if(recipeType.canSetOutput()) {
-			for(int i = 0; i < 90; ++i) {
-				stacks.set(i, ItemStack.EMPTY);
-			}
+		for(int i = 0; i < 81; ++i) {
+			stacks.set(i, ItemStack.EMPTY);
 		}
-		else {
-			for(int i = 0; i < 81; ++i) {
+		if(recipeType.canSetOutput()) {
+			for(int i = 81; i < 90; ++i) {
 				stacks.set(i, ItemStack.EMPTY);
 			}
 		}
