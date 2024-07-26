@@ -2,7 +2,6 @@ package thelm.packagedauto.block.entity;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import com.google.common.collect.Lists;
 
@@ -193,7 +192,8 @@ public class PackagerExtensionBlockEntity extends BaseBlockEntity {
 					ItemStack listStack = packager.itemHandler.getStackInSlot(10);
 					listStackItemHandler.setStackInSlot(0, listStack);
 					if(listStack.getItem() instanceof IPackageRecipeListItem listItem) {
-						listItem.getRecipeList(level, listStack).getRecipeList().forEach(recipe->{
+						listItem.getRecipeList(level, listStack).getRecipeList().stream().
+						filter(IPackageRecipeInfo::isValid).forEach(recipe->{
 							recipe.getPatterns().forEach(patternList::add);
 							recipe.getExtraPatterns().forEach(patternList::add);
 						});
@@ -201,7 +201,7 @@ public class PackagerExtensionBlockEntity extends BaseBlockEntity {
 					else if(listStack.getItem() instanceof IPackageItem packageItem) {
 						IPackageRecipeInfo recipe = packageItem.getRecipeInfo(listStack);
 						int index = packageItem.getIndex(listStack);
-						if(recipe != null && recipe.validPatternIndex(index)) {
+						if(recipe != null && recipe.isValid() && recipe.validPatternIndex(index)) {
 							patternList.add(recipe.getPatterns().get(index));
 						}
 					}

@@ -77,7 +77,7 @@ public class CrafterBlockEntity extends BaseBlockEntity implements IPackageCraft
 
 	@Override
 	public boolean acceptPackage(IPackageRecipeInfo recipeInfo, List<ItemStack> stacks, Direction direction) {
-		if(!isBusy() && recipeInfo instanceof ICraftingPackageRecipeInfo recipe) {
+		if(!isBusy() && recipeInfo.isValid() && recipeInfo instanceof ICraftingPackageRecipeInfo recipe) {
 			ItemStack slotStack = itemHandler.getStackInSlot(9);
 			ItemStack outputStack = recipe.getOutput();
 			if(slotStack.isEmpty() || ItemStack.isSameItemSameTags(slotStack, outputStack) && slotStack.getCount()+outputStack.getCount() <= outputStack.getMaxStackSize()) {

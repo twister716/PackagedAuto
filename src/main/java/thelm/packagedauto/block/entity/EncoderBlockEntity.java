@@ -105,7 +105,7 @@ public class EncoderBlockEntity extends BaseBlockEntity {
 			recipeListItem.setRecipeList(recipeList);
 			CompoundTag nbt = new CompoundTag();
 			recipeListItem.save(nbt);
-			itemHandler.getStackInSlot(0).setTag(nbt);
+			stack.setTag(nbt);
 		}
 	}
 
@@ -119,7 +119,9 @@ public class EncoderBlockEntity extends BaseBlockEntity {
 				if(i < recipeList.size()) {
 					IPackageRecipeInfo recipe = recipeList.get(i);
 					inv.recipeType = recipe.getRecipeType();
-					inv.setRecipe(recipe.getEncoderStacks());
+					if(recipe.isValid()) {
+						inv.setRecipe(recipe.getEncoderStacks());
+					}
 				}
 				else {
 					inv.recipeType = ProcessingPackageRecipeType.INSTANCE;
