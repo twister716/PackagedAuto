@@ -5,6 +5,7 @@
 	"block.packagedauto.encoder.save": "Сохранить",
 	"block.packagedauto.encoder.save_single": "Сохранить одиночный",
 	"block.packagedauto.encoder.load": "Загрузить",
+	"block.packagedauto.encoder.load_single": "Загрузить одиночный",
 	"block.packagedauto.encoder.pattern_slot": "Слот рецепта %s",
 	"block.packagedauto.encoder.change_recipe_type": "Сменить тип рецепта",
 	"block.packagedauto.packager": "Упаковщик",

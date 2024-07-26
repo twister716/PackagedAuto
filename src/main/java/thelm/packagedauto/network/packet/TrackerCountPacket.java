@@ -7,27 +7,21 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkEvent;
 import thelm.packagedauto.menu.UnpackagerMenu;
 
-public class TrackerCountPacket {
+public record TrackerCountPacket(boolean decrease) {
 
-	private boolean decrease;
-
-	public TrackerCountPacket(boolean decrease) {
-		this.decrease = decrease;
-	}
-
-	public static void encode(TrackerCountPacket pkt, FriendlyByteBuf buf) {
-		buf.writeBoolean(pkt.decrease);
+	public void encode(FriendlyByteBuf buf) {
+		buf.writeBoolean(decrease);
 	}
 
 	public static TrackerCountPacket decode(FriendlyByteBuf buf) {
 		return new TrackerCountPacket(buf.readBoolean());
 	}
 
-	public static void handle(TrackerCountPacket pkt, Supplier<NetworkEvent.Context> ctx) {
+	public void handle(Supplier<NetworkEvent.Context> ctx) {
 		ServerPlayer player = ctx.get().getSender();
 		ctx.get().enqueueWork(()->{
 			if(player.containerMenu instanceof UnpackagerMenu menu) {
-				menu.blockEntity.changeTrackerCount(pkt.decrease);
+				menu.blockEntity.changeTrackerCount(decrease);
 			}
 		});
 		ctx.get().setPacketHandled(true);

@@ -7,27 +7,21 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkEvent;
 import thelm.packagedauto.menu.FluidPackageFillerMenu;
 
-public class SetFluidAmountPacket {
+public record SetFluidAmountPacket(int amount) {
 
-	private int amount;
-
-	public SetFluidAmountPacket(int amount) {
-		this.amount = amount;
-	}
-
-	public static void encode(SetFluidAmountPacket pkt, FriendlyByteBuf buf) {
-		buf.writeInt(pkt.amount);
+	public void encode(FriendlyByteBuf buf) {
+		buf.writeInt(amount);
 	}
 
 	public static SetFluidAmountPacket decode(FriendlyByteBuf buf) {
 		return new SetFluidAmountPacket(buf.readInt());
 	}
 
-	public static void handle(SetFluidAmountPacket pkt, Supplier<NetworkEvent.Context> ctx) {
+	public void handle(Supplier<NetworkEvent.Context> ctx) {
 		ServerPlayer player = ctx.get().getSender();
 		ctx.get().enqueueWork(()->{
 			if(player.containerMenu instanceof FluidPackageFillerMenu menu) {
-				menu.blockEntity.requiredAmount = pkt.amount;
+				menu.blockEntity.requiredAmount = amount;
 			}
 		});
 		ctx.get().setPacketHandled(true);

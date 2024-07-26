@@ -7,17 +7,17 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkEvent;
 import thelm.packagedauto.menu.UnpackagerMenu;
 
-public class ChangeBlockingPacket {
+public record ChangeBlockingPacket() {
 
-	public ChangeBlockingPacket() {}
+	public static final ChangeBlockingPacket INSTANCE = new ChangeBlockingPacket();
 
-	public static void encode(ChangeBlockingPacket pkt, FriendlyByteBuf buf) {}
+	public void encode(FriendlyByteBuf buf) {}
 
 	public static ChangeBlockingPacket decode(FriendlyByteBuf buf) {
-		return new ChangeBlockingPacket();
+		return INSTANCE;
 	}
 
-	public static void handle(ChangeBlockingPacket pkt, Supplier<NetworkEvent.Context> ctx) {
+	public void handle(Supplier<NetworkEvent.Context> ctx) {
 		ServerPlayer player = ctx.get().getSender();
 		ctx.get().enqueueWork(()->{
 			if(player.containerMenu instanceof UnpackagerMenu menu) {

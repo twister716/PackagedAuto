@@ -8,17 +8,17 @@ import net.minecraftforge.network.NetworkEvent;
 import thelm.packagedauto.menu.PackagerExtensionMenu;
 import thelm.packagedauto.menu.PackagerMenu;
 
-public class ChangePackagingPacket {
+public record ChangePackagingPacket() {
 
-	public ChangePackagingPacket() {}
+	public static final ChangePackagingPacket INSTANCE = new ChangePackagingPacket();
 
-	public static void encode(ChangePackagingPacket pkt, FriendlyByteBuf buf) {}
+	public void encode(FriendlyByteBuf buf) {}
 
 	public static ChangePackagingPacket decode(FriendlyByteBuf buf) {
-		return new ChangePackagingPacket();
+		return INSTANCE;
 	}
 
-	public static void handle(ChangePackagingPacket pkt, Supplier<NetworkEvent.Context> ctx) {
+	public void handle(Supplier<NetworkEvent.Context> ctx) {
 		ServerPlayer player = ctx.get().getSender();
 		ctx.get().enqueueWork(()->{
 			if(player.containerMenu instanceof PackagerMenu menu) {
