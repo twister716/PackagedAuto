@@ -318,18 +318,16 @@ public class MiscHelper implements IMiscHelper {
 
 	@Override
 	public IPackageRecipeInfo readRecipe(CompoundNBT nbt) {
-		IPackageRecipeInfo recipe = RECIPE_CACHE.getIfPresent(nbt);
-		if(recipe != null && recipe.isValid()) {
-			return recipe;
-		}
 		IPackageRecipeType recipeType = PackagedAutoApi.instance().getRecipeType(new ResourceLocation(nbt.getString("RecipeType")));
 		if(recipeType != null) {
+			IPackageRecipeInfo recipe = RECIPE_CACHE.getIfPresent(nbt);
+			if(recipe != null) {
+				return recipe;
+			}
 			recipe = recipeType.getNewRecipeInfo();
 			recipe.read(nbt);
 			RECIPE_CACHE.put(nbt, recipe);
-			if(recipe.isValid()) {
-				return recipe;
-			}
+			return recipe;
 		}
 		return null;
 	}

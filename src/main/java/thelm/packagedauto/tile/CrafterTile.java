@@ -75,7 +75,7 @@ public class CrafterTile extends BaseTile implements ITickableTileEntity, IPacka
 
 	@Override
 	public boolean acceptPackage(IPackageRecipeInfo recipeInfo, List<ItemStack> stacks, Direction direction) {
-		if(!isBusy() && recipeInfo instanceof ICraftingPackageRecipeInfo) {
+		if(!isBusy() && recipeInfo.isValid() && recipeInfo instanceof ICraftingPackageRecipeInfo) {
 			ICraftingPackageRecipeInfo recipe = (ICraftingPackageRecipeInfo)recipeInfo;
 			ItemStack slotStack = itemHandler.getStackInSlot(9);
 			ItemStack outputStack = recipe.getOutput();

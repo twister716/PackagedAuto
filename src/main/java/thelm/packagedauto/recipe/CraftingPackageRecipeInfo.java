@@ -26,7 +26,7 @@ public class CraftingPackageRecipeInfo implements ICraftingPackageRecipeInfo {
 	ICraftingRecipe recipe;
 	List<ItemStack> input = new ArrayList<>();
 	CraftingInventory matrix = new CraftingInventory(new EmptyContainer(), 3, 3);
-	ItemStack output;
+	ItemStack output = ItemStack.EMPTY;
 	List<IPackagePattern> patterns = new ArrayList<>();
 
 	@Override
@@ -40,13 +40,13 @@ public class CraftingPackageRecipeInfo implements ICraftingPackageRecipeInfo {
 		for(int i = 0; i < 9 && i < matrixList.size(); ++i) {
 			matrix.setItem(i, matrixList.get(i));
 		}
+		input.addAll(MiscHelper.INSTANCE.condenseStacks(matrix));
+		for(int i = 0; i*9 < input.size(); ++i) {
+			patterns.add(new PackagePattern(this, i));
+		}
 		if(recipe instanceof ICraftingRecipe) {
 			this.recipe = (ICraftingRecipe)recipe;
-			input.addAll(MiscHelper.INSTANCE.condenseStacks(matrix));
 			output = this.recipe.assemble(matrix).copy();
-			for(int i = 0; i*9 < input.size(); ++i) {
-				patterns.add(new PackagePattern(this, i));
-			}
 		}
 	}
 

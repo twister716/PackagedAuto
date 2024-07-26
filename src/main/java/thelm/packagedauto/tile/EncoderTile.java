@@ -104,7 +104,7 @@ public class EncoderTile extends BaseTile {
 			IPackageRecipeList recipeListItem = ((IPackageRecipeListItem)stack.getItem()).getRecipeList(level, stack);
 			recipeListItem.setRecipeList(recipeList);
 			CompoundNBT nbt = recipeListItem.write(new CompoundNBT());
-			itemHandler.getStackInSlot(0).setTag(nbt);
+			stack.setTag(nbt);
 		}
 	}
 
@@ -118,7 +118,9 @@ public class EncoderTile extends BaseTile {
 				if(i < recipeList.size()) {
 					IPackageRecipeInfo recipe = recipeList.get(i);
 					inv.recipeType = recipe.getRecipeType();
-					inv.setRecipe(recipe.getEncoderStacks());
+					if(recipe.isValid()) {
+						inv.setRecipe(recipe.getEncoderStacks());
+					}
 				}
 				else {
 					inv.recipeType = ProcessingPackageRecipeType.INSTANCE;
