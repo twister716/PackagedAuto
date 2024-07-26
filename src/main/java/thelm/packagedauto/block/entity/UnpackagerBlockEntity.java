@@ -3,7 +3,6 @@ package thelm.packagedauto.block.entity;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import com.google.common.collect.Lists;
 
@@ -368,7 +367,7 @@ public class UnpackagerBlockEntity extends BaseBlockEntity {
 			}
 			IPackageRecipeInfo recipe = packageItem.getRecipeInfo(stack);
 			int index = packageItem.getIndex(stack);
-			if(recipe != null && recipe.validPatternIndex(index)) {
+			if(recipe != null && recipe.isValid() && recipe.validPatternIndex(index)) {
 				if(this.recipe == null) {
 					this.recipe = recipe;
 					amount = recipe.getPatterns().size();

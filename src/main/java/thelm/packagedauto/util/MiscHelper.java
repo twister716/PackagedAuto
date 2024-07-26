@@ -8,7 +8,6 @@ import java.util.Objects;
 import java.util.function.BooleanSupplier;
 import java.util.function.Function;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -344,18 +343,16 @@ public class MiscHelper implements IMiscHelper {
 
 	@Override
 	public IPackageRecipeInfo loadRecipe(CompoundTag nbt) {
-		IPackageRecipeInfo recipe = RECIPE_CACHE.getIfPresent(nbt);
-		if(recipe != null && recipe.isValid()) {
-			return recipe;
-		}
 		IPackageRecipeType recipeType = PackagedAutoApi.instance().getRecipeType(new ResourceLocation(nbt.getString("RecipeType")));
 		if(recipeType != null) {
+			IPackageRecipeInfo recipe = RECIPE_CACHE.getIfPresent(nbt);
+			if(recipe != null) {
+				return recipe;
+			}
 			recipe = recipeType.getNewRecipeInfo();
 			recipe.load(nbt);
 			RECIPE_CACHE.put(nbt, recipe);
-			if(recipe.isValid()) {
-				return recipe;
-			}
+			return recipe;
 		}
 		return null;
 	}
