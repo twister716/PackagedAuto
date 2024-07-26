@@ -4,6 +4,7 @@ tile.packagedauto.encoder.name=封包配方编码器
 tile.packagedauto.encoder.save=保存
 tile.packagedauto.encoder.save_single=保存单个
 tile.packagedauto.encoder.load=加载
+tile.packagedauto.encoder.load_single=加载单个
 tile.packagedauto.encoder.pattern_slot=配方槽位%s
 tile.packagedauto.encoder.change_recipe_type=更改配方类型
 tile.packagedauto.packager.name=封包机

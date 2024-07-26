@@ -21,7 +21,6 @@ import thelm.packagedauto.client.gui.GuiEncoder;
 import thelm.packagedauto.container.ContainerEncoder;
 import thelm.packagedauto.inventory.InventoryEncoder;
 import thelm.packagedauto.inventory.InventoryEncoderPattern;
-import thelm.packagedauto.recipe.RecipeTypeProcessing;
 
 public class TileEncoder extends TileBase {
 
@@ -102,12 +101,26 @@ public class TileEncoder extends TileBase {
 		}
 	}
 
-	public void loadRecipeList() {
+	public void loadRecipeList(boolean single) {
 		ItemStack stack = inventory.getStackInSlot(0);
 		if(stack.getItem() instanceof IRecipeListItem) {
 			IRecipeList recipeListItem = ((IRecipeListItem)stack.getItem()).getRecipeList(stack);
 			List<IRecipeInfo> recipeList = recipeListItem.getRecipeList();
-			for(int i = 0; i < patternInventories.length; ++i) {
+			if(single) {
+				InventoryEncoderPattern inv = patternInventories[patternIndex];
+				if(!recipeList.isEmpty()) {
+					int i = recipeList.size() > patternIndex ? patternIndex : 0;
+					IRecipeInfo recipe = recipeList.get(i);
+					inv.recipeType = recipe.getRecipeType();
+					if(recipe.isValid()) {
+						inv.setRecipe(recipe.getEncoderStacks());
+					}
+				}
+				else {
+					inv.setRecipe(null);
+				}
+			}
+			else for(int i = 0; i < patternInventories.length; ++i) {
 				InventoryEncoderPattern inv = patternInventories[i];
 				if(i < recipeList.size()) {
 					IRecipeInfo recipe = recipeList.get(i);
@@ -117,16 +130,15 @@ public class TileEncoder extends TileBase {
 					}
 				}
 				else {
-					inv.recipeType = RecipeTypeProcessing.INSTANCE;
 					inv.setRecipe(null);
 				}
 			}
 		}
-		else {
-			for(InventoryEncoderPattern inv : patternInventories) {
-				inv.recipeType = RecipeTypeProcessing.INSTANCE;
-				inv.setRecipe(null);
-			}
+		else if(single) {
+			patternInventories[patternIndex].setRecipe(null);
+		}
+		else for(InventoryEncoderPattern inv : patternInventories) {
+			inv.setRecipe(null);
 		}
 	}
 

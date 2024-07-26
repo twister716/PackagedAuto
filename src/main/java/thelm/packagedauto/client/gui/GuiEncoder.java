@@ -118,8 +118,9 @@ public class GuiEncoder extends GuiContainerTileBase<ContainerEncoder> {
 			PacketHandler.INSTANCE.sendToServer(new PacketSaveRecipeList(single));
 		}
 		if(button instanceof GuiButtonLoadPatterns) {
-			PacketHandler.INSTANCE.sendToServer(new PacketLoadRecipeList());
-			container.tile.loadRecipeList();
+			boolean single = isShiftKeyDown();
+			PacketHandler.INSTANCE.sendToServer(new PacketLoadRecipeList(single));
+			container.tile.loadRecipeList(single);
 			container.setupSlots();
 		}
 		if(button instanceof GuiButtonShowRecipesJEI) {
@@ -217,6 +218,13 @@ public class GuiEncoder extends GuiContainerTileBase<ContainerEncoder> {
 
 		GuiButtonLoadPatterns(int buttonId, int x, int y, String text) {
 			super(buttonId, x, y, 38, 18, text);
+		}
+
+		@Override
+		public void drawButtonForegroundLayer(int mouseX, int mouseY) {
+			if(isShiftKeyDown()) {
+				drawHoveringText(I18n.translateToLocal("tile.packagedauto.encoder.load_single"), mouseX, mouseY);
+			}
 		}
 	}
 

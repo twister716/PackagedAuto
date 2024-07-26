@@ -4,6 +4,7 @@ tile.packagedauto.encoder.name=Кодировщик программы реце�
 tile.packagedauto.encoder.save=Сохранить
 tile.packagedauto.encoder.save_single=Сохранить одиночный
 tile.packagedauto.encoder.load=Загрузить
+tile.packagedauto.encoder.load_single=Загрузить одиночный
 tile.packagedauto.encoder.pattern_slot=Слот рецепта %s
 tile.packagedauto.encoder.change_recipe_type=Сменить тип рецепта
 tile.packagedauto.packager.name=Упаковщик
