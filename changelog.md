@@ -1,3 +1,4 @@
+Add ability to load single patterns in encoder  
 Allow loading of invalid recipes and add validity checks  
 Disallow activating fluid package filler when working  
 Disallow changing amount setting of fluid package filler when working  

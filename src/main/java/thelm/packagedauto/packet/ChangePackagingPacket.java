@@ -11,6 +11,7 @@ import thelm.packagedauto.menu.PackagerMenu;
 public record ChangePackagingPacket() implements CustomPacketPayload {
 
 	public static final ResourceLocation ID = new ResourceLocation("packagedauto:change_packaging");
+	public static final ChangePackagingPacket INSTANCE = new ChangePackagingPacket();
 
 	@Override
 	public ResourceLocation id() {
@@ -21,7 +22,7 @@ public record ChangePackagingPacket() implements CustomPacketPayload {
 	public void write(FriendlyByteBuf buf) {}
 
 	public static ChangePackagingPacket read(FriendlyByteBuf buf) {
-		return new ChangePackagingPacket();
+		return INSTANCE;
 	}
 
 	public void handle(PlayPayloadContext ctx) {

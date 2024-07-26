@@ -10,6 +10,7 @@ import thelm.packagedauto.menu.UnpackagerMenu;
 public record ChangeBlockingPacket() implements CustomPacketPayload {
 
 	public static final ResourceLocation ID = new ResourceLocation("packagedauto:change_blocking");
+	public static final ChangeBlockingPacket INSTANCE = new ChangeBlockingPacket();
 
 	@Override
 	public ResourceLocation id() {
@@ -20,7 +21,7 @@ public record ChangeBlockingPacket() implements CustomPacketPayload {
 	public void write(FriendlyByteBuf buf) {}
 
 	public static ChangeBlockingPacket read(FriendlyByteBuf buf) {
-		return new ChangeBlockingPacket();
+		return INSTANCE;
 	}
 
 	public void handle(PlayPayloadContext ctx) {

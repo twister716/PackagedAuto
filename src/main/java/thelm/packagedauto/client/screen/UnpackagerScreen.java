@@ -96,7 +96,7 @@ public class UnpackagerScreen extends BaseScreen<UnpackagerMenu> {
 
 		@Override
 		public void onPress() {
-			PacketDistributor.SERVER.with(null).send(new ChangeBlockingPacket());
+			PacketDistributor.SERVER.with(null).send(ChangeBlockingPacket.INSTANCE);
 		}
 	}
 

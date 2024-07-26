@@ -75,7 +75,7 @@ public class PackagerExtensionScreen extends BaseScreen<PackagerExtensionMenu> {
 
 		@Override
 		public void onPress() {
-			PacketDistributor.SERVER.with(null).send(new ChangePackagingPacket());
+			PacketDistributor.SERVER.with(null).send(ChangePackagingPacket.INSTANCE);
 		}
 
 		private Tooltip currentTooltip() {

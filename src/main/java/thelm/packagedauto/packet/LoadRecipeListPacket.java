@@ -7,7 +7,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.neoforge.network.handling.PlayPayloadContext;
 import thelm.packagedauto.menu.EncoderMenu;
 
-public record LoadRecipeListPacket() implements CustomPacketPayload {
+public record LoadRecipeListPacket(boolean single) implements CustomPacketPayload {
 
 	public static final ResourceLocation ID = new ResourceLocation("packagedauto:load_recipe_list");
 
@@ -17,17 +17,19 @@ public record LoadRecipeListPacket() implements CustomPacketPayload {
 	}
 
 	@Override
-	public void write(FriendlyByteBuf buf) {}
+	public void write(FriendlyByteBuf buf) {
+		buf.writeBoolean(single);
+	}
 
 	public static LoadRecipeListPacket read(FriendlyByteBuf buf) {
-		return new LoadRecipeListPacket();
+		return new LoadRecipeListPacket(buf.readBoolean());
 	}
 
 	public void handle(PlayPayloadContext ctx) {
 		if(ctx.player().orElse(null) instanceof ServerPlayer player) {
 			ctx.workHandler().execute(()->{
 				if(player.containerMenu instanceof EncoderMenu menu) {
-					menu.blockEntity.loadRecipeList();
+					menu.blockEntity.loadRecipeList(single);
 				}
 			});
 		}

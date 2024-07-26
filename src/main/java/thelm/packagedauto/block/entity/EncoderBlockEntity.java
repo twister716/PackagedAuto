@@ -107,12 +107,25 @@ public class EncoderBlockEntity extends BaseBlockEntity {
 		}
 	}
 
-	public void loadRecipeList() {
+	public void loadRecipeList(boolean single) {
 		ItemStack stack = itemHandler.getStackInSlot(0);
 		if(stack.getItem() instanceof IPackageRecipeListItem listItem) {
 			IPackageRecipeList recipeListItem = listItem.getRecipeList(level, stack);
 			List<IPackageRecipeInfo> recipeList = recipeListItem.getRecipeList();
-			for(int i = 0; i < patternItemHandlers.length; ++i) {
+			if(single) {
+				EncoderPatternItemHandler inv = patternItemHandlers[patternIndex];
+				if(!recipeList.isEmpty()) {
+					int i = recipeList.size() > patternIndex ? patternIndex : 0;
+					IPackageRecipeInfo recipe = recipeList.get(i);
+					if(recipe.isValid()) {
+						inv.setRecipe(recipe.getEncoderStacks());
+					}
+				}
+				else {
+					inv.setRecipe(null);
+				}
+			}
+			else for(int i = 0; i < patternItemHandlers.length; ++i) {
 				EncoderPatternItemHandler inv = patternItemHandlers[i];
 				if(i < recipeList.size()) {
 					IPackageRecipeInfo recipe = recipeList.get(i);
@@ -122,16 +135,15 @@ public class EncoderBlockEntity extends BaseBlockEntity {
 					}
 				}
 				else {
-					inv.recipeType = ProcessingPackageRecipeType.INSTANCE;
 					inv.setRecipe(null);
 				}
 			}
 		}
-		else {
-			for(EncoderPatternItemHandler inv : patternItemHandlers) {
-				inv.recipeType = ProcessingPackageRecipeType.INSTANCE;
-				inv.setRecipe(null);
-			}
+		else if(single) {
+			patternItemHandlers[patternIndex].setRecipe(null);
+		}
+		else for(EncoderPatternItemHandler inv : patternItemHandlers) {
+			inv.setRecipe(null);
 		}
 	}
 
