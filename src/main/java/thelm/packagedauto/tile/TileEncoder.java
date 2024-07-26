@@ -98,7 +98,7 @@ public class TileEncoder extends TileBase {
 			IRecipeList recipeListItem = ((IRecipeListItem)stack.getItem()).getRecipeList(stack);
 			recipeListItem.setRecipeList(recipeList);
 			NBTTagCompound nbt = recipeListItem.writeToNBT(new NBTTagCompound());
-			inventory.getStackInSlot(0).setTagCompound(nbt);
+			stack.setTagCompound(nbt);
 		}
 	}
 
@@ -112,7 +112,9 @@ public class TileEncoder extends TileBase {
 				if(i < recipeList.size()) {
 					IRecipeInfo recipe = recipeList.get(i);
 					inv.recipeType = recipe.getRecipeType();
-					inv.setRecipe(recipe.getEncoderStacks());
+					if(recipe.isValid()) {
+						inv.setRecipe(recipe.getEncoderStacks());
+					}
 				}
 				else {
 					inv.recipeType = RecipeTypeProcessing.INSTANCE;

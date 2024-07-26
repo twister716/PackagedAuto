@@ -25,7 +25,7 @@ public class RecipeInfoCrafting implements IRecipeInfoCrafting {
 	IRecipe recipe;
 	List<ItemStack> input = new ArrayList<>();
 	InventoryCrafting matrix = new InventoryCrafting(new ContainerEmpty(), 3, 3);
-	ItemStack output;
+	ItemStack output = ItemStack.EMPTY;
 	List<IPackagePattern> patterns = new ArrayList<>();
 
 	@Override
@@ -39,12 +39,12 @@ public class RecipeInfoCrafting implements IRecipeInfoCrafting {
 		for(int i = 0; i < 9 && i < matrixList.size(); ++i) {
 			matrix.setInventorySlotContents(i, matrixList.get(i));
 		}
+		input.addAll(MiscUtil.condenseStacks(matrix));
+		for(int i = 0; i*9 < input.size(); ++i) {
+			patterns.add(new PatternHelper(this, i));
+		}
 		if(recipe != null) {
-			input.addAll(MiscUtil.condenseStacks(matrix));
 			output = recipe.getCraftingResult(matrix).copy();
-			for(int i = 0; i*9 < input.size(); ++i) {
-				patterns.add(new PatternHelper(this, i));
-			}
 		}
 	}
 

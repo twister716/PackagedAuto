@@ -446,7 +446,7 @@ public class TileUnpackager extends TileBase implements ITickable, IGridHost, IA
 			}
 			IRecipeInfo recipe = packageItem.getRecipeInfo(stack);
 			int index = packageItem.getIndex(stack);
-			if(recipe != null && recipe.validPatternIndex(index)) {
+			if(recipe != null && recipe.isValid() && recipe.validPatternIndex(index)) {
 				if(this.recipe == null) {
 					this.recipe = recipe;
 					amount = recipe.getPatterns().size();

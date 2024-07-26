@@ -20,6 +20,7 @@ public interface IRecipeInfoCrafting extends IRecipeInfo {
 
 	@Override
 	default List<ItemStack> getOutputs() {
-		return Collections.singletonList(getOutput());
+		ItemStack output = getOutput();
+		return output.isEmpty() ? Collections.emptyList() : Collections.singletonList(output);
 	}
 }

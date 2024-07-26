@@ -225,7 +225,8 @@ public class TilePackagerExtension extends TileBase implements ITickable, IGridH
 					ItemStack listStack = packager.inventory.getStackInSlot(10);
 					listStackInventory.setInventorySlotContents(0, listStack);
 					if(listStack.getItem() instanceof IRecipeListItem) {
-						((IRecipeListItem)listStack.getItem()).getRecipeList(listStack).getRecipeList().forEach(recipe->{
+						((IRecipeListItem)listStack.getItem()).getRecipeList(listStack).getRecipeList().stream().
+						filter(IRecipeInfo::isValid).forEach(recipe->{
 							recipe.getPatterns().forEach(patternList::add);
 							recipe.getExtraPatterns().forEach(patternList::add);
 						});
@@ -234,7 +235,7 @@ public class TilePackagerExtension extends TileBase implements ITickable, IGridH
 						IPackageItem packageItem = (IPackageItem)listStack.getItem();
 						IRecipeInfo recipe = packageItem.getRecipeInfo(listStack);
 						int index = packageItem.getIndex(listStack);
-						if(recipe != null && recipe.validPatternIndex(index)) {
+						if(recipe != null && recipe.isValid() && recipe.validPatternIndex(index)) {
 							patternList.add(recipe.getPatterns().get(index));
 						}
 					}
