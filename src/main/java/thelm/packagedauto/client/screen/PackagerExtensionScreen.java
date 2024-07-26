@@ -80,7 +80,7 @@ public class PackagerExtensionScreen extends BaseScreen<PackagerExtensionMenu> {
 
 		@Override
 		public void onPress() {
-			PacketHandler.INSTANCE.sendToServer(new ChangePackagingPacket());
+			PacketHandler.INSTANCE.sendToServer(ChangePackagingPacket.INSTANCE);
 		}
 
 		private Tooltip currentTooltip() {

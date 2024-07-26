@@ -7,27 +7,21 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkEvent;
 import thelm.packagedauto.menu.EncoderMenu;
 
-public class CycleRecipeTypePacket {
+public record CycleRecipeTypePacket(boolean reverse) {
 
-	private boolean reverse;
-
-	public CycleRecipeTypePacket(boolean reverse) {
-		this.reverse = reverse;
-	}
-
-	public static void encode(CycleRecipeTypePacket pkt, FriendlyByteBuf buf) {
-		buf.writeBoolean(pkt.reverse);
+	public void encode(FriendlyByteBuf buf) {
+		buf.writeBoolean(reverse);
 	}
 
 	public static CycleRecipeTypePacket decode(FriendlyByteBuf buf) {
 		return new CycleRecipeTypePacket(buf.readBoolean());
 	}
 
-	public static void handle(CycleRecipeTypePacket pkt, Supplier<NetworkEvent.Context> ctx) {
+	public void handle(Supplier<NetworkEvent.Context> ctx) {
 		ServerPlayer player = ctx.get().getSender();
 		ctx.get().enqueueWork(()->{
 			if(player.containerMenu instanceof EncoderMenu menu) {
-				menu.patternItemHandler.cycleRecipeType(pkt.reverse);
+				menu.patternItemHandler.cycleRecipeType(reverse);
 				menu.setupSlots();
 			}
 		});

@@ -12,23 +12,15 @@ import net.minecraftforge.network.PacketDistributor.TargetPoint;
 import thelm.packagedauto.client.DistributorRenderer;
 import thelm.packagedauto.network.PacketHandler;
 
-public class DistributorBeamPacket {
+public record DistributorBeamPacket(Vec3 source, Vec3 delta) {
 
-	private Vec3 source;
-	private Vec3 delta;
-
-	public DistributorBeamPacket(Vec3 source, Vec3 delta) {
-		this.source = source;
-		this.delta = delta;
-	}
-
-	public static void encode(DistributorBeamPacket pkt, FriendlyByteBuf buf) {
-		buf.writeDouble(pkt.source.x);
-		buf.writeDouble(pkt.source.y);
-		buf.writeDouble(pkt.source.z);
-		buf.writeDouble(pkt.delta.x);
-		buf.writeDouble(pkt.delta.y);
-		buf.writeDouble(pkt.delta.z);
+	public void encode(FriendlyByteBuf buf) {
+		buf.writeDouble(source.x);
+		buf.writeDouble(source.y);
+		buf.writeDouble(source.z);
+		buf.writeDouble(delta.x);
+		buf.writeDouble(delta.y);
+		buf.writeDouble(delta.z);
 	}
 
 	public static DistributorBeamPacket decode(FriendlyByteBuf buf) {
@@ -37,9 +29,9 @@ public class DistributorBeamPacket {
 		return new DistributorBeamPacket(source, delta);
 	}
 
-	public static void handle(DistributorBeamPacket pkt, Supplier<NetworkEvent.Context> ctx) {
+	public void handle(Supplier<NetworkEvent.Context> ctx) {
 		ctx.get().enqueueWork(()->{
-			DistributorRenderer.INSTANCE.addBeam(pkt.source, pkt.delta);	
+			DistributorRenderer.INSTANCE.addBeam(source, delta);	
 		});
 		ctx.get().setPacketHandled(true);
 	}

@@ -189,8 +189,16 @@ public class EncoderScreen extends BaseScreen<EncoderMenu> {
 
 	class ButtonLoadPatterns extends AbstractButton {
 
+		final Tooltip tooltip = Tooltip.create(Component.translatable("block.packagedauto.encoder.load_single"));
+
 		ButtonLoadPatterns(int x, int y, Component text) {
 			super(x, y, 38, 18, text);
+		}
+
+		@Override
+		public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+			setTooltip(hasShiftDown() ? tooltip : null);
+			super.render(graphics, mouseX, mouseY, partialTick);
 		}
 
 		@Override
@@ -198,8 +206,9 @@ public class EncoderScreen extends BaseScreen<EncoderMenu> {
 
 		@Override
 		public void onPress() {
-			PacketHandler.INSTANCE.sendToServer(new LoadRecipeListPacket());
-			menu.blockEntity.loadRecipeList();
+			boolean single = hasShiftDown();
+			PacketHandler.INSTANCE.sendToServer(new LoadRecipeListPacket(single));
+			menu.blockEntity.loadRecipeList(single);
 			menu.setupSlots();
 		}
 	}

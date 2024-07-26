@@ -5,6 +5,7 @@
 	"block.packagedauto.encoder.save": "保存",
 	"block.packagedauto.encoder.save_single": "保存單個",
 	"block.packagedauto.encoder.load": "加載",
+	"block.packagedauto.encoder.load_single": "加載單個",
 	"block.packagedauto.encoder.pattern_slot": "配方欄位%s",
 	"block.packagedauto.encoder.change_recipe_type": "更改配方類型",
 	"block.packagedauto.packager": "封包機",

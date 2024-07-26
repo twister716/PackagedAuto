@@ -5,6 +5,7 @@
 	"block.packagedauto.encoder.save": "Save",
 	"block.packagedauto.encoder.save_single": "Save Single",
 	"block.packagedauto.encoder.load": "Load",
+	"block.packagedauto.encoder.load_single": "Load Single",
 	"block.packagedauto.encoder.pattern_slot": "Recipe Slot %s",
 	"block.packagedauto.encoder.change_recipe_type": "Change Recipe Type",
 	"block.packagedauto.packager": "Packager",
