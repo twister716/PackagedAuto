@@ -65,6 +65,11 @@ public abstract class BaseBlockEntity extends BlockEntity implements Nameable, M
 		return getName();
 	}
 
+	@Override
+	public Component getCustomName() {
+		return customName;
+	}
+
 	public void setCustomName(Component name) {
 		customName = name;
 	}
