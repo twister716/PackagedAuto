@@ -47,7 +47,7 @@ public class BaseVolumeInventory {
 	}
 
 	public void load(CompoundTag nbt, HolderLookup.Provider registries) {
-		Arrays.fill(stacks, FluidStack.EMPTY);
+		Arrays.fill(stacks, type.getEmptyStackInstance());
 		ListTag tagList = nbt.getList("volumes", 10);
 		for(int i = 0; i < tagList.size(); ++i) {
 			CompoundTag tag = tagList.getCompound(i);
