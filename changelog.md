@@ -1,1 +1,2 @@
-Initial port to 1.21  
+Fix custom block names  
+Use the registry access helper method less  

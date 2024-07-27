@@ -5,6 +5,8 @@ import java.util.UUID;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.component.DataComponentMap;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.Connection;
@@ -74,8 +76,9 @@ public abstract class BaseBlockEntity extends BlockEntity implements Nameable, M
 		return getName();
 	}
 
-	public void setCustomName(Component name) {
-		customName = name;
+	@Override
+	public Component getCustomName() {
+		return customName;
 	}
 
 	protected abstract Component getDefaultName();
@@ -84,6 +87,18 @@ public abstract class BaseBlockEntity extends BlockEntity implements Nameable, M
 
 	public int getComparatorSignal() {
 		return ItemHandlerHelper.calcRedstoneFromInventory(itemHandler.getWrapperForDirection(null));
+	}
+
+	@Override
+	protected void applyImplicitComponents(DataComponentInput componentInput) {
+		super.applyImplicitComponents(componentInput);
+		customName = componentInput.get(DataComponents.CUSTOM_NAME);
+	}
+
+	@Override
+	protected void collectImplicitComponents(DataComponentMap.Builder components) {
+		super.collectImplicitComponents(components);
+		components.set(DataComponents.CUSTOM_NAME, customName);
 	}
 
 	@Override

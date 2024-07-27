@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.mojang.serialization.Codec;
 
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
@@ -66,8 +67,8 @@ public record FluidStackWrapper(FluidStack stack) implements IFluidStackWrapper 
 	}
 
 	@Override
-	public CompoundTag saveAEKey(CompoundTag tag) {
-		RegistryOps<Tag> ops = MiscHelper.INSTANCE.getRegistryAccess().createSerializationContext(NbtOps.INSTANCE);
+	public CompoundTag saveAEKey(CompoundTag tag, HolderLookup.Provider registries) {
+		RegistryOps<Tag> ops = registries.createSerializationContext(NbtOps.INSTANCE);
 		tag.putString("#t", "ae2:f");
 		tag.putString("id", BuiltInRegistries.FLUID.getKey(stack.getFluid()).toString());
 		if(!stack.isComponentsPatchEmpty()) {

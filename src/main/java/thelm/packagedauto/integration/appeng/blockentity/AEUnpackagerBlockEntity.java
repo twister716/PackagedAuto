@@ -140,7 +140,8 @@ public class AEUnpackagerBlockEntity extends UnpackagerBlockEntity implements II
 	@Override
 	public List<IPatternDetails> getAvailablePatterns() {
 		ItemStack patternStack = itemHandler.getStackInSlot(9);
-		return recipeList.stream().filter(pattern->!pattern.getOutputs().isEmpty()).<IPatternDetails>map(pattern->new RecipeCraftingPatternDetails(patternStack, pattern)).toList();
+		return recipeList.stream().filter(pattern->!pattern.getOutputs().isEmpty()).
+				<IPatternDetails>map(pattern->new RecipeCraftingPatternDetails(patternStack, pattern, level.registryAccess())).toList();
 	}
 
 	@Override

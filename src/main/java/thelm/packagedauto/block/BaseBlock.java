@@ -49,9 +49,6 @@ public abstract class BaseBlock extends Block implements EntityBlock {
 		if(!level.isClientSide) {
 			BlockEntity blockEntity = level.getBlockEntity(pos);
 			if(blockEntity instanceof BaseBlockEntity baseBlockEntity) {
-				if(stack.has(DataComponents.CUSTOM_NAME)) {
-					baseBlockEntity.setCustomName(stack.getDisplayName());
-				}
 				if(placer instanceof Player player) {
 					baseBlockEntity.setOwner(player);
 				}

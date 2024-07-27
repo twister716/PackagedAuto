@@ -135,7 +135,7 @@ public class AEPackagerBlockEntity extends PackagerBlockEntity implements IInWor
 	@Override
 	public List<IPatternDetails> getAvailablePatterns() {
 		ItemStack listStack = itemHandler.getStackInSlot(10);
-		return patternList.stream().<IPatternDetails>map(pattern->new PackageCraftingPatternDetails(listStack, pattern)).toList();
+		return patternList.stream().<IPatternDetails>map(pattern->new PackageCraftingPatternDetails(listStack, pattern, level.registryAccess())).toList();
 	}
 
 	@Override

@@ -14,6 +14,7 @@ import appeng.api.parts.IPartHost;
 import appeng.api.stacks.GenericStack;
 import appeng.helpers.patternprovider.PatternProviderLogicHost;
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import thelm.packagedauto.api.IPackageRecipeInfo;
 import thelm.packagedauto.integration.appeng.recipe.SimpleInput;
@@ -41,14 +42,14 @@ public class AppEngUtil {
 		return merged;
 	}
 
-	public static IInput[] toInputs(List<GenericStack> stacks) {
-		return toInputs(null, stacks);
+	public static IInput[] toInputs(List<GenericStack> stacks, HolderLookup.Provider registries) {
+		return toInputs(null, stacks, registries);
 	}
 
-	public static IInput[] toInputs(IPackageRecipeInfo recipe, List<GenericStack> stacks) {
+	public static IInput[] toInputs(IPackageRecipeInfo recipe, List<GenericStack> stacks, HolderLookup.Provider registries) {
 		IInput[] inputs = new IInput[stacks.size()];
 		for(int i = 0; i < stacks.size(); ++i) {
-			inputs[i] = new SimpleInput(recipe, stacks.get(i));
+			inputs[i] = new SimpleInput(recipe, stacks.get(i), registries);
 		}
 		return inputs;
 	}

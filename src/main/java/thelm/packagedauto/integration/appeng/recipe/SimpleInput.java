@@ -4,6 +4,7 @@ import appeng.api.crafting.IPatternDetails.IInput;
 import appeng.api.stacks.AEItemKey;
 import appeng.api.stacks.AEKey;
 import appeng.api.stacks.GenericStack;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.Level;
 import thelm.packagedauto.api.IPackageRecipeInfo;
@@ -17,9 +18,9 @@ public class SimpleInput implements IInput {
 	private final GenericStack[] template;
 	private final long multiplier;
 
-	public SimpleInput(IPackageRecipeInfo recipe, GenericStack stack) {
+	public SimpleInput(IPackageRecipeInfo recipe, GenericStack stack, HolderLookup.Provider registries) {
 		this.recipe = recipe;
-		template = new GenericStack[] {getGenericInput(stack)};
+		template = new GenericStack[] {getGenericInput(stack, registries)};
 		multiplier = stack.amount();
 	}
 
@@ -46,11 +47,11 @@ public class SimpleInput implements IInput {
 		return null;
 	}
 
-	private GenericStack getGenericInput(GenericStack stack) {
+	private GenericStack getGenericInput(GenericStack stack, HolderLookup.Provider registries) {
 		if(stack.what() instanceof AEItemKey itemKey && itemKey.toStack().has(PackagedAutoDataComponents.VOLUME_PACKAGE_STACK)) {
 			IVolumeStackWrapper vStack = itemKey.toStack().get(PackagedAutoDataComponents.VOLUME_PACKAGE_STACK);
 			if(!vStack.isEmpty() && vStack.getVolumeType().supportsAE()) {
-				AEKey key = AEKey.fromTagGeneric(MiscHelper.INSTANCE.getRegistryAccess(), vStack.saveAEKey(new CompoundTag()));
+				AEKey key = AEKey.fromTagGeneric(registries, vStack.saveAEKey(new CompoundTag(), registries));
 				if(key != null) {
 					return new GenericStack(key, vStack.getAmount());
 				}
