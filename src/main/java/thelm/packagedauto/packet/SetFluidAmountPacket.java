@@ -1,33 +1,28 @@
 package thelm.packagedauto.packet;
 
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
-import net.neoforged.neoforge.network.handling.PlayPayloadContext;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 import thelm.packagedauto.menu.FluidPackageFillerMenu;
 
 public record SetFluidAmountPacket(int amount) implements CustomPacketPayload {
 
-	public static final ResourceLocation ID = new ResourceLocation("packagedauto:set_fluid_amount");
+	public static final Type<SetFluidAmountPacket> TYPE = new Type<>(ResourceLocation.parse("packagedauto:set_fluid_amount"));
+	public static final StreamCodec<RegistryFriendlyByteBuf, SetFluidAmountPacket> STREAM_CODEC = ByteBufCodecs.INT.
+			map(SetFluidAmountPacket::new, SetFluidAmountPacket::amount).cast();
 
 	@Override
-	public ResourceLocation id() {
-		return ID;
+	public Type<SetFluidAmountPacket> type() {
+		return TYPE;
 	}
 
-	@Override
-	public void write(FriendlyByteBuf buf) {
-		buf.writeInt(amount);
-	}
-
-	public static SetFluidAmountPacket read(FriendlyByteBuf buf) {
-		return new SetFluidAmountPacket(buf.readInt());
-	}
-
-	public void handle(PlayPayloadContext ctx) {
-		if(ctx.player().orElse(null) instanceof ServerPlayer player) {
-			ctx.workHandler().execute(()->{
+	public void handle(IPayloadContext ctx) {
+		if(ctx.player() instanceof ServerPlayer player) {
+			ctx.enqueueWork(()->{
 				if(player.containerMenu instanceof FluidPackageFillerMenu menu) {
 					menu.blockEntity.requiredAmount = amount;
 				}

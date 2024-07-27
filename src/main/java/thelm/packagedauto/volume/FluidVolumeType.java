@@ -2,12 +2,16 @@ package thelm.packagedauto.volume;
 
 import java.util.Optional;
 
+import com.mojang.serialization.Codec;
+
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.core.component.DataComponentPatch;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -28,7 +32,7 @@ import thelm.packagedauto.client.FluidRenderer;
 public class FluidVolumeType implements IVolumeType {
 
 	public static final FluidVolumeType INSTANCE = new FluidVolumeType();
-	public static final ResourceLocation NAME = new ResourceLocation("minecraft:fluid");
+	public static final ResourceLocation NAME = ResourceLocation.parse("minecraft:fluid");
 
 	@Override
 	public ResourceLocation getName() {
@@ -56,9 +60,11 @@ public class FluidVolumeType implements IVolumeType {
 	}
 
 	@Override
-	public Optional<FluidStack> makeStackFromBase(Object volumeBase, int amount, CompoundTag nbt) {
+	public Optional<FluidStack> makeStackFromBase(Object volumeBase, int amount, DataComponentPatch patch) {
 		if(volumeBase instanceof Fluid fluid) {
-			return Optional.of(new FluidStack(fluid, amount, nbt));
+			FluidStack fluidStack = new FluidStack(fluid, amount);
+			fluidStack.applyComponents(patch);
+			return Optional.of(fluidStack);
 		}
 		else if(volumeBase instanceof FluidStack fluidStack) {
 			fluidStack = fluidStack.copy();
@@ -77,7 +83,9 @@ public class FluidVolumeType implements IVolumeType {
 	public Optional<IVolumeStackWrapper> wrapStack(Object volumeStack) {
 		if(volumeStack instanceof FluidStack fluidStack) {
 			if(fluidStack.getFluid() instanceof FlowingFluid fFluid && fFluid == fFluid.getFlowing()) {
-				fluidStack = new FluidStack(fFluid.getSource(), fluidStack.getAmount(), fluidStack.getTag());
+				DataComponentPatch patch = fluidStack.getComponentsPatch();
+				fluidStack = new FluidStack(fFluid.getSource(), fluidStack.getAmount());
+				fluidStack.applyComponents(patch);
 			}
 			return Optional.of(new FluidStackWrapper(fluidStack));
 		}
@@ -101,8 +109,13 @@ public class FluidVolumeType implements IVolumeType {
 	}
 
 	@Override
-	public IVolumeStackWrapper loadStack(CompoundTag tag) {
-		return new FluidStackWrapper(FluidStack.loadFluidStackFromNBT(tag));
+	public Codec<? extends IVolumeStackWrapper> getStackCodec() {
+		return FluidStackWrapper.CODEC;
+	}
+
+	@Override
+	public StreamCodec<RegistryFriendlyByteBuf, ? extends IVolumeStackWrapper> getStackStreamCodec() {
+		return FluidStackWrapper.STREAM_CODEC;
 	}
 
 	@Override

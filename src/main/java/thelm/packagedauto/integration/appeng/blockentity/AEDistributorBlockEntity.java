@@ -19,10 +19,11 @@ import appeng.api.util.AECableType;
 import appeng.api.util.AEColor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
-import thelm.packagedauto.block.DistributorBlock;
+import thelm.packagedauto.block.PackagedAutoBlocks;
 import thelm.packagedauto.block.entity.DistributorBlockEntity;
 
 public class AEDistributorBlockEntity extends DistributorBlockEntity implements IInWorldGridNodeHost, IGridNodeListener<AEDistributorBlockEntity>, IActionHost {
@@ -80,7 +81,7 @@ public class AEDistributorBlockEntity extends DistributorBlockEntity implements 
 		if(gridNode == null) {
 			gridNode = GridHelper.createManagedNode(this, this);
 			gridNode.setTagName("Node");
-			gridNode.setVisualRepresentation(DistributorBlock.INSTANCE);
+			gridNode.setVisualRepresentation(PackagedAutoBlocks.DISTRIBUTOR);
 			gridNode.setGridColor(AEColor.TRANSPARENT);
 			gridNode.setIdlePowerUsage(1);
 			gridNode.setInWorldNode(true);
@@ -122,16 +123,16 @@ public class AEDistributorBlockEntity extends DistributorBlockEntity implements 
 	}
 
 	@Override
-	public void load(CompoundTag nbt) {
-		super.load(nbt);
-		if(level != null && nbt.contains("Node")) {
+	public void loadAdditional(CompoundTag nbt, HolderLookup.Provider registries) {
+		super.loadAdditional(nbt, registries);
+		if(level != null && nbt.contains("node")) {
 			getMainNode().loadFromNBT(nbt);
 		}
 	}
 
 	@Override
-	public void saveAdditional(CompoundTag nbt) {
-		super.saveAdditional(nbt);
+	public void saveAdditional(CompoundTag nbt, HolderLookup.Provider registries) {
+		super.saveAdditional(nbt, registries);
 		if(gridNode != null) {
 			gridNode.saveToNBT(nbt);
 		}

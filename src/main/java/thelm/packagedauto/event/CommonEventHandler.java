@@ -1,14 +1,6 @@
 package thelm.packagedauto.event;
 
 import appeng.api.AECapabilities;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.network.chat.Component;
-import net.minecraft.world.inventory.MenuType;
-import net.minecraft.world.item.CreativeModeTab;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModList;
@@ -18,40 +10,18 @@ import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.server.ServerAboutToStartEvent;
-import net.neoforged.neoforge.network.event.RegisterPayloadHandlerEvent;
-import net.neoforged.neoforge.network.registration.IPayloadRegistrar;
-import net.neoforged.neoforge.registries.DeferredRegister;
-import thelm.packagedauto.api.IVolumePackageItem;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
+import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 import thelm.packagedauto.api.IVolumeType;
-import thelm.packagedauto.block.CrafterBlock;
-import thelm.packagedauto.block.DistributorBlock;
-import thelm.packagedauto.block.EncoderBlock;
-import thelm.packagedauto.block.FluidPackageFillerBlock;
-import thelm.packagedauto.block.PackagerBlock;
-import thelm.packagedauto.block.PackagerExtensionBlock;
-import thelm.packagedauto.block.UnpackagerBlock;
+import thelm.packagedauto.block.PackagedAutoBlocks;
 import thelm.packagedauto.block.entity.BaseBlockEntity;
-import thelm.packagedauto.block.entity.CrafterBlockEntity;
-import thelm.packagedauto.block.entity.DistributorBlockEntity;
-import thelm.packagedauto.block.entity.EncoderBlockEntity;
-import thelm.packagedauto.block.entity.FluidPackageFillerBlockEntity;
-import thelm.packagedauto.block.entity.PackagerBlockEntity;
-import thelm.packagedauto.block.entity.PackagerExtensionBlockEntity;
-import thelm.packagedauto.block.entity.UnpackagerBlockEntity;
+import thelm.packagedauto.block.entity.PackagedAutoBlockEntities;
+import thelm.packagedauto.component.PackagedAutoDataComponents;
 import thelm.packagedauto.config.PackagedAutoConfig;
+import thelm.packagedauto.creativetab.PackagedAutoCreativeTabs;
 import thelm.packagedauto.integration.appeng.AppEngUtil;
-import thelm.packagedauto.item.DistributorMarkerItem;
-import thelm.packagedauto.item.MiscItem;
-import thelm.packagedauto.item.PackageItem;
-import thelm.packagedauto.item.RecipeHolderItem;
-import thelm.packagedauto.item.VolumePackageItem;
-import thelm.packagedauto.menu.CrafterMenu;
-import thelm.packagedauto.menu.DistributorMenu;
-import thelm.packagedauto.menu.EncoderMenu;
-import thelm.packagedauto.menu.FluidPackageFillerMenu;
-import thelm.packagedauto.menu.PackagerExtensionMenu;
-import thelm.packagedauto.menu.PackagerMenu;
-import thelm.packagedauto.menu.UnpackagerMenu;
+import thelm.packagedauto.item.PackagedAutoItems;
+import thelm.packagedauto.menu.PackagedAutoMenus;
 import thelm.packagedauto.packet.ChangeBlockingPacket;
 import thelm.packagedauto.packet.ChangePackagingPacket;
 import thelm.packagedauto.packet.CycleRecipeTypePacket;
@@ -85,71 +55,12 @@ public class CommonEventHandler {
 		NeoForge.EVENT_BUS.addListener(this::onServerAboutToStart);
 		PackagedAutoConfig.registerConfig();
 
-		DeferredRegister<Block> blockRegister = DeferredRegister.create(Registries.BLOCK, "packagedauto");
-		blockRegister.register(modEventBus);
-		blockRegister.register("encoder", ()->EncoderBlock.INSTANCE);
-		blockRegister.register("packager", ()->PackagerBlock.INSTANCE);
-		blockRegister.register("packager_extension", ()->PackagerExtensionBlock.INSTANCE);
-		blockRegister.register("unpackager", ()->UnpackagerBlock.INSTANCE);
-		blockRegister.register("distributor", ()->DistributorBlock.INSTANCE);
-		blockRegister.register("crafter", ()->CrafterBlock.INSTANCE);
-		blockRegister.register("fluid_package_filler", ()->FluidPackageFillerBlock.INSTANCE);
-
-		DeferredRegister<Item> itemRegister = DeferredRegister.create(Registries.ITEM, "packagedauto");
-		itemRegister.register(modEventBus);
-		itemRegister.register("encoder", ()->EncoderBlock.ITEM_INSTANCE);
-		itemRegister.register("packager", ()->PackagerBlock.ITEM_INSTANCE);
-		itemRegister.register("packager_extension", ()->PackagerExtensionBlock.ITEM_INSTANCE);
-		itemRegister.register("unpackager", ()->UnpackagerBlock.ITEM_INSTANCE);
-		itemRegister.register("distributor", ()->DistributorBlock.ITEM_INSTANCE);
-		itemRegister.register("crafter", ()->CrafterBlock.ITEM_INSTANCE);
-		itemRegister.register("fluid_package_filler", ()->FluidPackageFillerBlock.ITEM_INSTANCE);
-		itemRegister.register("recipe_holder", ()->RecipeHolderItem.INSTANCE);
-		itemRegister.register("distributor_marker", ()->DistributorMarkerItem.INSTANCE);
-		itemRegister.register("package", ()->PackageItem.INSTANCE);
-		itemRegister.register("volume_package", ()->VolumePackageItem.INSTANCE);
-		itemRegister.register("package_component", ()->MiscItem.PACKAGE_COMPONENT);
-		itemRegister.register("me_package_component", ()->MiscItem.ME_PACKAGE_COMPONENT);
-
-		DeferredRegister<BlockEntityType<?>> blockEntityRegister = DeferredRegister.create(Registries.BLOCK_ENTITY_TYPE, "packagedauto");
-		blockEntityRegister.register(modEventBus);
-		blockEntityRegister.register("encoder", ()->EncoderBlockEntity.TYPE_INSTANCE);
-		blockEntityRegister.register("packager", ()->PackagerBlockEntity.TYPE_INSTANCE);
-		blockEntityRegister.register("packager_extension", ()->PackagerExtensionBlockEntity.TYPE_INSTANCE);
-		blockEntityRegister.register("unpackager", ()->UnpackagerBlockEntity.TYPE_INSTANCE);
-		blockEntityRegister.register("distributor", ()->DistributorBlockEntity.TYPE_INSTANCE);
-		blockEntityRegister.register("crafter", ()->CrafterBlockEntity.TYPE_INSTANCE);
-		blockEntityRegister.register("fluid_package_filler", ()->FluidPackageFillerBlockEntity.TYPE_INSTANCE);
-
-		DeferredRegister<MenuType<?>> menuRegister = DeferredRegister.create(Registries.MENU, "packagedauto");
-		menuRegister.register(modEventBus);
-		menuRegister.register("encoder", ()->EncoderMenu.TYPE_INSTANCE);
-		menuRegister.register("packager", ()->PackagerMenu.TYPE_INSTANCE);
-		menuRegister.register("packager_extension", ()->PackagerExtensionMenu.TYPE_INSTANCE);
-		menuRegister.register("unpackager", ()->UnpackagerMenu.TYPE_INSTANCE);
-		menuRegister.register("distributor", ()->DistributorMenu.TYPE_INSTANCE);
-		menuRegister.register("crafter", ()->CrafterMenu.TYPE_INSTANCE);
-		menuRegister.register("fluid_package_filler", ()->FluidPackageFillerMenu.TYPE_INSTANCE);
-
-		DeferredRegister<CreativeModeTab> creativeTabRegister = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, "packagedauto");
-		creativeTabRegister.register(modEventBus);
-		creativeTabRegister.register("tab", ()->CreativeModeTab.builder().
-				title(Component.translatable("itemGroup.packagedauto")).
-				icon(()->new ItemStack(PackageItem.INSTANCE)).
-				displayItems((parameters, output)->{
-					output.accept(EncoderBlock.ITEM_INSTANCE);
-					output.accept(PackagerBlock.ITEM_INSTANCE);
-					output.accept(PackagerExtensionBlock.ITEM_INSTANCE);
-					output.accept(UnpackagerBlock.ITEM_INSTANCE);
-					output.accept(DistributorBlock.ITEM_INSTANCE);
-					output.accept(CrafterBlock.ITEM_INSTANCE);
-					output.accept(FluidPackageFillerBlock.ITEM_INSTANCE);
-					output.accept(RecipeHolderItem.INSTANCE);
-					output.accept(DistributorMarkerItem.INSTANCE);
-					output.accept(MiscItem.PACKAGE_COMPONENT);
-					output.accept(MiscItem.ME_PACKAGE_COMPONENT);
-				}).
-				build());
+		PackagedAutoBlocks.BLOCKS.register(modEventBus);
+		PackagedAutoItems.ITEMS.register(modEventBus);
+		PackagedAutoBlockEntities.BLOCK_ENTITIES.register(modEventBus);
+		PackagedAutoMenus.MENUS.register(modEventBus);
+		PackagedAutoDataComponents.DATA_COMPONENTS.register(modEventBus);
+		PackagedAutoCreativeTabs.CREATIVE_TABS.register(modEventBus);
 	}
 
 	@SubscribeEvent
@@ -164,55 +75,63 @@ public class CommonEventHandler {
 
 	@SubscribeEvent
 	public void onRegisterCapabilities(RegisterCapabilitiesEvent event) {
-		event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, PackagerBlockEntity.TYPE_INSTANCE, BaseBlockEntity::getItemHandler);
-		event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, PackagerExtensionBlockEntity.TYPE_INSTANCE, BaseBlockEntity::getItemHandler);
-		event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, UnpackagerBlockEntity.TYPE_INSTANCE, BaseBlockEntity::getItemHandler);
-		event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, CrafterBlockEntity.TYPE_INSTANCE, BaseBlockEntity::getItemHandler);
-		event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, FluidPackageFillerBlockEntity.TYPE_INSTANCE, BaseBlockEntity::getItemHandler);
+		event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, PackagedAutoBlockEntities.PACKAGER.get(), BaseBlockEntity::getItemHandler);
+		event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, PackagedAutoBlockEntities.PACKAGER_EXTENSION.get(), BaseBlockEntity::getItemHandler);
+		event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, PackagedAutoBlockEntities.UNPACKAGER.get(), BaseBlockEntity::getItemHandler);
+		event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, PackagedAutoBlockEntities.CRAFTER.get(), BaseBlockEntity::getItemHandler);
+		event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, PackagedAutoBlockEntities.FLUID_PACKAGE_FILLER.get(), BaseBlockEntity::getItemHandler);
 
-		event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, PackagerBlockEntity.TYPE_INSTANCE, BaseBlockEntity::getEnergyStorage);
-		event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, PackagerExtensionBlockEntity.TYPE_INSTANCE, BaseBlockEntity::getEnergyStorage);
-		event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, UnpackagerBlockEntity.TYPE_INSTANCE, BaseBlockEntity::getEnergyStorage);
-		event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, CrafterBlockEntity.TYPE_INSTANCE, BaseBlockEntity::getEnergyStorage);
-		event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, FluidPackageFillerBlockEntity.TYPE_INSTANCE, BaseBlockEntity::getEnergyStorage);
+		event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, PackagedAutoBlockEntities.PACKAGER.get(), BaseBlockEntity::getEnergyStorage);
+		event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, PackagedAutoBlockEntities.PACKAGER_EXTENSION.get(), BaseBlockEntity::getEnergyStorage);
+		event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, PackagedAutoBlockEntities.UNPACKAGER.get(), BaseBlockEntity::getEnergyStorage);
+		event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, PackagedAutoBlockEntities.CRAFTER.get(), BaseBlockEntity::getEnergyStorage);
+		event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, PackagedAutoBlockEntities.FLUID_PACKAGE_FILLER.get(), BaseBlockEntity::getEnergyStorage);
 
 		MiscHelper.INSTANCE.conditionalRunnable(()->ModList.get().isLoaded("ae2"), ()->()->{
-			event.registerBlockEntity(AECapabilities.IN_WORLD_GRID_NODE_HOST, PackagerBlockEntity.TYPE_INSTANCE, AppEngUtil::getAsInWorldGridNodeHost);
-			event.registerBlockEntity(AECapabilities.IN_WORLD_GRID_NODE_HOST, PackagerExtensionBlockEntity.TYPE_INSTANCE, AppEngUtil::getAsInWorldGridNodeHost);
-			event.registerBlockEntity(AECapabilities.IN_WORLD_GRID_NODE_HOST, UnpackagerBlockEntity.TYPE_INSTANCE, AppEngUtil::getAsInWorldGridNodeHost);
-			event.registerBlockEntity(AECapabilities.IN_WORLD_GRID_NODE_HOST, DistributorBlockEntity.TYPE_INSTANCE, AppEngUtil::getAsInWorldGridNodeHost);
-			event.registerBlockEntity(AECapabilities.IN_WORLD_GRID_NODE_HOST, CrafterBlockEntity.TYPE_INSTANCE, AppEngUtil::getAsInWorldGridNodeHost);
+			event.registerBlockEntity(AECapabilities.IN_WORLD_GRID_NODE_HOST, PackagedAutoBlockEntities.PACKAGER.get(), (be, v)->AppEngUtil.getAsInWorldGridNodeHost(be));
+			event.registerBlockEntity(AECapabilities.IN_WORLD_GRID_NODE_HOST, PackagedAutoBlockEntities.PACKAGER_EXTENSION.get(), (be, v)->AppEngUtil.getAsInWorldGridNodeHost(be));
+			event.registerBlockEntity(AECapabilities.IN_WORLD_GRID_NODE_HOST, PackagedAutoBlockEntities.UNPACKAGER.get(), (be, v)->AppEngUtil.getAsInWorldGridNodeHost(be));
+			event.registerBlockEntity(AECapabilities.IN_WORLD_GRID_NODE_HOST, PackagedAutoBlockEntities.DISTRIBUTOR.get(), (be, v)->AppEngUtil.getAsInWorldGridNodeHost(be));
+			event.registerBlockEntity(AECapabilities.IN_WORLD_GRID_NODE_HOST, PackagedAutoBlockEntities.CRAFTER.get(), (be, v)->AppEngUtil.getAsInWorldGridNodeHost(be));
 		}, ()->()->{}).run();
 
 		for(IVolumeType volumeType : ApiImpl.INSTANCE.getVolumeTypeRegistry().values()) {
 			event.registerItem(volumeType.getItemCapability(), (stack, ctx)->{
-				if(stack.getItem() instanceof IVolumePackageItem volumePackage && volumeType == volumePackage.getVolumeType(stack)) {
+				if(stack.has(PackagedAutoDataComponents.VOLUME_PACKAGE_STACK) && volumeType == stack.get(PackagedAutoDataComponents.VOLUME_PACKAGE_STACK).getVolumeType()) {
 					return volumeType.makeItemCapability(stack);
 				}
 				return null;
-			}, VolumePackageItem.INSTANCE);
+			}, PackagedAutoItems.VOLUME_PACKAGE);
 		}
 	}
 
 	@SubscribeEvent
-	public void onRegisterPayloadHandler(RegisterPayloadHandlerEvent event) {
-		IPayloadRegistrar registrar = event.registrar("packagedauto");
-		registrar.play(SyncEnergyPacket.ID, SyncEnergyPacket::read, builder->builder.client(SyncEnergyPacket::handle));
-		registrar.play(SetItemStackPacket.ID, SetItemStackPacket::read, builder->builder.server(SetItemStackPacket::handle));
-		registrar.play(SetPatternIndexPacket.ID, SetPatternIndexPacket::read, builder->builder.server(SetPatternIndexPacket::handle));
-		registrar.play(CycleRecipeTypePacket.ID, CycleRecipeTypePacket::read, builder->builder.server(CycleRecipeTypePacket::handle));
-		registrar.play(SaveRecipeListPacket.ID, SaveRecipeListPacket::read, builder->builder.server(SaveRecipeListPacket::handle));
-		registrar.play(SetRecipePacket.ID, SetRecipePacket::read, builder->builder.server(SetRecipePacket::handle));
-		registrar.play(LoadRecipeListPacket.ID, LoadRecipeListPacket::read, builder->builder.server(LoadRecipeListPacket::handle));
-		registrar.play(ChangeBlockingPacket.ID, ChangeBlockingPacket::read, builder->builder.server(ChangeBlockingPacket::handle));
-		registrar.play(SetFluidAmountPacket.ID, SetFluidAmountPacket::read, builder->builder.server(SetFluidAmountPacket::handle));
-		registrar.play(ChangePackagingPacket.ID, ChangePackagingPacket::read, builder->builder.server(ChangePackagingPacket::handle));
-		registrar.play(TrackerCountPacket.ID, TrackerCountPacket::read, builder->builder.server(TrackerCountPacket::handle));
-		registrar.play(DistributorBeamPacket.ID, DistributorBeamPacket::read, builder->builder.client(DistributorBeamPacket::handle));
+	public void onRegisterPayloadHandlers(RegisterPayloadHandlersEvent event) {
+		PayloadRegistrar registrar = event.registrar("packagedauto");
+		registrar.playToClient(SyncEnergyPacket.TYPE, SyncEnergyPacket.STREAM_CODEC, SyncEnergyPacket::handle);
+		registrar.playToServer(SetItemStackPacket.TYPE, SetItemStackPacket.STREAM_CODEC, SetItemStackPacket::handle);
+		registrar.playToServer(SetPatternIndexPacket.TYPE, SetPatternIndexPacket.STREAM_CODEC, SetPatternIndexPacket::handle);
+		registrar.playToServer(CycleRecipeTypePacket.TYPE, CycleRecipeTypePacket.STREAM_CODEC, CycleRecipeTypePacket::handle);
+		registrar.playToServer(SaveRecipeListPacket.TYPE, SaveRecipeListPacket.STREAM_CODEC, SaveRecipeListPacket::handle);
+		registrar.playToServer(SetRecipePacket.TYPE, SetRecipePacket.STREAM_CODEC, SetRecipePacket::handle);
+		registrar.playToServer(LoadRecipeListPacket.TYPE, LoadRecipeListPacket.STREAM_CODEC, LoadRecipeListPacket::handle);
+		registrar.playToServer(ChangeBlockingPacket.TYPE, ChangeBlockingPacket.STREAM_CODEC, ChangeBlockingPacket::handle);
+		registrar.playToServer(SetFluidAmountPacket.TYPE, SetFluidAmountPacket.STREAM_CODEC, SetFluidAmountPacket::handle);
+		registrar.playToServer(ChangePackagingPacket.TYPE, ChangePackagingPacket.STREAM_CODEC, ChangePackagingPacket::handle);
+		registrar.playToServer(TrackerCountPacket.TYPE, TrackerCountPacket.STREAM_CODEC, TrackerCountPacket::handle);
+		registrar.playToClient(DistributorBeamPacket.TYPE, DistributorBeamPacket.STREAM_CODEC, DistributorBeamPacket::handle);
 	}
 
 	@SubscribeEvent
-	public void onModConfig(ModConfigEvent event) {
+	public void onModConfigLoading(ModConfigEvent.Loading event) {
+		switch(event.getConfig().getType()) {
+		case SERVER -> PackagedAutoConfig.reloadServerConfig();
+		default -> {}
+		}
+	}
+
+	@SubscribeEvent
+	public void onModConfigReloading(ModConfigEvent.Reloading event) {
 		switch(event.getConfig().getType()) {
 		case SERVER -> PackagedAutoConfig.reloadServerConfig();
 		default -> {}

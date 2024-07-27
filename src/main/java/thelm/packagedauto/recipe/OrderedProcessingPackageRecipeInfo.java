@@ -4,12 +4,15 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+
+import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
 import thelm.packagedauto.api.IPackagePattern;
 import thelm.packagedauto.api.IPackageRecipeInfo;
 import thelm.packagedauto.api.IPackageRecipeType;
@@ -18,26 +21,30 @@ import thelm.packagedauto.util.PackagePattern;
 
 public class OrderedProcessingPackageRecipeInfo implements IPackageRecipeInfo {
 
-	List<ItemStack> input = new ArrayList<>();
-	List<ItemStack> output = new ArrayList<>();
-	List<IPackagePattern> patterns = new ArrayList<>();
+	public static final MapCodec<OrderedProcessingPackageRecipeInfo> MAP_CODEC = RecordCodecBuilder.mapCodec(instance->instance.group(
+			ItemStack.CODEC.orElse(ItemStack.EMPTY).sizeLimitedListOf(81).fieldOf("input").forGetter(IPackageRecipeInfo::getInputs),
+			MiscHelper.LARGE_ITEM_CODEC.orElse(ItemStack.EMPTY).sizeLimitedListOf(9).fieldOf("output").forGetter(IPackageRecipeInfo::getOutputs)).
+			apply(instance, OrderedProcessingPackageRecipeInfo::new));
+	public static final Codec<OrderedProcessingPackageRecipeInfo> CODEC = MAP_CODEC.codec();
+	public static final StreamCodec<RegistryFriendlyByteBuf, OrderedProcessingPackageRecipeInfo> STREAM_CODEC = StreamCodec.composite(
+			ItemStack.LIST_STREAM_CODEC, IPackageRecipeInfo::getInputs,
+			ItemStack.LIST_STREAM_CODEC, IPackageRecipeInfo::getOutputs,
+			OrderedProcessingPackageRecipeInfo::new);
 
-	@Override
-	public void load(CompoundTag nbt) {
-		MiscHelper.INSTANCE.loadAllItems(nbt.getList("Input", 10), input);
-		MiscHelper.INSTANCE.loadAllItems(nbt.getList("Output", 10), output);
-		patterns.clear();
+	private final List<ItemStack> input;
+	private final List<ItemStack> output;
+	private final List<IPackagePattern> patterns = new ArrayList<>();
+
+	public OrderedProcessingPackageRecipeInfo(List<ItemStack> inputs, List<ItemStack> outputs) {
+		input = removeEmptyStacks(inputs);
+		output = MiscHelper.INSTANCE.condenseStacks(outputs, true);
 		for(int i = 0; i*9 < input.size(); ++i) {
 			patterns.add(new PackagePattern(this, i, true));
 		}
 	}
 
-	@Override
-	public void save(CompoundTag nbt) {
-		ListTag inputTag = MiscHelper.INSTANCE.saveAllItems(new ListTag(), input);
-		nbt.put("Input", inputTag);
-		ListTag outputTag = MiscHelper.INSTANCE.saveAllItems(new ListTag(), output);
-		nbt.put("Output", outputTag);
+	private static List<ItemStack> removeEmptyStacks(List<ItemStack> stacks) {
+		return stacks.stream().filter(stack -> !stack.isEmpty()).toList();
 	}
 
 	@Override
@@ -65,25 +72,9 @@ public class OrderedProcessingPackageRecipeInfo implements IPackageRecipeInfo {
 		return Collections.unmodifiableList(output);
 	}
 
-	private static List<ItemStack> removeEmptyStacks(List<ItemStack> stacks) {
-		return stacks.stream().filter(stack -> !stack.isEmpty()).toList();
-	}
-
-	@Override
-	public void generateFromStacks(List<ItemStack> input, List<ItemStack> output, Level level) {
-		this.input.clear();
-		this.input.addAll(removeEmptyStacks(input));
-		this.output.clear();
-		this.output.addAll(MiscHelper.INSTANCE.condenseStacks(output, true));
-		patterns.clear();
-		for(int i = 0; i*9 < this.input.size(); ++i) {
-			patterns.add(new PackagePattern(this, i, true));
-		}
-	}
-
 	@Override
 	public Int2ObjectMap<ItemStack> getEncoderStacks() {
-		Int2ObjectMap<ItemStack> map = new Int2ObjectOpenHashMap<>();
+		Int2ObjectMap<ItemStack> map = new Int2ObjectArrayMap<>();
 		for(int i = 0; i < input.size(); ++i) {
 			map.put(i, input.get(i));
 		}

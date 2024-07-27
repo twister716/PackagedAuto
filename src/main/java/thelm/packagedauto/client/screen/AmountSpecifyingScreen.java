@@ -17,7 +17,7 @@ import thelm.packagedauto.menu.BaseMenu;
 // Code from Refined Storage
 public abstract class AmountSpecifyingScreen<C extends BaseMenu<?>> extends BaseScreen<C> {
 
-	public static final ResourceLocation BACKGROUND = new ResourceLocation("packagedauto:textures/gui/amount_specifying.png");
+	public static final ResourceLocation BACKGROUND = ResourceLocation.parse("packagedauto:textures/gui/amount_specifying.png");
 
 	private BaseScreen<?> parent;
 

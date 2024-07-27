@@ -4,6 +4,7 @@ import java.util.List;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.IntSet;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
@@ -33,18 +34,18 @@ public class EncoderPatternItemHandler extends BaseItemHandler<EncoderBlockEntit
 	}
 
 	@Override
-	public void load(CompoundTag nbt) {
-		super.load(nbt);
-		recipeType = ApiImpl.INSTANCE.getRecipeType(new ResourceLocation(nbt.getString("RecipeType")));
+	public void load(CompoundTag nbt, HolderLookup.Provider registries) {
+		super.load(nbt, registries);
+		recipeType = ApiImpl.INSTANCE.getRecipeType(ResourceLocation.parse(nbt.getString("racipe_type")));
 		validateRecipeType();
 		updateRecipeInfo(false);
 	}
 
 	@Override
-	public void save(CompoundTag nbt) {
-		super.save(nbt);
+	public void save(CompoundTag nbt, HolderLookup.Provider registries) {
+		super.save(nbt, registries);
 		validateRecipeType();
-		nbt.putString("RecipeType", recipeType.getName().toString());
+		nbt.putString("racipe_type", recipeType.getName().toString());
 	}
 
 	@Override
@@ -67,8 +68,7 @@ public class EncoderPatternItemHandler extends BaseItemHandler<EncoderBlockEntit
 		if(!blockEntity.hasLevel()) {
 			return;
 		}
-		IPackageRecipeInfo info = recipeType.getNewRecipeInfo();
-		info.generateFromStacks(stacks.subList(0, 81), recipeType.canSetOutput() ? stacks.subList(81, 90) : List.of(), blockEntity.getLevel());
+		IPackageRecipeInfo info = recipeType.generateRecipeInfoFromStacks(stacks.subList(0, 81), recipeType.canSetOutput() ? stacks.subList(81, 90) : List.of(), blockEntity.getLevel());
 		if(info.isValid()) {
 			if(recipeInfo == null || !recipeInfo.equals(info)) {
 				recipeInfo = info;

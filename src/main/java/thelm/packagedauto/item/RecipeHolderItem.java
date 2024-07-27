@@ -2,6 +2,7 @@ package thelm.packagedauto.item;
 
 import java.util.List;
 
+import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentUtils;
 import net.minecraft.network.chat.MutableComponent;
@@ -13,37 +14,32 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import thelm.packagedauto.api.IPackageRecipeInfo;
-import thelm.packagedauto.api.IPackageRecipeList;
-import thelm.packagedauto.api.IPackageRecipeListItem;
-import thelm.packagedauto.api.IVolumePackageItem;
 import thelm.packagedauto.api.IVolumeStackWrapper;
-import thelm.packagedauto.util.PackageRecipeList;
+import thelm.packagedauto.component.PackagedAutoDataComponents;
 
-public class RecipeHolderItem extends Item implements IPackageRecipeListItem {
-
-	public static final RecipeHolderItem INSTANCE = new RecipeHolderItem();
+public class RecipeHolderItem extends Item {
 
 	protected RecipeHolderItem() {
 		super(new Item.Properties());
 	}
 
 	@Override
-	public IPackageRecipeList getRecipeList(Level level, ItemStack stack) {
-		return new PackageRecipeList(level, stack.getTag());
-	}
-
-	@Override
 	public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
 		if(!level.isClientSide && player.isShiftKeyDown()) {
-			return InteractionResultHolder.success(new ItemStack(INSTANCE, player.getItemInHand(hand).getCount()));
+			ItemStack stack = player.getItemInHand(hand).copy();
+			DataComponentPatch patch = DataComponentPatch.builder().
+					remove(PackagedAutoDataComponents.RECIPE_LIST.get()).
+					build();
+			stack.applyComponents(patch);
+			return InteractionResultHolder.success(stack);
 		}
 		return super.use(level, player, hand);
 	}
 
 	@Override
-	public void appendHoverText(ItemStack stack, Level level, List<Component> tooltip, TooltipFlag isAdvanced) {
-		if(stack.hasTag()) {
-			List<IPackageRecipeInfo> recipeList = getRecipeList(level, stack).getRecipeList();
+	public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag isAdvanced) {
+		if(stack.has(PackagedAutoDataComponents.RECIPE_LIST)) {
+			List<IPackageRecipeInfo> recipeList = stack.get(PackagedAutoDataComponents.RECIPE_LIST);
 			tooltip.add(Component.translatable("item.packagedauto.recipe_holder.recipes"));
 			for(IPackageRecipeInfo recipe : recipeList) {
 				MutableComponent component = recipe.getRecipeType().getDisplayName().append(": ");
@@ -52,8 +48,8 @@ public class RecipeHolderItem extends Item implements IPackageRecipeListItem {
 						component.append(", ");
 					}
 					ItemStack is = recipe.getOutputs().get(i);
-					if(is.getItem() instanceof IVolumePackageItem vp) {
-						IVolumeStackWrapper vs = vp.getVolumeStack(is);
+					if(is.has(PackagedAutoDataComponents.VOLUME_PACKAGE_STACK)) {
+						IVolumeStackWrapper vs = is.get(PackagedAutoDataComponents.VOLUME_PACKAGE_STACK);
 						component.append(is.getCount()+"x").append(vs.getAmountDesc()).append(" ").
 						append(ComponentUtils.wrapInSquareBrackets(vs.getDisplayName()));
 					}
@@ -64,6 +60,6 @@ public class RecipeHolderItem extends Item implements IPackageRecipeListItem {
 				tooltip.add(component);
 			}
 		}
-		super.appendHoverText(stack, level, tooltip, isAdvanced);
+		super.appendHoverText(stack, context, tooltip, isAdvanced);
 	}
 }

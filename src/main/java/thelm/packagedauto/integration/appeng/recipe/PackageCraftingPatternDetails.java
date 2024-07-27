@@ -15,14 +15,14 @@ public class PackageCraftingPatternDetails implements IPatternDetails {
 	public final AEItemKey recipeHolder;
 	public final IPackagePattern pattern;
 	public final IInput[] inputs;
-	public final GenericStack[] outputs;
+	public final List<GenericStack> outputs;
 
 	public PackageCraftingPatternDetails(ItemStack recipeHolder, IPackagePattern pattern) {
 		this.recipeHolder = AEItemKey.of(recipeHolder);
 		this.pattern = pattern;
 		List<GenericStack> sparseInputs = pattern.getInputs().stream().map(GenericStack::fromItemStack).toList();
 		inputs = AppEngUtil.toInputs(pattern.getRecipeInfo(), AppEngUtil.condenseStacks(sparseInputs));
-		outputs = new GenericStack[] {GenericStack.fromItemStack(pattern.getOutput())};
+		outputs = List.of(GenericStack.fromItemStack(pattern.getOutput()));
 	}
 
 	@Override
@@ -36,7 +36,7 @@ public class PackageCraftingPatternDetails implements IPatternDetails {
 	}
 
 	@Override
-	public GenericStack[] getOutputs() {
+	public List<GenericStack> getOutputs() {
 		return outputs;
 	}
 

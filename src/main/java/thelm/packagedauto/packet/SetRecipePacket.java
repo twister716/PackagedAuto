@@ -1,52 +1,41 @@
 package thelm.packagedauto.packet;
 
+import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.network.handling.PlayPayloadContext;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 import thelm.packagedauto.menu.EncoderMenu;
 
 public record SetRecipePacket(Int2ObjectMap<ItemStack> map) implements CustomPacketPayload {
 
-	public static final ResourceLocation ID = new ResourceLocation("packagedauto:set_recipe");
+	public static final Type<SetRecipePacket> TYPE = new Type<>(ResourceLocation.parse("packagedauto:set_recipe"));
+	public static final StreamCodec<RegistryFriendlyByteBuf, SetRecipePacket> STREAM_CODEC = ByteBufCodecs.
+			map(SetRecipePacket::createMap, ByteBufCodecs.VAR_INT, ItemStack.OPTIONAL_STREAM_CODEC).
+			map(SetRecipePacket::new, SetRecipePacket::map);
 
 	@Override
-	public ResourceLocation id() {
-		return ID;
+	public Type<SetRecipePacket> type() {
+		return TYPE;
 	}
 
 	public SetRecipePacket addItem(int index, ItemStack stack) {
-		map.put(index, stack);
+		map.put((byte)index, stack);
 		return this;
 	}
 
-	@Override
-	public void write(FriendlyByteBuf buf) {
-		buf.writeByte(map.size());
-		for(Int2ObjectMap.Entry<ItemStack> entry : map.int2ObjectEntrySet()) {
-			buf.writeByte(entry.getIntKey());
-			buf.writeItemWithLargeCount(entry.getValue());
-		}
+	public static Int2ObjectMap<ItemStack> createMap(int capacity) {
+		return new Int2ObjectArrayMap<>(capacity);
 	}
 
-	public static SetRecipePacket read(FriendlyByteBuf buf) {
-		Int2ObjectMap<ItemStack> map = new Int2ObjectOpenHashMap<>();
-		int size = buf.readByte();
-		for(int i = 0; i < size; ++i) {
-			int index = buf.readByte();
-			ItemStack stack = buf.readItemWithLargeCount();
-			map.put(index, stack);
-		}
-		return new SetRecipePacket(map);
-	}
-
-	public void handle(PlayPayloadContext ctx) {
-		if(ctx.player().orElse(null) instanceof ServerPlayer player) {
-			ctx.workHandler().execute(()->{
+	public void handle(IPayloadContext ctx) {
+		if(ctx.player() instanceof ServerPlayer player) {
+			ctx.enqueueWork(()->{
 				if(player.containerMenu instanceof EncoderMenu menu) {
 					menu.patternItemHandler.setRecipe(map);
 				}

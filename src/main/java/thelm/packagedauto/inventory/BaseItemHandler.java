@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.world.inventory.ContainerData;
@@ -36,13 +37,13 @@ public class BaseItemHandler<T extends BaseBlockEntity> extends ItemStackHandler
 		}
 	}
 
-	public void load(CompoundTag nbt) {
+	public void load(CompoundTag nbt, HolderLookup.Provider registries) {
 		stacks.clear();
-		MiscHelper.INSTANCE.loadAllItems(nbt.getList("Items", 10), stacks, "Slot");
+		MiscHelper.INSTANCE.loadAllItems(nbt.getList("items", 10), stacks, "slot", registries);
 	}
 
-	public void save(CompoundTag nbt) {
-		nbt.put("Items", MiscHelper.INSTANCE.saveAllItems(new ListTag(), stacks, "Slot"));
+	public void save(CompoundTag nbt, HolderLookup.Provider registries) {
+		nbt.put("items", MiscHelper.INSTANCE.saveAllItems(new ListTag(), stacks, "slot", registries));
 	}
 
 	public void setChanged() {

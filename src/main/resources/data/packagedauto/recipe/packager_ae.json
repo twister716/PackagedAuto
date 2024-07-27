@@ -7,29 +7,29 @@
 	],
 	"type": "minecraft:crafting_shaped",
 	"result": {
-		"item": "packagedauto:unpackager",
+		"id": "packagedauto:packager",
 		"count": 1
 	},
 	"pattern": [
 		"ICI",
-		"RSR",
-		"IHI"
+		"RTR",
+		"IPI"
 	],
 	"key": {
 		"C": {
 			"item": "packagedauto:me_package_component"
 		},
-		"S": {
-			"tag": "forge:chests/wooden"
+		"T": {
+			"item": "minecraft:crafter"
 		},
-		"H": {
-			"item": "minecraft:hopper"
+		"P": {
+			"item": "minecraft:piston"
 		},
 		"I": {
-			"tag": "forge:ingots/iron"
+			"tag": "c:ingots/iron"
 		},
 		"R": {
-			"tag": "forge:dusts/redstone"
+			"tag": "c:dusts/redstone"
 		}
 	}
 }

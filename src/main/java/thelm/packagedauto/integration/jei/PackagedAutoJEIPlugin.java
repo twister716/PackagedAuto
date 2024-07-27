@@ -15,13 +15,7 @@ import mezz.jei.api.runtime.IIngredientManager;
 import mezz.jei.api.runtime.IJeiRuntime;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.ItemStack;
 import net.neoforged.fml.ModList;
-import thelm.packagedauto.block.EncoderBlock;
-import thelm.packagedauto.block.FluidPackageFillerBlock;
-import thelm.packagedauto.block.PackagerBlock;
-import thelm.packagedauto.block.PackagerExtensionBlock;
-import thelm.packagedauto.block.UnpackagerBlock;
 import thelm.packagedauto.client.screen.EncoderScreen;
 import thelm.packagedauto.integration.jei.category.FluidPackageContentsCategory;
 import thelm.packagedauto.integration.jei.category.FluidPackageFillingCategory;
@@ -29,12 +23,13 @@ import thelm.packagedauto.integration.jei.category.PackageContentsCategory;
 import thelm.packagedauto.integration.jei.category.PackageProcessingCategory;
 import thelm.packagedauto.integration.jei.category.PackageRecipeCategory;
 import thelm.packagedauto.integration.jei.category.PackagingCategory;
+import thelm.packagedauto.item.PackagedAutoItems;
 
 @JeiPlugin
 public class PackagedAutoJEIPlugin implements IModPlugin {
 
-	public static final ResourceLocation UID = new ResourceLocation("packagedauto:jei");
-	public static final ResourceLocation BACKGROUND = new ResourceLocation("packagedauto:textures/gui/jei.png");
+	public static final ResourceLocation UID = ResourceLocation.parse("packagedauto:jei");
+	public static final ResourceLocation BACKGROUND = ResourceLocation.parse("packagedauto:textures/gui/jei.png");
 
 	public static IJeiRuntime jeiRuntime;
 	private static List<ResourceLocation> allCategories;
@@ -70,11 +65,11 @@ public class PackagedAutoJEIPlugin implements IModPlugin {
 	@Override
 	public void registerRecipeCatalysts(IRecipeCatalystRegistration registration) {
 		if(!ModList.get().isLoaded("emi")) {
-			registration.addRecipeCatalyst(new ItemStack(EncoderBlock.INSTANCE), PackageRecipeCategory.TYPE);
-			registration.addRecipeCatalyst(new ItemStack(PackagerBlock.INSTANCE), PackagingCategory.TYPE);
-			registration.addRecipeCatalyst(new ItemStack(PackagerExtensionBlock.INSTANCE), PackagingCategory.TYPE);
-			registration.addRecipeCatalyst(new ItemStack(UnpackagerBlock.INSTANCE), PackageProcessingCategory.TYPE);
-			registration.addRecipeCatalyst(new ItemStack(FluidPackageFillerBlock.INSTANCE), FluidPackageFillingCategory.TYPE);
+			registration.addRecipeCatalyst(PackagedAutoItems.ENCODER.toStack(), PackageRecipeCategory.TYPE);
+			registration.addRecipeCatalyst(PackagedAutoItems.PACKAGER.toStack(), PackagingCategory.TYPE);
+			registration.addRecipeCatalyst(PackagedAutoItems.PACKAGER_EXTENSION.toStack(), PackagingCategory.TYPE);
+			registration.addRecipeCatalyst(PackagedAutoItems.UNPACKAGER.toStack(), PackageProcessingCategory.TYPE);
+			registration.addRecipeCatalyst(PackagedAutoItems.FLUID_PACKAGE_FILLER.toStack(), FluidPackageFillingCategory.TYPE);
 		}
 	}
 

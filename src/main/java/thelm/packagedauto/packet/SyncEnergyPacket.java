@@ -3,38 +3,32 @@ package thelm.packagedauto.packet;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.level.Level;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.network.PacketDistributor;
-import net.neoforged.neoforge.network.PacketDistributor.TargetPoint;
-import net.neoforged.neoforge.network.handling.PlayPayloadContext;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 import thelm.packagedauto.block.entity.BaseBlockEntity;
 
 public record SyncEnergyPacket(BlockPos pos, int energy) implements CustomPacketPayload {
 
-	public static final ResourceLocation ID = new ResourceLocation("packagedauto:sync_energy");
+	public static final Type<SyncEnergyPacket> TYPE = new Type<>(ResourceLocation.parse("packagedauto:sync_energy"));
+	public static final StreamCodec<RegistryFriendlyByteBuf, SyncEnergyPacket> STREAM_CODEC = StreamCodec.composite(
+			BlockPos.STREAM_CODEC, SyncEnergyPacket::pos,
+			ByteBufCodecs.INT, SyncEnergyPacket::energy,
+			SyncEnergyPacket::new);
 
 	@Override
-	public ResourceLocation id() {
-		return ID;
+	public Type<SyncEnergyPacket> type() {
+		return TYPE;
 	}
 
-	@Override
-	public void write(FriendlyByteBuf buf) {
-		buf.writeBlockPos(pos);
-		buf.writeInt(energy);
-	}
-
-	public static SyncEnergyPacket read(FriendlyByteBuf buf) {
-		return new SyncEnergyPacket(buf.readBlockPos(), buf.readInt());
-	}
-
-	public void handle(PlayPayloadContext ctx) {
-		ctx.workHandler().execute(()->{
+	public void handle(IPayloadContext ctx) {
+		ctx.enqueueWork(()->{
 			ClientLevel level = Minecraft.getInstance().level;
 			if(level.isLoaded(pos)) {
 				BlockEntity be = level.getBlockEntity(pos);
@@ -45,9 +39,7 @@ public record SyncEnergyPacket(BlockPos pos, int energy) implements CustomPacket
 		});
 	}
 
-	public static void syncEnergy(BlockPos pos, int energy, ResourceKey<Level> dimension, double range) {
-		PacketDistributor.NEAR.
-		with(new TargetPoint(pos.getX()+0.5D, pos.getY()+0.5D, pos.getZ()+0.5D, range, dimension)).
-		send(new SyncEnergyPacket(pos, energy));
+	public static void syncEnergy(ServerLevel level, BlockPos pos, int energy, double range) {
+		PacketDistributor.sendToPlayersNear(level, null, pos.getX()+0.5D, pos.getY()+0.5D, pos.getZ()+0.5D, range, new SyncEnergyPacket(pos, energy));
 	}
 }

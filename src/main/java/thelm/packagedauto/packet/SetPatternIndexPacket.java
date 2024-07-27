@@ -1,33 +1,28 @@
 package thelm.packagedauto.packet;
 
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
-import net.neoforged.neoforge.network.handling.PlayPayloadContext;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 import thelm.packagedauto.menu.EncoderMenu;
 
 public record SetPatternIndexPacket(int index) implements CustomPacketPayload {
 
-	public static final ResourceLocation ID = new ResourceLocation("packagedauto:set_pattern_index");
+	public static final Type<SetPatternIndexPacket> TYPE = new Type<>(ResourceLocation.parse("packagedauto:set_pattern_index"));
+	public static final StreamCodec<RegistryFriendlyByteBuf, SetPatternIndexPacket> STREAM_CODEC = ByteBufCodecs.INT.
+			map(SetPatternIndexPacket::new, SetPatternIndexPacket::index).cast();
 
 	@Override
-	public ResourceLocation id() {
-		return ID;
+	public Type<SetPatternIndexPacket> type() {
+		return TYPE;
 	}
 
-	@Override
-	public void write(FriendlyByteBuf buf) {
-		buf.writeByte(index);
-	}
-
-	public static SetPatternIndexPacket read(FriendlyByteBuf buf) {
-		return new SetPatternIndexPacket(buf.readByte());
-	}
-
-	public void handle(PlayPayloadContext ctx) {
-		if(ctx.player().orElse(null) instanceof ServerPlayer player) {
-			ctx.workHandler().execute(()->{
+	public void handle(IPayloadContext ctx) {
+		if(ctx.player() instanceof ServerPlayer player) {
+			ctx.enqueueWork(()->{
 				if(player.containerMenu instanceof EncoderMenu menu) {
 					menu.blockEntity.setPatternIndex(index);
 					menu.setupSlots();

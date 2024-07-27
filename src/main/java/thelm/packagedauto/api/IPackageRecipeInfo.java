@@ -2,19 +2,22 @@ package thelm.packagedauto.api;
 
 import java.util.List;
 
+import com.mojang.serialization.Codec;
+
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
 
 /**
  * Please override {@link IPackageRecipeInfo#equals(IPackageRecipeInfo)} when implementing a new recipe type.
  */
 public interface IPackageRecipeInfo {
 
-	void load(CompoundTag nbt);
-
-	void save(CompoundTag nbt);
+	static final Codec<IPackageRecipeInfo> CODEC = IPackageRecipeType.CODEC.dispatch(
+			"recipe_type", IPackageRecipeInfo::getRecipeType, IPackageRecipeType::getRecipeInfoMapCodec);
+	static final StreamCodec<RegistryFriendlyByteBuf, IPackageRecipeInfo> STREAM_CODEC = IPackageRecipeType.STREAM_CODEC.
+			<RegistryFriendlyByteBuf>cast().dispatch(IPackageRecipeInfo::getRecipeType, IPackageRecipeType::getRecipeInfoStreamCodec);
 
 	IPackageRecipeType getRecipeType();
 
@@ -29,8 +32,6 @@ public interface IPackageRecipeInfo {
 	List<ItemStack> getInputs();
 
 	List<ItemStack> getOutputs();
-
-	void generateFromStacks(List<ItemStack> input, List<ItemStack> output, Level level);
 
 	Int2ObjectMap<ItemStack> getEncoderStacks();
 

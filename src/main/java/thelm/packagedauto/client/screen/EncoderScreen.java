@@ -25,7 +25,7 @@ import yalter.mousetweaks.api.MouseTweaksDisableWheelTweak;
 @MouseTweaksDisableWheelTweak
 public class EncoderScreen extends BaseScreen<EncoderMenu> {
 
-	public static final ResourceLocation BACKGROUND = new ResourceLocation("packagedauto:textures/gui/encoder.png");
+	public static final ResourceLocation BACKGROUND = ResourceLocation.parse("packagedauto:textures/gui/encoder.png");
 
 	public EncoderScreen(EncoderMenu menu, Inventory inventory, Component title) {
 		super(menu, inventory, title);
@@ -121,7 +121,7 @@ public class EncoderScreen extends BaseScreen<EncoderMenu> {
 
 		@Override
 		public void onPress() {
-			PacketDistributor.SERVER.with(null).send(new SetPatternIndexPacket(id));
+			PacketDistributor.sendToServer(new SetPatternIndexPacket(id));
 			menu.blockEntity.setPatternIndex(id);
 			menu.setupSlots();
 		}
@@ -157,7 +157,7 @@ public class EncoderScreen extends BaseScreen<EncoderMenu> {
 		@Override
 		public void onPress() {
 			boolean reverse = hasShiftDown();
-			PacketDistributor.SERVER.with(null).send(new CycleRecipeTypePacket(reverse));
+			PacketDistributor.sendToServer(new CycleRecipeTypePacket(reverse));
 			menu.patternItemHandler.cycleRecipeType(reverse);
 			menu.setupSlots();
 		}
@@ -183,7 +183,7 @@ public class EncoderScreen extends BaseScreen<EncoderMenu> {
 		@Override
 		public void onPress() {
 			boolean single = hasShiftDown();
-			PacketDistributor.SERVER.with(null).send(new SaveRecipeListPacket(single));
+			PacketDistributor.sendToServer(new SaveRecipeListPacket(single));
 		}
 	}
 
@@ -207,7 +207,7 @@ public class EncoderScreen extends BaseScreen<EncoderMenu> {
 		@Override
 		public void onPress() {
 			boolean single = hasShiftDown();
-			PacketDistributor.SERVER.with(null).send(new LoadRecipeListPacket(single));
+			PacketDistributor.sendToServer(new LoadRecipeListPacket(single));
 			menu.blockEntity.loadRecipeList(single);
 			menu.setupSlots();
 		}

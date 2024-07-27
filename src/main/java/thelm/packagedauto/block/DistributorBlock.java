@@ -3,8 +3,6 @@ package thelm.packagedauto.block;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.Containers;
-import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.SoundType;
@@ -16,11 +14,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.MapColor;
 import thelm.packagedauto.block.entity.BaseBlockEntity;
 import thelm.packagedauto.block.entity.DistributorBlockEntity;
+import thelm.packagedauto.block.entity.PackagedAutoBlockEntities;
 
 public class DistributorBlock extends BaseBlock {
-
-	public static final DistributorBlock INSTANCE = new DistributorBlock();
-	public static final Item ITEM_INSTANCE = new BlockItem(INSTANCE, new Item.Properties());
 
 	protected DistributorBlock() {
 		super(BlockBehaviour.Properties.of().strength(15F, 25F).mapColor(MapColor.METAL).sound(SoundType.METAL));
@@ -28,7 +24,7 @@ public class DistributorBlock extends BaseBlock {
 
 	@Override
 	public DistributorBlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-		return DistributorBlockEntity.TYPE_INSTANCE.create(pos, state);
+		return PackagedAutoBlockEntities.DISTRIBUTOR.get().create(pos, state);
 	}
 
 	@Override

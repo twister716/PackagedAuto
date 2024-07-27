@@ -18,6 +18,8 @@ import org.apache.logging.log4j.Logger;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Lists;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import it.unimi.dsi.fastutil.Hash;
 import it.unimi.dsi.fastutil.objects.Object2IntLinkedOpenCustomHashMap;
@@ -26,30 +28,31 @@ import it.unimi.dsi.fastutil.objects.ObjectRBTreeSet;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.ExtraCodecs;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.level.Level;
 import net.neoforged.fml.loading.FMLEnvironment;
+import net.neoforged.neoforge.common.util.DataComponentUtil;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemHandlerHelper;
 import thelm.packagedauto.api.IMiscHelper;
 import thelm.packagedauto.api.IPackagePattern;
 import thelm.packagedauto.api.IPackageRecipeInfo;
-import thelm.packagedauto.api.IPackageRecipeType;
-import thelm.packagedauto.api.IVolumePackageItem;
 import thelm.packagedauto.api.IVolumeStackWrapper;
 import thelm.packagedauto.api.IVolumeType;
-import thelm.packagedauto.api.PackagedAutoApi;
+import thelm.packagedauto.component.PackagedAutoDataComponents;
 import thelm.packagedauto.item.VolumePackageItem;
 
 public class MiscHelper implements IMiscHelper {
@@ -103,13 +106,13 @@ public class MiscHelper implements IMiscHelper {
 
 	@Override
 	public List<ItemStack> condenseStacks(List<ItemStack> stacks, boolean ignoreStackSize) {
-		Object2IntLinkedOpenCustomHashMap<Pair<Item, CompoundTag>> map = new Object2IntLinkedOpenCustomHashMap<>(new Hash.Strategy<>() {
+		Object2IntLinkedOpenCustomHashMap<Pair<Item, DataComponentPatch>> map = new Object2IntLinkedOpenCustomHashMap<>(new Hash.Strategy<>() {
 			@Override
-			public int hashCode(Pair<Item, CompoundTag> o) {
+			public int hashCode(Pair<Item, DataComponentPatch> o) {
 				return Objects.hash(Item.getId(o.getLeft()), o.getRight());
 			}
 			@Override
-			public boolean equals(Pair<Item, CompoundTag> a, Pair<Item, CompoundTag> b) {
+			public boolean equals(Pair<Item, DataComponentPatch> a, Pair<Item, DataComponentPatch> b) {
 				return a.equals(b);
 			}
 		});
@@ -117,27 +120,27 @@ public class MiscHelper implements IMiscHelper {
 			if(stack.isEmpty()) {
 				continue;
 			}
-			Pair<Item, CompoundTag> pair = Pair.of(stack.getItem(), stack.getTag());
+			Pair<Item, DataComponentPatch> pair = Pair.of(stack.getItem(), stack.getComponentsPatch());
 			if(!map.containsKey(pair)) {
 				map.put(pair, 0);
 			}
 			map.addTo(pair, stack.getCount());
 		}
 		List<ItemStack> list = new ArrayList<>();
-		for(Object2IntMap.Entry<Pair<Item, CompoundTag>> entry : map.object2IntEntrySet()) {
-			Pair<Item, CompoundTag> pair = entry.getKey();
+		for(Object2IntMap.Entry<Pair<Item, DataComponentPatch>> entry : map.object2IntEntrySet()) {
+			Pair<Item, DataComponentPatch> pair = entry.getKey();
 			int count = entry.getIntValue();
 			Item item = pair.getLeft();
-			CompoundTag nbt = pair.getRight();
+			DataComponentPatch patch = pair.getRight();
 			if(ignoreStackSize) {
 				ItemStack toAdd = new ItemStack(item, count);
-				toAdd.setTag(nbt);
+				toAdd.applyComponents(patch);
 				list.add(toAdd);
 			}
 			else {
 				while(count > 0) {
 					ItemStack toAdd = new ItemStack(item, 1);
-					toAdd.setTag(nbt);
+					toAdd.applyComponents(patch);
 					int limit = item.getMaxStackSize(toAdd);
 					toAdd.setCount(Math.min(count, limit));
 					list.add(toAdd);
@@ -149,26 +152,23 @@ public class MiscHelper implements IMiscHelper {
 		return list;
 	}
 
-
 	@Override
-	public ListTag saveAllItems(ListTag tagList, List<ItemStack> list) {
-		return saveAllItems(tagList, list, "Index");
+	public ListTag saveAllItems(ListTag tagList, List<ItemStack> list, HolderLookup.Provider registries) {
+		return saveAllItems(tagList, list, "Index", registries);
 	}
 
 	@Override
-	public ListTag saveAllItems(ListTag tagList, List<ItemStack> list, String indexKey) {
+	public ListTag saveAllItems(ListTag tagList, List<ItemStack> list, String indexKey, HolderLookup.Provider registries) {
 		for(int i = 0; i < list.size(); ++i) {
 			ItemStack stack = list.get(i);
 			boolean empty = stack.isEmpty();
 			if(!empty || i == list.size()-1) {
 				if(empty) {
-					// Ensure that the end-of-list stack if empty is always the default empty stack
-					// Have to use air now
-					stack = new ItemStack(Items.AIR);
+					stack = ItemStack.EMPTY;
 				}
 				CompoundTag nbt = new CompoundTag();
 				nbt.putByte(indexKey, (byte)i);
-				saveItemWithLargeCount(nbt, stack);
+				saveItemWithLargeCount(nbt, stack, registries);
 				tagList.add(nbt);
 			}
 		}
@@ -176,12 +176,12 @@ public class MiscHelper implements IMiscHelper {
 	}
 
 	@Override
-	public void loadAllItems(ListTag tagList, List<ItemStack> list) {
-		loadAllItems(tagList, list, "Index");
+	public void loadAllItems(ListTag tagList, List<ItemStack> list, HolderLookup.Provider registries) {
+		loadAllItems(tagList, list, "Index", registries);
 	}
 
 	@Override
-	public void loadAllItems(ListTag tagList, List<ItemStack> list, String indexKey) {
+	public void loadAllItems(ListTag tagList, List<ItemStack> list, String indexKey, HolderLookup.Provider registries) {
 		list.clear();
 		try {
 			for(int i = 0; i < tagList.size(); ++i) {
@@ -191,7 +191,7 @@ public class MiscHelper implements IMiscHelper {
 					list.add(ItemStack.EMPTY);
 				}
 				if(j >= 0)  {
-					ItemStack stack = loadItemWithLargeCount(nbt);
+					ItemStack stack = loadItemWithLargeCount(nbt, registries);
 					list.set(j, stack.isEmpty() ? ItemStack.EMPTY : stack);
 				}
 			}
@@ -199,27 +199,23 @@ public class MiscHelper implements IMiscHelper {
 		catch(UnsupportedOperationException | IndexOutOfBoundsException e) {}
 	}
 
+	public static final Codec<ItemStack> LARGE_ITEM_CODEC = RecordCodecBuilder.create(instance->instance.group(
+			ItemStack.ITEM_NON_AIR_CODEC.fieldOf("item").forGetter(ItemStack::getItemHolder),
+			ExtraCodecs.POSITIVE_INT.fieldOf("count").orElse(1).forGetter(ItemStack::getCount),
+			DataComponentPatch.CODEC.optionalFieldOf("components", DataComponentPatch.EMPTY).forGetter(ItemStack::getComponentsPatch)).
+			apply(instance, ItemStack::new));
+
 	@Override
-	public CompoundTag saveItemWithLargeCount(CompoundTag nbt, ItemStack stack) {
-		stack.save(nbt);
-		int count = stack.getCount();
-		if((byte)count == count) {
-			nbt.putByte("Count", (byte)count);
-		}
-		else if((short)count == count) {
-			nbt.putShort("Count", (short)count);
-		}
-		else {
-			nbt.putInt("Count", (short)count);
+	public CompoundTag saveItemWithLargeCount(CompoundTag nbt, ItemStack stack, HolderLookup.Provider registries) {
+		if(!stack.isEmpty()) {
+			nbt.merge((CompoundTag)DataComponentUtil.wrapEncodingExceptions(stack, LARGE_ITEM_CODEC, registries));
 		}
 		return nbt;
 	}
 
 	@Override
-	public ItemStack loadItemWithLargeCount(CompoundTag nbt) {
-		ItemStack stack = ItemStack.of(nbt);
-		stack.setCount(nbt.getInt("Count"));
-		return stack;
+	public ItemStack loadItemWithLargeCount(CompoundTag nbt, HolderLookup.Provider registries) {
+		return LARGE_ITEM_CODEC.parse(registries.createSerializationContext(NbtOps.INSTANCE), nbt).result().orElse(ItemStack.EMPTY);
 	}
 
 	@Override
@@ -284,6 +280,11 @@ public class MiscHelper implements IMiscHelper {
 	}
 
 	@Override
+	public boolean isPackage(ItemStack stack) {
+		return stack.has(PackagedAutoDataComponents.RECIPE) && stack.has(PackagedAutoDataComponents.PACKAGE_INDEX);
+	}
+
+	@Override
 	public boolean isEmpty(IItemHandler itemHandler) {
 		if(itemHandler == null || itemHandler.getSlots() == 0) {
 			return false;
@@ -307,26 +308,21 @@ public class MiscHelper implements IMiscHelper {
 	}
 
 	@Override
-	public CompoundTag saveRecipe(CompoundTag nbt, IPackageRecipeInfo recipe) {
-		nbt.putString("RecipeType", recipe.getRecipeType().getName().toString());
-		recipe.save(nbt);
-		return nbt;
+	public CompoundTag saveRecipe(CompoundTag nbt, IPackageRecipeInfo recipe, HolderLookup.Provider registries) {
+		return nbt.merge((CompoundTag)IPackageRecipeInfo.CODEC.encodeStart(registries.createSerializationContext(NbtOps.INSTANCE), recipe).result().orElse(new CompoundTag()));
 	}
 
 	@Override
-	public IPackageRecipeInfo loadRecipe(CompoundTag nbt) {
-		IPackageRecipeType recipeType = PackagedAutoApi.instance().getRecipeType(new ResourceLocation(nbt.getString("RecipeType")));
-		if(recipeType != null) {
-			IPackageRecipeInfo recipe = RECIPE_CACHE.getIfPresent(nbt);
-			if(recipe != null) {
-				return recipe;
-			}
-			recipe = recipeType.getNewRecipeInfo();
-			recipe.load(nbt);
-			RECIPE_CACHE.put(nbt, recipe);
+	public IPackageRecipeInfo loadRecipe(CompoundTag nbt, HolderLookup.Provider registries) {
+		IPackageRecipeInfo recipe = RECIPE_CACHE.getIfPresent(nbt);
+		if(recipe != null) {
 			return recipe;
 		}
-		return null;
+		recipe = IPackageRecipeInfo.CODEC.parse(registries.createSerializationContext(NbtOps.INSTANCE), nbt).result().orElse(null);
+		if(recipe != null) {
+			RECIPE_CACHE.put(nbt, recipe);
+		}
+		return recipe;
 	}
 
 	@Override
@@ -362,7 +358,7 @@ public class MiscHelper implements IMiscHelper {
 		List<ItemStack> inputs = recipe.getInputs();
 		List<ItemStack> outputs = recipe.getOutputs();
 		Function<ItemStack, Object[]> decompose = stack->new Object[] {
-				stack.getItem(), stack.getCount(), stack.getTag(),
+				stack.getItem(), stack.getCount(), stack.getComponentsPatch(),
 		};
 		Object[] toHash = {
 				recipeInternal, inputs.stream().map(decompose).toArray(), outputs.stream().map(decompose).toArray(),
@@ -378,7 +374,7 @@ public class MiscHelper implements IMiscHelper {
 		f:for(ItemStack req : condensedRequired) {
 			for(ItemStack offer : condensedOffered) {
 				if(req.getCount() <= offer.getCount() && req.getItem() == offer.getItem() &&
-						(!req.hasTag() || ItemStack.isSameItemSameTags(req, offer))) {
+						(req.isComponentsPatchEmpty() || ItemStack.isSameItemSameComponents(req, offer))) {
 					continue f;
 				}
 			}
@@ -392,7 +388,7 @@ public class MiscHelper implements IMiscHelper {
 			for(ItemStack offer : offered) {
 				if(!offer.isEmpty()) {
 					if(req.getItem() == offer.getItem() &&
-							(!req.hasTag() || ItemStack.isSameItemSameTags(req, offer))) {
+							(req.isComponentsPatchEmpty() || ItemStack.isSameItemSameComponents(req, offer))) {
 						int toRemove = Math.min(count, offer.getCount());
 						offer.shrink(toRemove);
 						count -= toRemove;
@@ -408,12 +404,12 @@ public class MiscHelper implements IMiscHelper {
 
 	@Override
 	public boolean arePatternsDisjoint(List<IPackagePattern> patternList) {
-		ObjectRBTreeSet<Pair<Item, CompoundTag>> set = new ObjectRBTreeSet<>(
+		ObjectRBTreeSet<Pair<Item, DataComponentPatch>> set = new ObjectRBTreeSet<>(
 				Comparator.comparing(pair->Pair.of(BuiltInRegistries.ITEM.getKey(pair.getLeft()), ""+pair.getRight())));
 		for(IPackagePattern pattern : patternList) {
 			List<ItemStack> condensedInputs = condenseStacks(pattern.getInputs(), true);
 			for(ItemStack stack : condensedInputs) {
-				Pair<Item, CompoundTag> toAdd = Pair.of(stack.getItem(), stack.getTag());
+				Pair<Item, DataComponentPatch> toAdd = Pair.of(stack.getItem(), stack.getComponentsPatch());
 				if(set.contains(toAdd)) {
 					return false;
 				}
@@ -448,12 +444,11 @@ public class MiscHelper implements IMiscHelper {
 		if(stack.isEmpty()) {
 			return stack;
 		}
-		if(stack.getItem() instanceof IVolumePackageItem vPackage &&
-				vPackage.getVolumeType(stack) != null &&
-				vPackage.getVolumeType(stack).hasBlockCapability(level, pos, direction)) {
-			IVolumeType vType = vPackage.getVolumeType(stack);
+		if(stack.has(PackagedAutoDataComponents.VOLUME_PACKAGE_STACK) &&
+				stack.get(PackagedAutoDataComponents.VOLUME_PACKAGE_STACK).getVolumeType().hasBlockCapability(level, pos, direction)) {
 			stack = stack.copy();
-			IVolumeStackWrapper vStack = vPackage.getVolumeStack(stack);
+			IVolumeStackWrapper vStack = stack.get(PackagedAutoDataComponents.VOLUME_PACKAGE_STACK);
+			IVolumeType vType = vStack.getVolumeType();
 			while(!stack.isEmpty()) {
 				int simulateFilled = vType.fill(level, pos, direction, vStack, true);
 				if(simulateFilled == vStack.getAmount()) {

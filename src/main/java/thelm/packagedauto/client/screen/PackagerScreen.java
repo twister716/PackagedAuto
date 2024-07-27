@@ -16,7 +16,7 @@ import thelm.packagedauto.packet.ChangePackagingPacket;
 
 public class PackagerScreen extends BaseScreen<PackagerMenu> {
 
-	public static final ResourceLocation BACKGROUND = new ResourceLocation("packagedauto:textures/gui/packager.png");
+	public static final ResourceLocation BACKGROUND = ResourceLocation.parse("packagedauto:textures/gui/packager.png");
 
 	public PackagerScreen(PackagerMenu menu, Inventory inventory, Component title) {
 		super(menu, inventory, title);
@@ -75,7 +75,7 @@ public class PackagerScreen extends BaseScreen<PackagerMenu> {
 
 		@Override
 		public void onPress() {
-			PacketDistributor.SERVER.with(null).send(ChangePackagingPacket.INSTANCE);
+			PacketDistributor.sendToServer(ChangePackagingPacket.INSTANCE);
 		}
 
 		private Tooltip currentTooltip() {

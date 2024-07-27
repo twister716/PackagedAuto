@@ -20,7 +20,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.fluids.FluidType;
 import thelm.packagedauto.api.IVolumeType;
 import thelm.packagedauto.client.screen.EncoderScreen;
-import thelm.packagedauto.menu.EncoderMenu;
+import thelm.packagedauto.menu.PackagedAutoMenus;
 import thelm.packagedauto.util.ApiImpl;
 
 @EmiEntrypoint
@@ -34,7 +34,7 @@ public class PackagedAutoEMIPlugin implements EmiPlugin {
 	public void register(EmiRegistry registry) {
 		registry.addDragDropHandler(EncoderScreen.class, new EncoderDragDropHandler());
 		registry.addGenericStackProvider(new FluidVolumeStackProvider());
-		registry.addRecipeHandler(EncoderMenu.TYPE_INSTANCE, new EncoderRecipeHandler());
+		registry.addRecipeHandler(PackagedAutoMenus.ENCODER.get(), new EncoderRecipeHandler());
 	}
 
 	public static List<ResourceLocation> getAllRecipeCategories() {
@@ -92,7 +92,7 @@ public class PackagedAutoEMIPlugin implements EmiPlugin {
 		}
 		IVolumeType volumeType = ApiImpl.INSTANCE.getVolumeType(emiStack.getKey().getClass());
 		if(volumeType != null) {
-			return volumeType.makeStackFromBase(emiStack.getKey(), amount, emiStack.getNbt());
+			return volumeType.makeStackFromBase(emiStack.getKey(), amount, emiStack.getComponentChanges());
 		}
 		return Optional.ofNullable(emiStack.getItemStack());
 	}

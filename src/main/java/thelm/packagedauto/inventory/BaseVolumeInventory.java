@@ -2,6 +2,7 @@ package thelm.packagedauto.inventory;
 
 import java.util.Arrays;
 
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.neoforged.neoforge.fluids.FluidStack;
@@ -45,30 +46,30 @@ public class BaseVolumeInventory {
 		}
 	}
 
-	public void load(CompoundTag nbt) {
+	public void load(CompoundTag nbt, HolderLookup.Provider registries) {
 		Arrays.fill(stacks, FluidStack.EMPTY);
-		ListTag tagList = nbt.getList("Volumes", 10);
+		ListTag tagList = nbt.getList("volumes", 10);
 		for(int i = 0; i < tagList.size(); ++i) {
 			CompoundTag tag = tagList.getCompound(i);
-			int j = tag.getByte("Slot") & 255;
+			int j = tag.getByte("slot") & 255;
 			if(j >= 0 && j < stacks.length) {
-				stacks[j] = type.loadStack(tag);
+				stacks[j] = type.loadRawStack(tag, registries);
 			}
 		}
 	}
 
-	public CompoundTag write(CompoundTag nbt) {
+	public CompoundTag save(CompoundTag nbt, HolderLookup.Provider registries) {
 		ListTag tagList = new ListTag();
 		for(int i = 0; i < stacks.length; ++i) {
 			IVolumeStackWrapper stack = stacks[i];
 			if(!stack.isEmpty()) {
 				CompoundTag tag = new CompoundTag();
-				tag.putByte("Slot", (byte)i);
-				stack.save(tag);
+				tag.putByte("slot", (byte)i);
+				type.saveRawStack(tag, stack, registries);
 				tagList.add(tag);
 			}
 		}
-		nbt.put("Volumes", tagList);
+		nbt.put("volumes", tagList);
 		return nbt;
 	}
 }

@@ -1,9 +1,13 @@
 package thelm.packagedauto.capability;
 
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandlerItem;
+import thelm.packagedauto.api.IFluidStackWrapper;
+import thelm.packagedauto.api.IVolumeStackWrapper;
+import thelm.packagedauto.component.PackagedAutoDataComponents;
+import thelm.packagedauto.volume.FluidStackWrapper;
 
 public class StackFluidHandlerItem implements IFluidHandlerItem {
 
@@ -19,21 +23,19 @@ public class StackFluidHandlerItem implements IFluidHandlerItem {
 	}
 
 	public FluidStack getFluid() {
-		CompoundTag tagCompound = container.getTag();
-		if(tagCompound == null || !tagCompound.contains("Fluid")) {
-			return FluidStack.EMPTY;
+		IVolumeStackWrapper stack = container.get(PackagedAutoDataComponents.VOLUME_PACKAGE_STACK);
+		if(stack instanceof IFluidStackWrapper fluid) {
+			return fluid.getFluid();
 		}
-		return FluidStack.loadFluidStackFromNBT(tagCompound.getCompound("Fluid"));
+		return FluidStack.EMPTY;
 	}
 
 	public void setFluid(FluidStack fluid)  {
 		if(fluid != null && !fluid.isEmpty()) {
-			if(!container.hasTag()) {
-				container.setTag(new CompoundTag());
-			}
-			CompoundTag fluidTag = new CompoundTag();
-			fluid.writeToNBT(fluidTag);
-			container.getTag().put("Fluid", fluidTag);
+			DataComponentPatch patch = DataComponentPatch.builder().
+					set(PackagedAutoDataComponents.VOLUME_PACKAGE_STACK.get(), FluidStackWrapper.of(fluid)).
+					build();
+			container.applyComponents(patch);
 		}
 	}
 
@@ -72,7 +74,7 @@ public class StackFluidHandlerItem implements IFluidHandlerItem {
 		if(resource.getAmount() < getFluid().getAmount()) {
 			return FluidStack.EMPTY;
 		}
-		if(!fluidStack.isEmpty() && fluidStack.isFluidEqual(resource)) {
+		if(!fluidStack.isEmpty() && FluidStack.isSameFluidSameComponents(fluidStack, resource)) {
 			if(action.execute()) {
 				setContainerToEmpty();
 			}

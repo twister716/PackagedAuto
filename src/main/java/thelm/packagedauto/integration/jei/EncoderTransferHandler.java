@@ -59,7 +59,7 @@ public class EncoderTransferHandler implements IRecipeTransferHandler<EncoderMen
 		if(!doTransfer) {
 			return null;
 		}
-		PacketDistributor.SERVER.with(null).send(new SetRecipePacket(map));
+		PacketDistributor.sendToServer(new SetRecipePacket(map));
 		return null;
 	}
 }

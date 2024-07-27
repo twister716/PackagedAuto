@@ -16,7 +16,7 @@ import thelm.packagedauto.packet.SetFluidAmountPacket;
 
 public class FluidPackageFillerScreen extends BaseScreen<FluidPackageFillerMenu> {
 
-	public static final ResourceLocation BACKGROUND = new ResourceLocation("packagedauto:textures/gui/fluid_package_filler.png");
+	public static final ResourceLocation BACKGROUND = ResourceLocation.parse("packagedauto:textures/gui/fluid_package_filler.png");
 	public static final FluidRenderer FLUID_RENDERER = new FluidRenderer(16, 52, 1);
 
 	protected EditBox amountField;
@@ -57,7 +57,7 @@ public class FluidPackageFillerScreen extends BaseScreen<FluidPackageFillerMenu>
 			try {
 				int amount = Mth.clamp(Integer.parseInt(amountField.getValue()), 1, 1000000);
 				if(amount != menu.blockEntity.requiredAmount) {
-					PacketDistributor.SERVER.with(null).send(new SetFluidAmountPacket(amount));
+					PacketDistributor.sendToServer(new SetFluidAmountPacket(amount));
 				}
 			}
 			catch(NumberFormatException e) {
@@ -99,7 +99,7 @@ public class FluidPackageFillerScreen extends BaseScreen<FluidPackageFillerMenu>
 			graphics.renderTooltip(font, Component.translatable("block.packagedauto.fluid_package_filler.redstone"), mouseX-leftPos, mouseY-topPos);
 		}
 		if(menu.blockEntity.isWorking && !menu.blockEntity.currentFluid.isEmpty() && mouseX-leftPos >= 80 && mouseY-topPos >= 17 && mouseX-leftPos <= 95 && mouseY-topPos <= 68) {
-			graphics.renderTooltip(font, Component.literal("").append(menu.blockEntity.currentFluid.getDisplayName()).append(" "+menu.blockEntity.amount+" / "+menu.blockEntity.requiredAmount+" mB"), mouseX-leftPos, mouseY-topPos);
+			graphics.renderTooltip(font, Component.literal("").append(menu.blockEntity.currentFluid.getHoverName()).append(" "+menu.blockEntity.amount+" / "+menu.blockEntity.requiredAmount+" mB"), mouseX-leftPos, mouseY-topPos);
 		}
 		super.renderLabels(graphics, mouseX, mouseY);
 	}

@@ -7,8 +7,9 @@ import appeng.api.stacks.GenericStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.Level;
 import thelm.packagedauto.api.IPackageRecipeInfo;
-import thelm.packagedauto.api.IVolumePackageItem;
 import thelm.packagedauto.api.IVolumeStackWrapper;
+import thelm.packagedauto.component.PackagedAutoDataComponents;
+import thelm.packagedauto.util.MiscHelper;
 
 public class SimpleInput implements IInput {
 
@@ -46,10 +47,10 @@ public class SimpleInput implements IInput {
 	}
 
 	private GenericStack getGenericInput(GenericStack stack) {
-		if(stack.what() instanceof AEItemKey itemKey && itemKey.getItem() instanceof IVolumePackageItem vPackage) {
-			IVolumeStackWrapper vStack = vPackage.getVolumeStack(itemKey.toStack());
+		if(stack.what() instanceof AEItemKey itemKey && itemKey.toStack().has(PackagedAutoDataComponents.VOLUME_PACKAGE_STACK)) {
+			IVolumeStackWrapper vStack = itemKey.toStack().get(PackagedAutoDataComponents.VOLUME_PACKAGE_STACK);
 			if(!vStack.isEmpty() && vStack.getVolumeType().supportsAE()) {
-				AEKey key = AEKey.fromTagGeneric(vStack.saveAEKey(new CompoundTag()));
+				AEKey key = AEKey.fromTagGeneric(MiscHelper.INSTANCE.getRegistryAccess(), vStack.saveAEKey(new CompoundTag()));
 				if(key != null) {
 					return new GenericStack(key, vStack.getAmount());
 				}

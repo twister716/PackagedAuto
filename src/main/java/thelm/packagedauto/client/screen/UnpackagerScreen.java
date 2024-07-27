@@ -17,7 +17,7 @@ import thelm.packagedauto.packet.TrackerCountPacket;
 
 public class UnpackagerScreen extends BaseScreen<UnpackagerMenu> {
 
-	public static final ResourceLocation BACKGROUND = new ResourceLocation("packagedauto:textures/gui/unpackager.png");
+	public static final ResourceLocation BACKGROUND = ResourceLocation.parse("packagedauto:textures/gui/unpackager.png");
 
 	public UnpackagerScreen(UnpackagerMenu menu, Inventory inventory, Component title) {
 		super(menu, inventory, title);
@@ -96,7 +96,7 @@ public class UnpackagerScreen extends BaseScreen<UnpackagerMenu> {
 
 		@Override
 		public void onPress() {
-			PacketDistributor.SERVER.with(null).send(ChangeBlockingPacket.INSTANCE);
+			PacketDistributor.sendToServer(ChangeBlockingPacket.INSTANCE);
 		}
 	}
 
@@ -123,7 +123,7 @@ public class UnpackagerScreen extends BaseScreen<UnpackagerMenu> {
 
 		@Override
 		public void onPress() {
-			PacketDistributor.SERVER.with(null).send(new TrackerCountPacket(decrease));
+			PacketDistributor.sendToServer(new TrackerCountPacket(decrease));
 		}
 	}
 }

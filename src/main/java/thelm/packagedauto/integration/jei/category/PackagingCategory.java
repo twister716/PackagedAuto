@@ -14,8 +14,8 @@ import mezz.jei.api.recipe.category.IRecipeCategory;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import thelm.packagedauto.api.IPackagePattern;
-import thelm.packagedauto.block.PackagerBlock;
 import thelm.packagedauto.integration.jei.PackagedAutoJEIPlugin;
+import thelm.packagedauto.item.PackagedAutoItems;
 
 public class PackagingCategory implements IRecipeCategory<IPackagePattern> {
 
@@ -27,7 +27,7 @@ public class PackagingCategory implements IRecipeCategory<IPackagePattern> {
 
 	public PackagingCategory(IGuiHelper guiHelper) {
 		background = guiHelper.createDrawable(PackagedAutoJEIPlugin.BACKGROUND, 108, 64, 112, 54);
-		icon = guiHelper.createDrawableIngredient(VanillaTypes.ITEM_STACK, new ItemStack(PackagerBlock.INSTANCE));
+		icon = guiHelper.createDrawableIngredient(VanillaTypes.ITEM_STACK, PackagedAutoItems.PACKAGER.toStack());
 	}
 
 	@Override

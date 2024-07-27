@@ -19,8 +19,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import thelm.packagedauto.api.IPackagePattern;
 import thelm.packagedauto.api.IPackageRecipeInfo;
-import thelm.packagedauto.block.UnpackagerBlock;
 import thelm.packagedauto.integration.jei.PackagedAutoJEIPlugin;
+import thelm.packagedauto.item.PackagedAutoItems;
 
 public class PackageProcessingCategory implements IRecipeCategory<IPackageRecipeInfo> {
 
@@ -32,7 +32,7 @@ public class PackageProcessingCategory implements IRecipeCategory<IPackageRecipe
 
 	public PackageProcessingCategory(IGuiHelper guiHelper) {
 		background = guiHelper.createDrawable(PackagedAutoJEIPlugin.BACKGROUND, 108, 0, 140, 64);
-		icon = guiHelper.createDrawableIngredient(VanillaTypes.ITEM_STACK, new ItemStack(UnpackagerBlock.INSTANCE));
+		icon = guiHelper.createDrawableIngredient(VanillaTypes.ITEM_STACK, PackagedAutoItems.UNPACKAGER.toStack());
 	}
 
 	@Override

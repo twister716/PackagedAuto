@@ -24,18 +24,18 @@ public class AppEngUtil {
 
 	private AppEngUtil() {}
 
-	public static IInWorldGridNodeHost getAsInWorldGridNodeHost(BlockEntity blockEntity, Direction direction) {
+	public static IInWorldGridNodeHost getAsInWorldGridNodeHost(BlockEntity blockEntity) {
 		if(blockEntity instanceof IInWorldGridNodeHost inWorldGridNodeHost) {
 			return inWorldGridNodeHost;
 		}
 		return null;
 	}
 
-	public static GenericStack[] condenseStacks(List<GenericStack> stacks) {
-		GenericStack[] merged = stacks.stream().filter(Objects::nonNull).
+	public static List<GenericStack> condenseStacks(List<GenericStack> stacks) {
+		List<GenericStack> merged = stacks.stream().filter(Objects::nonNull).
 				collect(Collectors.toMap(GenericStack::what, Functions.identity(), GenericStack::sum, LinkedHashMap::new)).
-				values().stream().toArray(GenericStack[]::new);
-		if(merged.length == 0) {
+				values().stream().toList();
+		if(merged.size() == 0) {
 			throw new IllegalStateException("No pattern here!");
 		}
 		return merged;
@@ -43,14 +43,6 @@ public class AppEngUtil {
 
 	public static IInput[] toInputs(List<GenericStack> stacks) {
 		return toInputs(null, stacks);
-	}
-
-	public static IInput[] toInputs(IPackageRecipeInfo recipe, GenericStack[] stacks) {
-		IInput[] inputs = new IInput[stacks.length];
-		for(int i = 0; i < stacks.length; ++i) {
-			inputs[i] = new SimpleInput(recipe, stacks[i]);
-		}
-		return inputs;
 	}
 
 	public static IInput[] toInputs(IPackageRecipeInfo recipe, List<GenericStack> stacks) {

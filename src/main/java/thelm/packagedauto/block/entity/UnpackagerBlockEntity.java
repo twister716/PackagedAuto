@@ -10,6 +10,7 @@ import it.unimi.dsi.fastutil.booleans.BooleanArrayList;
 import it.unimi.dsi.fastutil.booleans.BooleanList;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.chat.Component;
@@ -20,33 +21,21 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.items.IItemHandler;
 import thelm.packagedauto.api.IPackageCraftingMachine;
-import thelm.packagedauto.api.IPackageItem;
 import thelm.packagedauto.api.IPackageRecipeInfo;
 import thelm.packagedauto.api.IPackageRecipeType;
-import thelm.packagedauto.api.IVolumePackageItem;
-import thelm.packagedauto.block.PackagerBlock;
-import thelm.packagedauto.block.PackagerExtensionBlock;
-import thelm.packagedauto.block.UnpackagerBlock;
+import thelm.packagedauto.block.PackagedAutoBlocks;
+import thelm.packagedauto.component.PackagedAutoDataComponents;
 import thelm.packagedauto.energy.EnergyStorage;
-import thelm.packagedauto.integration.appeng.blockentity.AEUnpackagerBlockEntity;
 import thelm.packagedauto.inventory.UnpackagerItemHandler;
 import thelm.packagedauto.menu.UnpackagerMenu;
 import thelm.packagedauto.util.MiscHelper;
 
 public class UnpackagerBlockEntity extends BaseBlockEntity {
-
-	public static final BlockEntityType<UnpackagerBlockEntity> TYPE_INSTANCE = BlockEntityType.Builder.
-			of(MiscHelper.INSTANCE.<BlockEntityType.BlockEntitySupplier<UnpackagerBlockEntity>>conditionalSupplier(
-					()->ModList.get().isLoaded("ae2"),
-					()->()->AEUnpackagerBlockEntity::new, ()->()->UnpackagerBlockEntity::new).get(),
-					UnpackagerBlock.INSTANCE).build(null);
 
 	public static int energyCapacity = 5000;
 	public static int energyUsage = 50;
@@ -60,7 +49,7 @@ public class UnpackagerBlockEntity extends BaseBlockEntity {
 	public int trackerCount = 6;
 
 	public UnpackagerBlockEntity(BlockPos pos, BlockState state) {
-		super(TYPE_INSTANCE, pos, state);
+		super(PackagedAutoBlockEntities.UNPACKAGER.get(), pos, state);
 		setItemHandler(new UnpackagerItemHandler(this));
 		setEnergyStorage(new EnergyStorage(this, energyCapacity));
 		for(int i = 0; i < trackers.length; ++i) {
@@ -97,10 +86,10 @@ public class UnpackagerBlockEntity extends BaseBlockEntity {
 		for(int i = 0; i < 9; ++i) {
 			if(energyStorage.getEnergyStored() >= energyUsage) {
 				ItemStack stack = itemHandler.getStackInSlot(i);
-				if(!stack.isEmpty() && stack.getItem() instanceof IPackageItem packageItem) {
+				if(!stack.isEmpty() && MiscHelper.INSTANCE.isPackage(stack)) {
 					boolean flag = false;
 					for(PackageTracker tracker : nonEmptyTrackers) {
-						if(tracker.tryAcceptPackage(packageItem, stack, i)) {
+						if(tracker.tryAcceptPackage(stack, i)) {
 							flag = true;
 							stack.shrink(1);
 							if(stack.isEmpty()) {
@@ -118,7 +107,7 @@ public class UnpackagerBlockEntity extends BaseBlockEntity {
 					}
 					if(!flag) {
 						for(PackageTracker tracker : emptyTrackers) {
-							if(tracker.tryAcceptPackage(packageItem, stack, i)) {
+							if(tracker.tryAcceptPackage(stack, i)) {
 								stack.shrink(1);
 								if(stack.isEmpty()) {
 									itemHandler.setStackInSlot(i, ItemStack.EMPTY);
@@ -174,9 +163,9 @@ public class UnpackagerBlockEntity extends BaseBlockEntity {
 			}
 			BlockPos offsetPos = worldPosition.relative(direction);
 			Block block = level.getBlockState(offsetPos).getBlock();
-			if(block == PackagerBlock.INSTANCE ||
-					block == PackagerExtensionBlock.INSTANCE ||
-					block == UnpackagerBlock.INSTANCE) {
+			if(block == PackagedAutoBlocks.PACKAGER.get() ||
+					block == PackagedAutoBlocks.PACKAGER_EXTENSION.get() ||
+					block == PackagedAutoBlocks.UNPACKAGER.get()) {
 				trackerToEmpty.direction = null;
 				continue;
 			}
@@ -189,9 +178,8 @@ public class UnpackagerBlockEntity extends BaseBlockEntity {
 			for(int i = 0; i < trackerToEmpty.toSend.size(); ++i) {
 				ItemStack stack = trackerToEmpty.toSend.get(i);
 				ItemStack stackRem = stack;
-				if(stack.getItem() instanceof IVolumePackageItem vPackage &&
-						vPackage.getVolumeType(stack) != null &&
-						vPackage.getVolumeType(stack).hasBlockCapability(level, offsetPos, direction.getOpposite())) {
+				if(stack.has(PackagedAutoDataComponents.VOLUME_PACKAGE_STACK) &&
+						stack.get(PackagedAutoDataComponents.VOLUME_PACKAGE_STACK).getVolumeType().hasBlockCapability(level, offsetPos, direction.getOpposite())) {
 					stackRem = MiscHelper.INSTANCE.fillVolume(level, offsetPos, direction.getOpposite(), stack, false);
 				}
 				else if(itemHandler != null) {
@@ -215,9 +203,9 @@ public class UnpackagerBlockEntity extends BaseBlockEntity {
 			}
 			BlockPos offsetPos = worldPosition.relative(direction);
 			Block block = level.getBlockState(offsetPos).getBlock();
-			if(block == PackagerBlock.INSTANCE ||
-					block == PackagerExtensionBlock.INSTANCE ||
-					block == UnpackagerBlock.INSTANCE) {
+			if(block == PackagedAutoBlocks.PACKAGER.get() ||
+					block == PackagedAutoBlocks.PACKAGER_EXTENSION.get() ||
+					block == PackagedAutoBlocks.UNPACKAGER.get()) {
 				continue;
 			}
 			BlockEntity blockEntity = level.getBlockEntity(worldPosition.relative(direction));
@@ -231,10 +219,9 @@ public class UnpackagerBlockEntity extends BaseBlockEntity {
 			if(blocking) {
 				for(int i = 0; i < trackerToEmpty.toSend.size(); ++i) {
 					ItemStack stack = trackerToEmpty.toSend.get(i);
-					if(stack.getItem() instanceof IVolumePackageItem vPackage &&
-							vPackage.getVolumeType(stack) != null &&
-							vPackage.getVolumeType(stack).hasBlockCapability(level, offsetPos, direction.getOpposite())) {
-						if(!vPackage.getVolumeType(stack).isEmpty(level, offsetPos, direction.getOpposite())) {
+					if(stack.has(PackagedAutoDataComponents.VOLUME_PACKAGE_STACK) &&
+							stack.get(PackagedAutoDataComponents.VOLUME_PACKAGE_STACK).getVolumeType().hasBlockCapability(level, offsetPos, direction.getOpposite())) {
+						if(!stack.get(PackagedAutoDataComponents.VOLUME_PACKAGE_STACK).getVolumeType().isEmpty(level, offsetPos, direction.getOpposite())) {
 							continue dir;
 						}
 					}
@@ -248,9 +235,8 @@ public class UnpackagerBlockEntity extends BaseBlockEntity {
 			for(int i = 0; i < trackerToEmpty.toSend.size(); ++i) {
 				ItemStack stack = trackerToEmpty.toSend.get(i);
 				ItemStack stackRem = stack;
-				if(stack.getItem() instanceof IVolumePackageItem vPackage &&
-						vPackage.getVolumeType(stack) != null &&
-						vPackage.getVolumeType(stack).hasBlockCapability(level, offsetPos, direction.getOpposite())) {
+				if(stack.has(PackagedAutoDataComponents.VOLUME_PACKAGE_STACK) &&
+						stack.get(PackagedAutoDataComponents.VOLUME_PACKAGE_STACK).getVolumeType().hasBlockCapability(level, offsetPos, direction.getOpposite())) {
 					stackRem = MiscHelper.INSTANCE.fillVolume(level, offsetPos, direction.getOpposite(), stack, false);
 				}
 				else if(itemHandler != null) {
@@ -309,26 +295,26 @@ public class UnpackagerBlockEntity extends BaseBlockEntity {
 	}
 
 	@Override
-	public void load(CompoundTag nbt) {
-		super.load(nbt);
-		blocking = nbt.getBoolean("Blocking");
-		trackerCount = nbt.contains("Trackers") ? nbt.getByte("Trackers") : 6;
-		powered = nbt.getBoolean("Powered");
+	public void loadAdditional(CompoundTag nbt, HolderLookup.Provider registries) {
+		super.loadAdditional(nbt, registries);
+		blocking = nbt.getBoolean("blocking");
+		trackerCount = nbt.contains("trackers") ? nbt.getByte("trackers") : 6;
+		powered = nbt.getBoolean("powered");
 		for(int i = 0; i < trackers.length; ++i) {
-			trackers[i].load(nbt.getCompound(String.format("Tracker%02d", i)));
+			trackers[i].load(nbt.getCompound(String.format("tracker_%02d", i)), registries);
 		}
 	}
 
 	@Override
-	public void saveAdditional(CompoundTag nbt) {
-		super.saveAdditional(nbt);
-		nbt.putBoolean("Blocking", blocking);
-		nbt.putByte("Trackers", (byte)trackerCount);
-		nbt.putBoolean("Powered", powered);
+	public void saveAdditional(CompoundTag nbt, HolderLookup.Provider registries) {
+		super.saveAdditional(nbt, registries);
+		nbt.putBoolean("blocking", blocking);
+		nbt.putByte("trackers", (byte)trackerCount);
+		nbt.putBoolean("powered", powered);
 		for(int i = 0; i < trackers.length; ++i) {
 			CompoundTag subNBT = new CompoundTag();
-			trackers[i].save(subNBT);
-			nbt.put(String.format("Tracker%02d", i), subNBT);
+			trackers[i].save(subNBT, registries);
+			nbt.put(String.format("tracker_%02d", i), subNBT);
 		}
 	}
 
@@ -373,28 +359,30 @@ public class UnpackagerBlockEntity extends BaseBlockEntity {
 			}
 		}
 
-		public boolean tryAcceptPackage(IPackageItem packageItem, ItemStack stack, int invIndex) {
+		public boolean tryAcceptPackage(ItemStack stack, int invIndex) {
 			if(rejectedIndexes[invIndex]) {
 				return false;
 			}
-			IPackageRecipeInfo recipe = packageItem.getRecipeInfo(stack);
-			int index = packageItem.getIndex(stack);
-			if(recipe != null && recipe.isValid() && recipe.validPatternIndex(index)) {
-				if(this.recipe == null) {
-					this.recipe = recipe;
-					amount = recipe.getPatterns().size();
-					received.size(amount);
-					received.set(index, true);
-					sync(false);
-					setChanged();
-					return true;
-				}
-				else if(this.recipe.equals(recipe)) {
-					if(!received.getBoolean(index)) {
+			if(MiscHelper.INSTANCE.isPackage(stack)) {
+				IPackageRecipeInfo recipe = stack.get(PackagedAutoDataComponents.RECIPE);
+				int index = stack.get(PackagedAutoDataComponents.PACKAGE_INDEX);
+				if(recipe.isValid() && recipe.validPatternIndex(index)) {
+					if(this.recipe == null) {
+						this.recipe = recipe;
+						amount = recipe.getPatterns().size();
+						received.size(amount);
 						received.set(index, true);
 						sync(false);
 						setChanged();
 						return true;
+					}
+					else if(this.recipe.equals(recipe)) {
+						if(!received.getBoolean(index)) {
+							received.set(index, true);
+							sync(false);
+							setChanged();
+							return true;
+						}
 					}
 				}
 			}
@@ -435,39 +423,39 @@ public class UnpackagerBlockEntity extends BaseBlockEntity {
 			toSend.addAll(Lists.transform(recipe.getInputs(), ItemStack::copy));
 		}
 
-		public void load(CompoundTag nbt) {
+		public void load(CompoundTag nbt, HolderLookup.Provider registries) {
 			clearRecipe();
-			CompoundTag tag = nbt.getCompound("Recipe");
-			IPackageRecipeInfo recipe = MiscHelper.INSTANCE.loadRecipe(tag);
+			CompoundTag tag = nbt.getCompound("recipe");
+			IPackageRecipeInfo recipe = MiscHelper.INSTANCE.loadRecipe(tag, registries);
 			if(recipe != null) {
 				this.recipe = recipe;
-				amount = nbt.getByte("Amount");
+				amount = nbt.getByte("amount");
 				received.size(amount);
-				byte[] receivedArray = nbt.getByteArray("Received");
+				byte[] receivedArray = nbt.getByteArray("received");
 				for(int i = 0; i < received.size(); ++i) {
 					received.set(i, receivedArray[i] != 0);
 				}
 			}
-			MiscHelper.INSTANCE.loadAllItems(nbt.getList("ToSend", 10), toSend);
-			if(nbt.contains("Direction")) {
-				direction = Direction.from3DDataValue(nbt.getByte("Direction"));
+			MiscHelper.INSTANCE.loadAllItems(nbt.getList("to_send", 10), toSend, registries);
+			if(nbt.contains("direction")) {
+				direction = Direction.from3DDataValue(nbt.getByte("direction"));
 			}
 		}
 
-		public void save(CompoundTag nbt) {
+		public void save(CompoundTag nbt, HolderLookup.Provider registries) {
 			if(recipe != null) {
-				CompoundTag tag = MiscHelper.INSTANCE.saveRecipe(new CompoundTag(), recipe);
-				nbt.put("Recipe", tag);
-				nbt.putByte("Amount", (byte)amount);
+				CompoundTag tag = MiscHelper.INSTANCE.saveRecipe(new CompoundTag(), recipe, registries);
+				nbt.put("recipe", tag);
+				nbt.putByte("amount", (byte)amount);
 				byte[] receivedArray = new byte[received.size()];
 				for(int i = 0; i < received.size(); ++i) {
 					receivedArray[i] = (byte)(received.getBoolean(i) ? 1 : 0);
 				}
-				nbt.putByteArray("Received", receivedArray);
+				nbt.putByteArray("received", receivedArray);
 			}
-			nbt.put("ToSend", MiscHelper.INSTANCE.saveAllItems(new ListTag(), toSend));
+			nbt.put("to_send", MiscHelper.INSTANCE.saveAllItems(new ListTag(), toSend, registries));
 			if(direction != null) {
-				nbt.putByte("Direction", (byte)direction.get3DDataValue());
+				nbt.putByte("direction", (byte)direction.get3DDataValue());
 			}
 		}
 

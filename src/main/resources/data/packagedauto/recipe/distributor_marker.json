@@ -1,21 +1,21 @@
 {
 	"type": "minecraft:crafting_shapeless",
 	"result": {
-		"item": "packagedauto:distributor_marker",
+		"id": "packagedauto:distributor_marker",
 		"count": 4
 	},
 	"ingredients": [
 		{
-			"tag": "forge:ender_pearls"
+			"tag": "c:ender_pearls"
 		},
 		{
 			"item": "minecraft:chorus_fruit"
 		},
 		{
-			"tag": "forge:dusts/redstone"
+			"tag": "c:dusts/redstone"
 		},
 		{
-			"tag": "forge:ingots/gold"
+			"tag": "c:ingots/gold"
 		}
 	]
 }

@@ -8,7 +8,7 @@ import thelm.packagedauto.menu.CrafterMenu;
 
 public class CrafterScreen extends BaseScreen<CrafterMenu> {
 
-	public static final ResourceLocation BACKGROUND = new ResourceLocation("packagedauto:textures/gui/crafter.png");
+	public static final ResourceLocation BACKGROUND = ResourceLocation.parse("packagedauto:textures/gui/crafter.png");
 
 	public CrafterScreen(CrafterMenu menu, Inventory inventory, Component title) {
 		super(menu, inventory, title);

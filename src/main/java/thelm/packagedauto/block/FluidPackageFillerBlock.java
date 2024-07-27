@@ -1,8 +1,6 @@
 package thelm.packagedauto.block;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
@@ -14,11 +12,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.MapColor;
 import thelm.packagedauto.block.entity.BaseBlockEntity;
 import thelm.packagedauto.block.entity.FluidPackageFillerBlockEntity;
+import thelm.packagedauto.block.entity.PackagedAutoBlockEntities;
 
 public class FluidPackageFillerBlock extends BaseBlock {
-
-	public static final FluidPackageFillerBlock INSTANCE = new FluidPackageFillerBlock();
-	public static final Item ITEM_INSTANCE = new BlockItem(INSTANCE, new Item.Properties());
 
 	protected FluidPackageFillerBlock() {
 		super(BlockBehaviour.Properties.of().strength(15F, 25F).mapColor(MapColor.METAL).sound(SoundType.METAL));
@@ -26,7 +22,7 @@ public class FluidPackageFillerBlock extends BaseBlock {
 
 	@Override
 	public FluidPackageFillerBlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-		return FluidPackageFillerBlockEntity.TYPE_INSTANCE.create(pos, state);
+		return PackagedAutoBlockEntities.FLUID_PACKAGE_FILLER.get().create(pos, state);
 	}
 
 	@Override
@@ -36,6 +32,6 @@ public class FluidPackageFillerBlock extends BaseBlock {
 
 	@Override
 	public void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, BlockPos fromPos, boolean isMoving) {
-		level.getBlockEntity(pos, FluidPackageFillerBlockEntity.TYPE_INSTANCE).ifPresent(FluidPackageFillerBlockEntity::updatePowered);
+		level.getBlockEntity(pos, PackagedAutoBlockEntities.FLUID_PACKAGE_FILLER.get()).ifPresent(FluidPackageFillerBlockEntity::updatePowered);
 	}
 }

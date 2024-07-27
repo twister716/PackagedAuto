@@ -4,15 +4,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.ints.IntRBTreeSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import net.minecraft.core.Vec3i;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.neoforged.fml.ModList;
 import thelm.packagedauto.api.IPackageRecipeInfo;
@@ -26,7 +32,7 @@ import thelm.packagedauto.util.MiscHelper;
 public class ProcessingPackageRecipeType implements IPackageRecipeType {
 
 	public static final ProcessingPackageRecipeType INSTANCE = new ProcessingPackageRecipeType();
-	public static final ResourceLocation NAME = new ResourceLocation("packagedauto:processing");
+	public static final ResourceLocation NAME = ResourceLocation.parse("packagedauto:processing");
 	public static final IntSet SLOTS;
 	public static final Vec3i COLOR = new Vec3i(139, 139, 139);
 	public static final Vec3i COLOR_HIGHLIGHT =new Vec3i(139, 139, 179);
@@ -54,8 +60,23 @@ public class ProcessingPackageRecipeType implements IPackageRecipeType {
 	}
 
 	@Override
-	public IPackageRecipeInfo getNewRecipeInfo() {
-		return new ProcessingPackageRecipeInfo();
+	public MapCodec<? extends IPackageRecipeInfo> getRecipeInfoMapCodec() {
+		return ProcessingPackageRecipeInfo.MAP_CODEC;
+	}
+
+	@Override
+	public Codec<? extends IPackageRecipeInfo> getRecipeInfoCodec() {
+		return ProcessingPackageRecipeInfo.CODEC;
+	}
+
+	@Override
+	public StreamCodec<RegistryFriendlyByteBuf, ? extends IPackageRecipeInfo> getRecipeInfoStreamCodec() {
+		return ProcessingPackageRecipeInfo.STREAM_CODEC;
+	}
+
+	@Override
+	public IPackageRecipeInfo generateRecipeInfoFromStacks(List<ItemStack> inputs, List<ItemStack> outputs, Level level) {
+		return new ProcessingPackageRecipeInfo(inputs, outputs);
 	}
 
 	@Override

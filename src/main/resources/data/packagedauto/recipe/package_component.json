@@ -1,7 +1,7 @@
 {
 	"type": "minecraft:crafting_shaped",
 	"result": {
-		"item": "packagedauto:package_component",
+		"id": "packagedauto:package_component",
 		"count": 1
 	},
 	"pattern": [
@@ -17,7 +17,7 @@
 			"tag": "minecraft:planks"
 		},
 		"G": {
-			"tag": "forge:ingots/gold"
+			"tag": "c:ingots/gold"
 		}
 	}
 }

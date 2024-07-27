@@ -2,6 +2,7 @@ package thelm.packagedauto.block.entity;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
@@ -9,7 +10,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.energy.IEnergyStorage;
@@ -19,18 +19,14 @@ import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemHandlerHelper;
-import thelm.packagedauto.api.IVolumePackageItem;
-import thelm.packagedauto.block.FluidPackageFillerBlock;
-import thelm.packagedauto.block.UnpackagerBlock;
+import thelm.packagedauto.block.PackagedAutoBlocks;
+import thelm.packagedauto.component.PackagedAutoDataComponents;
 import thelm.packagedauto.energy.EnergyStorage;
 import thelm.packagedauto.inventory.FluidPackageFillerItemHandler;
 import thelm.packagedauto.menu.FluidPackageFillerMenu;
 import thelm.packagedauto.util.MiscHelper;
 
 public class FluidPackageFillerBlockEntity extends BaseBlockEntity {
-
-	public static final BlockEntityType<FluidPackageFillerBlockEntity> TYPE_INSTANCE = BlockEntityType.Builder.
-			of(FluidPackageFillerBlockEntity::new, FluidPackageFillerBlock.INSTANCE).build(null);
 
 	public static int energyCapacity = 5000;
 	public static int energyReq = 500;
@@ -46,7 +42,7 @@ public class FluidPackageFillerBlockEntity extends BaseBlockEntity {
 	public boolean activated = false;
 
 	public FluidPackageFillerBlockEntity(BlockPos pos, BlockState state) {
-		super(TYPE_INSTANCE, pos, state);
+		super(PackagedAutoBlockEntities.FLUID_PACKAGE_FILLER.get(), pos, state);
 		setItemHandler(new FluidPackageFillerItemHandler(this));
 		setEnergyStorage(new EnergyStorage(this, energyCapacity));
 	}
@@ -115,7 +111,7 @@ public class FluidPackageFillerBlockEntity extends BaseBlockEntity {
 		}
 		ItemStack slotStack = itemHandler.getStackInSlot(1);
 		ItemStack outputStack = MiscHelper.INSTANCE.tryMakeVolumePackage(currentFluid);
-		return slotStack.isEmpty() || ItemStack.isSameItemSameTags(slotStack, outputStack) && slotStack.getCount()+1 <= outputStack.getMaxStackSize();
+		return slotStack.isEmpty() || ItemStack.isSameItemSameComponents(slotStack, outputStack) && slotStack.getCount()+1 <= outputStack.getMaxStackSize();
 	}
 
 	protected boolean canFinish() {
@@ -161,7 +157,7 @@ public class FluidPackageFillerBlockEntity extends BaseBlockEntity {
 		if(itemHandler.getStackInSlot(1).isEmpty()) {
 			itemHandler.setStackInSlot(1, MiscHelper.INSTANCE.tryMakeVolumePackage(currentFluid));
 		}
-		else if(itemHandler.getStackInSlot(1).getItem() instanceof IVolumePackageItem) {
+		else if(itemHandler.getStackInSlot(1).has(PackagedAutoDataComponents.VOLUME_PACKAGE_STACK)) {
 			itemHandler.getStackInSlot(1).grow(1);
 		}
 		endProcess();
@@ -187,7 +183,7 @@ public class FluidPackageFillerBlockEntity extends BaseBlockEntity {
 			Block block = level.getBlockState(offsetPos).getBlock();
 			IItemHandler itemHandler = level.getCapability(Capabilities.ItemHandler.BLOCK, offsetPos, direction.getOpposite());
 			IFluidHandler fluidHandler = level.getCapability(Capabilities.FluidHandler.BLOCK, offsetPos, direction.getOpposite());
-			if(block != UnpackagerBlock.INSTANCE && itemHandler != null && fluidHandler == null) {
+			if(block != PackagedAutoBlocks.UNPACKAGER.get() && itemHandler != null && fluidHandler == null) {
 				ItemStack stack = this.itemHandler.getStackInSlot(1);
 				if(!stack.isEmpty()) {
 					ItemStack stackRem = ItemHandlerHelper.insertItem(itemHandler, stack, false);
@@ -232,35 +228,35 @@ public class FluidPackageFillerBlockEntity extends BaseBlockEntity {
 	}
 
 	@Override
-	public void load(CompoundTag nbt) {
-		super.load(nbt);
-		isWorking = nbt.getBoolean("Working");
-		amount = nbt.getInt("Amount");
-		remainingProgress = nbt.getInt("Progress");
-		powered = nbt.getBoolean("Powered");
+	public void loadAdditional(CompoundTag nbt, HolderLookup.Provider registries) {
+		super.loadAdditional(nbt, registries);
+		isWorking = nbt.getBoolean("working");
+		amount = nbt.getInt("amount");
+		remainingProgress = nbt.getInt("progress");
+		powered = nbt.getBoolean("powered");
 	}
 
 	@Override
-	public void saveAdditional(CompoundTag nbt) {
-		super.saveAdditional(nbt);
-		nbt.putBoolean("Working", isWorking);
-		nbt.putInt("Amount", amount);
-		nbt.putInt("Progress", remainingProgress);
-		nbt.putBoolean("Powered", powered);
+	public void saveAdditional(CompoundTag nbt, HolderLookup.Provider registries) {
+		super.saveAdditional(nbt, registries);
+		nbt.putBoolean("working", isWorking);
+		nbt.putInt("amount", amount);
+		nbt.putInt("progress", remainingProgress);
+		nbt.putBoolean("powered", powered);
 	}
 
 	@Override
-	public void loadSync(CompoundTag nbt) {
-		super.loadSync(nbt);
-		currentFluid = FluidStack.loadFluidStackFromNBT(nbt.getCompound("Fluid"));
-		requiredAmount = nbt.getInt("AmountReq");
+	public void loadSync(CompoundTag nbt, HolderLookup.Provider registries) {
+		super.loadSync(nbt, registries);
+		currentFluid = FluidStack.parseOptional(registries, nbt.getCompound("fluid"));
+		requiredAmount = nbt.getInt("amount_req");
 	}
 
 	@Override
-	public CompoundTag saveSync(CompoundTag nbt) {
-		super.saveSync(nbt);
-		nbt.put("Fluid", currentFluid.writeToNBT(new CompoundTag()));
-		nbt.putInt("AmountReq", requiredAmount);
+	public CompoundTag saveSync(CompoundTag nbt, HolderLookup.Provider registries) {
+		super.saveSync(nbt, registries);
+		nbt.put("fluid", currentFluid.saveOptional(registries));
+		nbt.putInt("amount_req", requiredAmount);
 		return nbt;
 	}
 

@@ -1,7 +1,7 @@
 package thelm.packagedauto.menu.factory;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -20,7 +20,7 @@ public class PositionalBlockEntityMenuFactory<C extends AbstractContainerMenu, T
 	}
 
 	@Override
-	public C create(int windowId, Inventory inv, FriendlyByteBuf data) {
+	public C create(int windowId, Inventory inv, RegistryFriendlyByteBuf data) {
 		BlockPos pos = data.readBlockPos();
 		T blockEntity = (T)inv.player.level().getBlockEntity(pos);
 		return factory.create(windowId, inv, blockEntity);

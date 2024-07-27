@@ -1,23 +1,18 @@
 package thelm.packagedauto.menu;
 
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.inventory.MenuType;
-import net.neoforged.neoforge.common.extensions.IMenuTypeExtension;
 import net.neoforged.neoforge.items.SlotItemHandler;
 import thelm.packagedauto.block.entity.EncoderBlockEntity;
 import thelm.packagedauto.inventory.EncoderPatternItemHandler;
-import thelm.packagedauto.menu.factory.PositionalBlockEntityMenuFactory;
 import thelm.packagedauto.slot.FalseCopySlot;
 import thelm.packagedauto.slot.PreviewSlot;
 
 public class EncoderMenu extends BaseMenu<EncoderBlockEntity> {
 
-	public static final MenuType<EncoderMenu> TYPE_INSTANCE = IMenuTypeExtension.create(new PositionalBlockEntityMenuFactory<>(EncoderMenu::new));
-
 	public EncoderPatternItemHandler patternItemHandler;
 
 	public EncoderMenu(int windowId, Inventory playerInventory, EncoderBlockEntity blockEntity) {
-		super(TYPE_INSTANCE, windowId, playerInventory, blockEntity);
+		super(PackagedAutoMenus.ENCODER.get(), windowId, playerInventory, blockEntity);
 		setupSlots();
 	}
 

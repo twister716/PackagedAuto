@@ -4,7 +4,7 @@ import java.util.List;
 
 import appeng.api.config.Actionable;
 import appeng.api.config.PowerMultiplier;
-import appeng.api.config.PowerUnits;
+import appeng.api.config.PowerUnit;
 import appeng.api.crafting.IPatternDetails;
 import appeng.api.features.IPlayerRegistry;
 import appeng.api.networking.GridFlags;
@@ -27,10 +27,11 @@ import appeng.api.util.AECableType;
 import appeng.api.util.AEColor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
-import thelm.packagedauto.block.PackagerBlock;
+import thelm.packagedauto.block.PackagedAutoBlocks;
 import thelm.packagedauto.block.entity.PackagerBlockEntity;
 import thelm.packagedauto.integration.appeng.recipe.PackageCraftingPatternDetails;
 
@@ -90,7 +91,7 @@ public class AEPackagerBlockEntity extends PackagerBlockEntity implements IInWor
 		if(gridNode == null) {
 			gridNode = GridHelper.createManagedNode(this, this);
 			gridNode.setTagName("Node");
-			gridNode.setVisualRepresentation(PackagerBlock.INSTANCE);
+			gridNode.setVisualRepresentation(PackagedAutoBlocks.PACKAGER);
 			gridNode.setGridColor(AEColor.TRANSPARENT);
 			gridNode.setFlags(GridFlags.REQUIRE_CHANNEL);
 			gridNode.addService(ICraftingProvider.class, this);
@@ -113,7 +114,7 @@ public class AEPackagerBlockEntity extends PackagerBlockEntity implements IInWor
 		if(!isBusy() && patternDetails instanceof PackageCraftingPatternDetails pattern) {
 			ItemStack slotStack = itemHandler.getStackInSlot(9);
 			ItemStack outputStack = pattern.pattern.getOutput();
-			if(slotStack.isEmpty() || ItemStack.isSameItemSameTags(slotStack, outputStack) && slotStack.getCount()+1 <= outputStack.getMaxStackSize()) {
+			if(slotStack.isEmpty() || ItemStack.isSameItemSameComponents(slotStack, outputStack) && slotStack.getCount()+1 <= outputStack.getMaxStackSize()) {
 				currentPattern = pattern.pattern;
 				lockPattern = true;
 				List<ItemStack> inputs = pattern.pattern.getInputs();
@@ -169,7 +170,7 @@ public class AEPackagerBlockEntity extends PackagerBlockEntity implements IInWor
 		if(getMainNode().isActive()) {
 			IGrid grid = getMainNode().getGrid();
 			IEnergyService energyService = grid.getEnergyService();
-			double conversion = PowerUnits.FE.convertTo(PowerUnits.AE, 1);
+			double conversion = PowerUnit.FE.convertTo(PowerUnit.AE, 1);
 			int request = Math.min(energyStorage.getMaxReceive(), energyStorage.getMaxEnergyStored()-energyStorage.getEnergyStored());
 			double available = energyService.extractAEPower((request+0.5)*conversion, Actionable.SIMULATE, PowerMultiplier.CONFIG);
 			int extract = (int)(available/conversion);
@@ -179,16 +180,16 @@ public class AEPackagerBlockEntity extends PackagerBlockEntity implements IInWor
 	}
 
 	@Override
-	public void load(CompoundTag nbt) {
-		super.load(nbt);
-		if(level != null && nbt.contains("Node")) {
+	public void loadAdditional(CompoundTag nbt, HolderLookup.Provider registries) {
+		super.loadAdditional(nbt, registries);
+		if(level != null && nbt.contains("node")) {
 			getMainNode().loadFromNBT(nbt);
 		}
 	}
 
 	@Override
-	public void saveAdditional(CompoundTag nbt) {
-		super.saveAdditional(nbt);
+	public void saveAdditional(CompoundTag nbt, HolderLookup.Provider registries) {
+		super.saveAdditional(nbt, registries);
 		if(gridNode != null) {
 			gridNode.saveToNBT(nbt);
 		}

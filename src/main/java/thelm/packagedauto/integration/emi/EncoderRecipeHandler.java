@@ -56,7 +56,7 @@ public class EncoderRecipeHandler implements EmiRecipeHandler<EncoderMenu> {
 			return false;
 		}
 		Minecraft.getInstance().setScreen(context.getScreen());
-		PacketDistributor.SERVER.with(null).send(new SetRecipePacket(map));
+		PacketDistributor.sendToServer(new SetRecipePacket(map));
 		return true;
 	}
 }

@@ -4,9 +4,12 @@ import java.util.UUID;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.Connection;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.ComponentSerialization;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
@@ -84,45 +87,45 @@ public abstract class BaseBlockEntity extends BlockEntity implements Nameable, M
 	}
 
 	@Override
-	public void load(CompoundTag nbt) {
-		super.load(nbt);
-		loadSync(nbt);
-		itemHandler.load(nbt);
+	protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registries) {
+		super.loadAdditional(nbt, registries);
+		loadSync(nbt, registries);
+		itemHandler.load(nbt, registries);
 		energyStorage.read(nbt);
 		ownerUUID = null;
-		if(nbt.hasUUID("OwnerUUID")) {
-			ownerUUID = nbt.getUUID("OwnerUUID");
+		if(nbt.hasUUID("owner_uuid")) {
+			ownerUUID = nbt.getUUID("owner_uuid");
 		}
 	}
 
 	@Override
-	public void saveAdditional(CompoundTag nbt) {
-		super.saveAdditional(nbt);
-		saveSync(nbt);
-		itemHandler.save(nbt);
+	public void saveAdditional(CompoundTag nbt, HolderLookup.Provider registries) {
+		super.saveAdditional(nbt, registries);
+		saveSync(nbt, registries);
+		itemHandler.save(nbt, registries);
 		energyStorage.save(nbt);
 		if(ownerUUID != null) {
-			nbt.putUUID("OwnerUUID", ownerUUID);
+			nbt.putUUID("owner_uuid", ownerUUID);
 		}
 	}
 
-	public void loadSync(CompoundTag nbt) {
-		if(nbt.contains("Name")) {
-			customName = Component.Serializer.fromJson(nbt.getString("Name"));
+	public void loadSync(CompoundTag nbt, HolderLookup.Provider registries) {
+		if(nbt.contains("name")) {
+			customName = ComponentSerialization.CODEC.parse(registries.createSerializationContext(NbtOps.INSTANCE), nbt.get("name")).result().orElse(null);
 		}
 	}
 
-	public CompoundTag saveSync(CompoundTag nbt) {
+	public CompoundTag saveSync(CompoundTag nbt, HolderLookup.Provider registries) {
 		if(customName != null) {
-			nbt.putString("Name", Component.Serializer.toJson(customName));
+			nbt.put("name", ComponentSerialization.CODEC.encodeStart(registries.createSerializationContext(NbtOps.INSTANCE), customName).result().get());
 		}
 		return nbt;
 	}
 
 	@Override
-	public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt) {
+	public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt, HolderLookup.Provider registries) {
 		if(pkt.getTag() != null) {
-			loadSync(pkt.getTag());
+			loadSync(pkt.getTag(), registries);
 		}
 	}
 
@@ -132,14 +135,14 @@ public abstract class BaseBlockEntity extends BlockEntity implements Nameable, M
 	}
 
 	@Override
-	public void handleUpdateTag(CompoundTag tag) {
-		loadSync(tag);
+	public void handleUpdateTag(CompoundTag tag, HolderLookup.Provider registries) {
+		loadSync(tag, registries);
 	}
 
 	@Override
-	public CompoundTag getUpdateTag() {
-		CompoundTag nbt = super.getUpdateTag();
-		saveSync(nbt);
+	public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+		CompoundTag nbt = super.getUpdateTag(registries);
+		saveSync(nbt, registries);
 		return nbt;
 	}
 

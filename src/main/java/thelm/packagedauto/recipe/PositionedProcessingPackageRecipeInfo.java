@@ -4,54 +4,51 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+
 import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
 import thelm.packagedauto.api.IPackagePattern;
+import thelm.packagedauto.api.IPackageRecipeInfo;
 import thelm.packagedauto.api.IPackageRecipeType;
 import thelm.packagedauto.util.MiscHelper;
 import thelm.packagedauto.util.PackagePattern;
 
 public class PositionedProcessingPackageRecipeInfo implements IPositionedProcessingPackageRecipeInfo {
 
-	List<ItemStack> input = new ArrayList<>();
-	Int2ObjectMap<ItemStack> matrix = new Int2ObjectArrayMap<>(81);
-	List<ItemStack> output = new ArrayList<>();
-	List<IPackagePattern> patterns = new ArrayList<>();
+	public static final MapCodec<PositionedProcessingPackageRecipeInfo> MAP_CODEC = RecordCodecBuilder.mapCodec(instance->instance.group(
+			ItemStack.OPTIONAL_CODEC.orElse(ItemStack.EMPTY).sizeLimitedListOf(81).fieldOf("input").forGetter(PositionedProcessingPackageRecipeInfo::getMatrixAsList),
+			MiscHelper.LARGE_ITEM_CODEC.orElse(ItemStack.EMPTY).sizeLimitedListOf(9).fieldOf("output").forGetter(IPackageRecipeInfo::getOutputs)).
+			apply(instance, PositionedProcessingPackageRecipeInfo::new));
+	public static final Codec<PositionedProcessingPackageRecipeInfo> CODEC = MAP_CODEC.codec();
+	public static final StreamCodec<RegistryFriendlyByteBuf, PositionedProcessingPackageRecipeInfo> STREAM_CODEC = StreamCodec.composite(
+			ItemStack.OPTIONAL_LIST_STREAM_CODEC, PositionedProcessingPackageRecipeInfo::getMatrixAsList,
+			ItemStack.LIST_STREAM_CODEC, IPackageRecipeInfo::getOutputs,
+			PositionedProcessingPackageRecipeInfo::new);
 
-	@Override
-	public void load(CompoundTag nbt) {
-		matrix.clear();
-		input.clear();
-		List<ItemStack> matrixList = new ArrayList<>();
-		MiscHelper.INSTANCE.loadAllItems(nbt.getList("Matrix", 10), matrixList);
-		for(int i = 0; i < 81 && i < matrixList.size(); ++i) {
-			ItemStack stack = matrixList.get(i);
+	private final List<ItemStack> input = new ArrayList<>();
+	private final Int2ObjectMap<ItemStack> matrix = new Int2ObjectArrayMap<>(81);
+	private final List<ItemStack> output;
+	private final List<IPackagePattern> patterns = new ArrayList<>();
+
+	public PositionedProcessingPackageRecipeInfo(List<ItemStack> inputs, List<ItemStack> outputs) {
+		for(int i = 0; i < 81; ++i) {
+			ItemStack stack = inputs.get(i).copy();
 			if(!stack.isEmpty()) {
 				matrix.put(i, stack);
 				input.add(stack);
 			}
 		}
-		MiscHelper.INSTANCE.loadAllItems(nbt.getList("Output", 10), output);
-		for(int i = 0; i*9 < input.size(); ++i) {
-			patterns.add(new PackagePattern(this, i));
+		output = MiscHelper.INSTANCE.condenseStacks(outputs, true);
+		for(int i = 0; i*9 < this.input.size(); ++i) {
+			patterns.add(new PackagePattern(this, i, true));
 		}
-	}
-
-	@Override
-	public void save(CompoundTag nbt) {
-		List<ItemStack> matrixList = new ArrayList<>();
-		for(int i = 0; i < 81; ++i) {
-			matrixList.add(matrix.getOrDefault(i, ItemStack.EMPTY));
-		}
-		ListTag matrixTag = MiscHelper.INSTANCE.saveAllItems(new ListTag(), matrixList);
-		nbt.put("Matrix", matrixTag);
-		ListTag outputTag = MiscHelper.INSTANCE.saveAllItems(new ListTag(), output);
-		nbt.put("Output", outputTag);		
 	}
 
 	@Override
@@ -84,22 +81,12 @@ public class PositionedProcessingPackageRecipeInfo implements IPositionedProcess
 		return matrix;
 	}
 
-	@Override
-	public void generateFromStacks(List<ItemStack> input, List<ItemStack> output, Level level) {
-		this.input.clear();
+	public List<ItemStack> getMatrixAsList() {
+		List<ItemStack> matrixList = new ArrayList<>();
 		for(int i = 0; i < 81; ++i) {
-			ItemStack stack = input.get(i).copy();
-			if(!stack.isEmpty()) {
-				matrix.put(i, stack);
-				this.input.add(stack);
-			}
+			matrixList.add(matrix.getOrDefault(i, ItemStack.EMPTY));
 		}
-		this.output.clear();
-		this.output.addAll(MiscHelper.INSTANCE.condenseStacks(output, true));
-		patterns.clear();
-		for(int i = 0; i*9 < this.input.size(); ++i) {
-			patterns.add(new PackagePattern(this, i, true));
-		}
+		return matrixList;
 	}
 
 	@Override

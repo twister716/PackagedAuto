@@ -24,8 +24,8 @@ import net.minecraft.world.item.ItemStack;
 import thelm.packagedauto.api.IPackagePattern;
 import thelm.packagedauto.api.IPackageRecipeInfo;
 import thelm.packagedauto.api.IPackageRecipeType;
-import thelm.packagedauto.block.EncoderBlock;
 import thelm.packagedauto.integration.jei.PackagedAutoJEIPlugin;
+import thelm.packagedauto.item.PackagedAutoItems;
 
 public class PackageRecipeCategory implements IRecipeCategory<IPackageRecipeInfo> {
 
@@ -38,7 +38,7 @@ public class PackageRecipeCategory implements IRecipeCategory<IPackageRecipeInfo
 
 	public PackageRecipeCategory(IGuiHelper guiHelper) {
 		background = guiHelper.createDrawable(PackagedAutoJEIPlugin.BACKGROUND, 0, 0, 162, 226);
-		icon = guiHelper.createDrawableIngredient(VanillaTypes.ITEM_STACK, new ItemStack(EncoderBlock.INSTANCE));
+		icon = guiHelper.createDrawableIngredient(VanillaTypes.ITEM_STACK, PackagedAutoItems.ENCODER.toStack());
 		slotBackground = guiHelper.createDrawable(PackagedAutoJEIPlugin.BACKGROUND, 162, 118, 16, 16);
 	}
 

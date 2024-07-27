@@ -7,12 +7,12 @@
 	],
 	"type": "minecraft:crafting_shaped",
 	"result": {
-		"item": "packagedauto:packager",
+		"id": "packagedauto:packager_extension",
 		"count": 1
 	},
 	"pattern": [
 		"ICI",
-		"RTR",
+		"GTG",
 		"IPI"
 	],
 	"key": {
@@ -20,16 +20,16 @@
 			"item": "packagedauto:me_package_component"
 		},
 		"T": {
-			"item": "minecraft:crafting_table"
+			"item": "minecraft:crafter"
 		},
 		"P": {
 			"item": "minecraft:piston"
 		},
 		"I": {
-			"tag": "forge:ingots/iron"
+			"tag": "c:ingots/iron"
 		},
-		"R": {
-			"tag": "forge:dusts/redstone"
+		"G": {
+			"tag": "c:dusts/glowstone"
 		}
 	}
 }

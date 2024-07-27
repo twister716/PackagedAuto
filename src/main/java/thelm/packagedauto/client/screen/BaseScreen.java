@@ -9,8 +9,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.Slot;
-import thelm.packagedauto.api.IVolumePackageItem;
 import thelm.packagedauto.api.IVolumeStackWrapper;
+import thelm.packagedauto.component.PackagedAutoDataComponents;
 import thelm.packagedauto.menu.BaseMenu;
 import thelm.packagedauto.slot.FalseCopySlot;
 import thelm.packagedauto.slot.FalseCopyVolumeSlot;
@@ -54,8 +54,8 @@ public abstract class BaseScreen<C extends BaseMenu<?>> extends AbstractContaine
 					}
 				}
 				else if((slot instanceof FalseCopySlot || slot instanceof PreviewSlot)
-						&& slot.getItem().getItem() instanceof IVolumePackageItem vPackage) {
-					IVolumeStackWrapper stack = vPackage.getVolumeStack(slot.getItem());
+						&& slot.getItem().has(PackagedAutoDataComponents.VOLUME_PACKAGE_STACK)) {
+					IVolumeStackWrapper stack = slot.getItem().get(PackagedAutoDataComponents.VOLUME_PACKAGE_STACK);
 					if(!stack.isEmpty()) {
 						stack.getVolumeType().render(graphics, leftPos+slot.x, topPos+slot.y, stack);
 					}
@@ -83,9 +83,9 @@ public abstract class BaseScreen<C extends BaseMenu<?>> extends AbstractContaine
 	protected void slotClicked(Slot slot, int slotId, int mouseButton, ClickType type) {
 		if(type != ClickType.QUICK_MOVE && (type != ClickType.CLONE || !minecraft.player.isCreative()) &&
 				menu.getCarried().isEmpty() && slot instanceof FalseCopySlot && slot.isActive() && !slot.getItem().isEmpty()) {
-			if(!hasControlDown() && slot.getItem().getItem() instanceof IVolumePackageItem vPackage) {
+			if(!hasControlDown() && slot.getItem().has(PackagedAutoDataComponents.VOLUME_PACKAGE_STACK)) {
 				minecraft.setScreen(new VolumeAmountSpecifyingScreen(
-						this, minecraft.player.getInventory(), slot.index, vPackage.getVolumeStack(slot.getItem()), getVolumeAmountSpecificationLimit(slot)));
+						this, minecraft.player.getInventory(), slot.index, slot.getItem().get(PackagedAutoDataComponents.VOLUME_PACKAGE_STACK), getVolumeAmountSpecificationLimit(slot)));
 			}
 			else {
 				minecraft.setScreen(new ItemAmountSpecifyingScreen(

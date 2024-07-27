@@ -1,6 +1,7 @@
 package thelm.packagedauto.energy;
 
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerLevel;
 import thelm.packagedauto.block.entity.BaseBlockEntity;
 import thelm.packagedauto.packet.SyncEnergyPacket;
 
@@ -27,7 +28,7 @@ public class EnergyStorage extends net.neoforged.neoforge.energy.EnergyStorage {
 	}
 
 	public EnergyStorage read(CompoundTag nbt) {
-		energy = nbt.getInt("Energy");
+		energy = nbt.getInt("energy");
 		if(energy > capacity) {
 			energy = capacity;
 		}
@@ -38,7 +39,7 @@ public class EnergyStorage extends net.neoforged.neoforge.energy.EnergyStorage {
 		if(energy < 0) {
 			energy = 0;
 		}
-		nbt.putInt("Energy", energy);
+		nbt.putInt("energy", energy);
 	}
 
 	public EnergyStorage setCapacity(int capacity) {
@@ -96,7 +97,7 @@ public class EnergyStorage extends net.neoforged.neoforge.energy.EnergyStorage {
 	public void updateIfChanged() {
 		int currentEnergy = getEnergyStored();
 		if(!blockEntity.getLevel().isClientSide && prevEnergy != currentEnergy) {
-			SyncEnergyPacket.syncEnergy(blockEntity.getBlockPos(), currentEnergy, blockEntity.getLevel().dimension(), 8);
+			SyncEnergyPacket.syncEnergy((ServerLevel)blockEntity.getLevel(), blockEntity.getBlockPos(), currentEnergy, 8);
 			blockEntity.setChanged();
 		}
 		prevEnergy = currentEnergy;

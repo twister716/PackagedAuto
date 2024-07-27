@@ -3,9 +3,9 @@ package thelm.packagedauto.inventory;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.items.IItemHandlerModifiable;
-import net.neoforged.neoforge.items.wrapper.EmptyHandler;
-import thelm.packagedauto.api.IPackageRecipeListItem;
+import net.neoforged.neoforge.items.wrapper.EmptyItemHandler;
 import thelm.packagedauto.block.entity.EncoderBlockEntity;
+import thelm.packagedauto.item.PackagedAutoItems;
 
 public class EncoderItemHandler extends BaseItemHandler<EncoderBlockEntity> {
 
@@ -15,11 +15,12 @@ public class EncoderItemHandler extends BaseItemHandler<EncoderBlockEntity> {
 
 	@Override
 	public boolean isItemValid(int slot, ItemStack stack) {
-		return stack.getItem() instanceof IPackageRecipeListItem;
+		// TODO use tags instead
+		return stack.is(PackagedAutoItems.RECIPE_HOLDER);
 	}
 
 	@Override
 	public IItemHandlerModifiable getWrapperForDirection(Direction side) {
-		return (IItemHandlerModifiable)EmptyHandler.INSTANCE;
+		return (IItemHandlerModifiable)EmptyItemHandler.INSTANCE;
 	}
 }

@@ -1,7 +1,7 @@
 {
 	"type": "minecraft:crafting_shaped",
 	"result": {
-		"item": "packagedauto:fluid_package_filler",
+		"id": "packagedauto:fluid_package_filler",
 		"count": 1
 	},
 	"pattern": [
@@ -20,10 +20,10 @@
 			"item": "minecraft:piston"
 		},
 		"I": {
-			"tag": "forge:ingots/iron"
+			"tag": "c:ingots/iron"
 		},
 		"U": {
-			"tag": "forge:ingots/copper"
+			"tag": "c:ingots/copper"
 		}
 	}
 }

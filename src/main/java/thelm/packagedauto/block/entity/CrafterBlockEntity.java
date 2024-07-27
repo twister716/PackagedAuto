@@ -4,38 +4,31 @@ import java.util.List;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemHandlerHelper;
 import thelm.packagedauto.api.IPackageCraftingMachine;
 import thelm.packagedauto.api.IPackageRecipeInfo;
-import thelm.packagedauto.block.CrafterBlock;
-import thelm.packagedauto.block.UnpackagerBlock;
+import thelm.packagedauto.block.PackagedAutoBlocks;
 import thelm.packagedauto.energy.EnergyStorage;
-import thelm.packagedauto.integration.appeng.blockentity.AECrafterBlockEntity;
 import thelm.packagedauto.inventory.CrafterItemHandler;
 import thelm.packagedauto.menu.CrafterMenu;
 import thelm.packagedauto.recipe.ICraftingPackageRecipeInfo;
 import thelm.packagedauto.util.MiscHelper;
 
 public class CrafterBlockEntity extends BaseBlockEntity implements IPackageCraftingMachine {
-
-	public static final BlockEntityType<CrafterBlockEntity> TYPE_INSTANCE = BlockEntityType.Builder.
-			of(MiscHelper.INSTANCE.<BlockEntityType.BlockEntitySupplier<CrafterBlockEntity>>conditionalSupplier(
-					()->ModList.get().isLoaded("ae2"),
-					()->()->AECrafterBlockEntity::new, ()->()->CrafterBlockEntity::new).get(),
-					CrafterBlock.INSTANCE).build(null);
 
 	public static int energyCapacity = 5000;
 	public static int energyReq = 500;
@@ -47,7 +40,7 @@ public class CrafterBlockEntity extends BaseBlockEntity implements IPackageCraft
 	public ICraftingPackageRecipeInfo currentRecipe;
 
 	public CrafterBlockEntity(BlockPos pos, BlockState state) {
-		super(TYPE_INSTANCE, pos, state);
+		super(PackagedAutoBlockEntities.CRAFTER.get(), pos, state);
 		setItemHandler(new CrafterItemHandler(this));
 		setEnergyStorage(new EnergyStorage(this, energyCapacity));
 	}
@@ -79,12 +72,15 @@ public class CrafterBlockEntity extends BaseBlockEntity implements IPackageCraft
 		if(!isBusy() && recipeInfo.isValid() && recipeInfo instanceof ICraftingPackageRecipeInfo recipe) {
 			ItemStack slotStack = itemHandler.getStackInSlot(9);
 			ItemStack outputStack = recipe.getOutput();
-			if(slotStack.isEmpty() || ItemStack.isSameItemSameTags(slotStack, outputStack) && slotStack.getCount()+outputStack.getCount() <= outputStack.getMaxStackSize()) {
+			if(slotStack.isEmpty() || ItemStack.isSameItemSameComponents(slotStack, outputStack) && slotStack.getCount()+outputStack.getCount() <= outputStack.getMaxStackSize()) {
 				currentRecipe = recipe;
 				isWorking = true;
 				remainingProgress = energyReq;
-				for(int i = 0; i < 9; ++i) {
-					itemHandler.setStackInSlot(i, recipe.getMatrix().getItem(i).copy());
+				CraftingInput matrix = recipe.getMatrix();
+				for(int i = 0; i < matrix.height(); ++i) {
+					for(int j = 0; j < matrix.width(); ++j) {
+						itemHandler.setStackInSlot(i*3+j, matrix.getItem(i*matrix.width()+j).copy());
+					}
 				}
 				setChanged();
 				return true;
@@ -115,8 +111,11 @@ public class CrafterBlockEntity extends BaseBlockEntity implements IPackageCraft
 			itemHandler.getStackInSlot(9).grow(currentRecipe.getOutput().getCount());
 		}
 		List<ItemStack> remainingItems = currentRecipe.getRemainingItems();
-		for(int i = 0; i < 9; ++i) {
-			itemHandler.setStackInSlot(i, remainingItems.get(i));
+		CraftingInput matrix = currentRecipe.getMatrix();
+		for(int i = 0; i < matrix.height(); ++i) {
+			for(int j = 0; j < matrix.width(); ++j) {
+				itemHandler.setStackInSlot(i*3+j, remainingItems.get(i*matrix.width()+j));
+			}
 		}
 		endProcess();
 	}
@@ -134,7 +133,7 @@ public class CrafterBlockEntity extends BaseBlockEntity implements IPackageCraft
 			BlockPos offsetPos = worldPosition.relative(direction);
 			Block block = level.getBlockState(offsetPos).getBlock();
 			IItemHandler itemHandler = level.getCapability(Capabilities.ItemHandler.BLOCK, offsetPos, direction.getOpposite());
-			if(block != UnpackagerBlock.INSTANCE && itemHandler != null) {
+			if(block != PackagedAutoBlocks.UNPACKAGER.get() && itemHandler != null) {
 				for(int i = 9; i >= endIndex; --i) {
 					ItemStack stack = this.itemHandler.getStackInSlot(i);
 					if(stack.isEmpty()) {
@@ -171,14 +170,14 @@ public class CrafterBlockEntity extends BaseBlockEntity implements IPackageCraft
 	}
 
 	@Override
-	public void load(CompoundTag nbt) {
-		super.load(nbt);
-		isWorking = nbt.getBoolean("Working");
-		remainingProgress = nbt.getInt("Progress");
+	public void loadAdditional(CompoundTag nbt, HolderLookup.Provider registries) {
+		super.loadAdditional(nbt, registries);
+		isWorking = nbt.getBoolean("working");
+		remainingProgress = nbt.getInt("progress");
 		currentRecipe = null;
-		if(nbt.contains("Recipe")) {
-			CompoundTag tag = nbt.getCompound("Recipe");
-			IPackageRecipeInfo recipe = MiscHelper.INSTANCE.loadRecipe(tag);
+		if(nbt.contains("recipe")) {
+			CompoundTag tag = nbt.getCompound("recipe");
+			IPackageRecipeInfo recipe = MiscHelper.INSTANCE.loadRecipe(tag, registries);
 			if(recipe instanceof ICraftingPackageRecipeInfo craftingRecipe) {
 				currentRecipe = craftingRecipe;
 			}
@@ -186,13 +185,13 @@ public class CrafterBlockEntity extends BaseBlockEntity implements IPackageCraft
 	}
 
 	@Override
-	public void saveAdditional(CompoundTag nbt) {
-		super.saveAdditional(nbt);
-		nbt.putBoolean("Working", isWorking);
-		nbt.putInt("Progress", remainingProgress);
+	public void saveAdditional(CompoundTag nbt, HolderLookup.Provider registries) {
+		super.saveAdditional(nbt, registries);
+		nbt.putBoolean("working", isWorking);
+		nbt.putInt("progress", remainingProgress);
 		if(currentRecipe != null) {
-			CompoundTag tag = MiscHelper.INSTANCE.saveRecipe(new CompoundTag(), currentRecipe);
-			nbt.put("Recipe", tag);
+			Tag tag = MiscHelper.INSTANCE.saveRecipe(new CompoundTag(), currentRecipe, registries);
+			nbt.put("recipe", tag);
 		}
 	}
 

@@ -1,8 +1,6 @@
 package thelm.packagedauto.block;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
@@ -13,12 +11,10 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.MapColor;
 import thelm.packagedauto.block.entity.BaseBlockEntity;
+import thelm.packagedauto.block.entity.PackagedAutoBlockEntities;
 import thelm.packagedauto.block.entity.PackagerExtensionBlockEntity;
 
 public class PackagerExtensionBlock extends BaseBlock {
-
-	public static final PackagerExtensionBlock INSTANCE = new PackagerExtensionBlock();
-	public static final Item ITEM_INSTANCE = new BlockItem(INSTANCE, new Item.Properties());
 
 	protected PackagerExtensionBlock() {
 		super(BlockBehaviour.Properties.of().strength(15F, 25F).mapColor(MapColor.METAL).sound(SoundType.METAL));
@@ -26,7 +22,7 @@ public class PackagerExtensionBlock extends BaseBlock {
 
 	@Override
 	public PackagerExtensionBlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-		return PackagerExtensionBlockEntity.TYPE_INSTANCE.create(pos, state);
+		return PackagedAutoBlockEntities.PACKAGER_EXTENSION.get().create(pos, state);
 	}
 
 	@Override
@@ -36,6 +32,6 @@ public class PackagerExtensionBlock extends BaseBlock {
 
 	@Override
 	public void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, BlockPos fromPos, boolean isMoving) {
-		level.getBlockEntity(pos, PackagerExtensionBlockEntity.TYPE_INSTANCE).ifPresent(PackagerExtensionBlockEntity::updatePowered);
+		level.getBlockEntity(pos, PackagedAutoBlockEntities.PACKAGER_EXTENSION.get()).ifPresent(PackagerExtensionBlockEntity::updatePowered);
 	}
 }

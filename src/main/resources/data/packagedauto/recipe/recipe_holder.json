@@ -1,13 +1,13 @@
 {
 	"type": "minecraft:crafting_shaped",
 	"result": {
-		"item": "packagedauto:encoder",
-		"count": 1
+		"id": "packagedauto:recipe_holder",
+		"count": 2
 	},
 	"pattern": [
-		"ICI",
-		"TGT",
-		"IRI"
+		"TRT",
+		"RGR",
+		"ICI"
 	],
 	"key": {
 		"C": {
@@ -16,14 +16,14 @@
 		"G": {
 			"item": "minecraft:glowstone"
 		},
-		"R": {
-			"item": "minecraft:comparator"
-		},
 		"T": {
-			"item": "minecraft:crafting_table"
+			"tag": "c:glass_blocks"
 		},
 		"I": {
-			"tag": "forge:ingots/iron"
+			"tag": "c:ingots/copper"
+		},
+		"R": {
+			"tag": "c:dusts/redstone"
 		}
 	}
 }

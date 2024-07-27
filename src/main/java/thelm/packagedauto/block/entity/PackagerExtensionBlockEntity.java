@@ -7,6 +7,7 @@ import com.google.common.collect.Lists;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
@@ -14,33 +15,22 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.common.util.RecipeMatcher;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.items.IItemHandlerModifiable;
 import net.neoforged.neoforge.items.ItemHandlerHelper;
 import net.neoforged.neoforge.items.ItemStackHandler;
-import thelm.packagedauto.api.IPackageItem;
 import thelm.packagedauto.api.IPackagePattern;
 import thelm.packagedauto.api.IPackageRecipeInfo;
-import thelm.packagedauto.api.IPackageRecipeListItem;
-import thelm.packagedauto.block.PackagerExtensionBlock;
+import thelm.packagedauto.component.PackagedAutoDataComponents;
 import thelm.packagedauto.energy.EnergyStorage;
-import thelm.packagedauto.integration.appeng.blockentity.AEPackagerExtensionBlockEntity;
 import thelm.packagedauto.inventory.PackagerExtensionItemHandler;
 import thelm.packagedauto.menu.PackagerExtensionMenu;
 import thelm.packagedauto.util.MiscHelper;
 
 public class PackagerExtensionBlockEntity extends BaseBlockEntity {
-
-	public static final BlockEntityType<PackagerExtensionBlockEntity> TYPE_INSTANCE = BlockEntityType.Builder.
-			of(MiscHelper.INSTANCE.<BlockEntityType.BlockEntitySupplier<PackagerExtensionBlockEntity>>conditionalSupplier(
-					()->ModList.get().isLoaded("ae2"),
-					()->()->AEPackagerExtensionBlockEntity::new, ()->()->PackagerExtensionBlockEntity::new).get(),
-					PackagerExtensionBlock.INSTANCE).build(null);
 
 	public static int energyCapacity = 5000;
 	public static int energyReq = 500;
@@ -59,7 +49,7 @@ public class PackagerExtensionBlockEntity extends BaseBlockEntity {
 	public boolean powered = false;
 
 	public PackagerExtensionBlockEntity(BlockPos pos, BlockState state) {
-		super(TYPE_INSTANCE, pos, state);
+		super(PackagedAutoBlockEntities.PACKAGER_EXTENSION.get(), pos, state);
 		setItemHandler(new PackagerExtensionItemHandler(this));
 		setEnergyStorage(new EnergyStorage(this, energyCapacity));
 	}
@@ -145,7 +135,7 @@ public class PackagerExtensionBlockEntity extends BaseBlockEntity {
 		}
 		ItemStack slotStack = itemHandler.getStackInSlot(9);
 		ItemStack outputStack = currentPattern.getOutput();
-		return slotStack.isEmpty() || ItemStack.isSameItemSameTags(slotStack, outputStack) && slotStack.getCount()+1 <= outputStack.getMaxStackSize();
+		return slotStack.isEmpty() || ItemStack.isSameItemSameComponents(slotStack, outputStack) && slotStack.getCount()+1 <= outputStack.getMaxStackSize();
 	}
 
 	protected boolean canFinish() {
@@ -190,17 +180,17 @@ public class PackagerExtensionBlockEntity extends BaseBlockEntity {
 				if(level.getBlockEntity(posP) instanceof PackagerBlockEntity packager) {
 					ItemStack listStack = packager.itemHandler.getStackInSlot(10);
 					listStackItemHandler.setStackInSlot(0, listStack);
-					if(listStack.getItem() instanceof IPackageRecipeListItem listItem) {
-						listItem.getRecipeList(level, listStack).getRecipeList().stream().
+					if(listStack.has(PackagedAutoDataComponents.RECIPE_LIST)) {
+						listStack.get(PackagedAutoDataComponents.RECIPE_LIST).stream().
 						filter(IPackageRecipeInfo::isValid).forEach(recipe->{
 							recipe.getPatterns().forEach(patternList::add);
 							recipe.getExtraPatterns().forEach(patternList::add);
 						});
 					}
-					else if(listStack.getItem() instanceof IPackageItem packageItem) {
-						IPackageRecipeInfo recipe = packageItem.getRecipeInfo(listStack);
-						int index = packageItem.getIndex(listStack);
-						if(recipe != null && recipe.isValid() && recipe.validPatternIndex(index)) {
+					else if(MiscHelper.INSTANCE.isPackage(listStack)) {
+						IPackageRecipeInfo recipe = listStack.get(PackagedAutoDataComponents.RECIPE);
+						int index = listStack.get(PackagedAutoDataComponents.PACKAGE_INDEX);
+						if(recipe.isValid() && recipe.validPatternIndex(index)) {
 							patternList.add(recipe.getPatterns().get(index));
 						}
 					}
@@ -244,7 +234,7 @@ public class PackagerExtensionBlockEntity extends BaseBlockEntity {
 			if(itemHandler.getStackInSlot(9).isEmpty()) {
 				itemHandler.setStackInSlot(9, currentPattern.getOutput());
 			}
-			else if(itemHandler.getStackInSlot(9).getItem() instanceof IPackageItem) {
+			else if(MiscHelper.INSTANCE.isPackage(itemHandler.getStackInSlot(9))) {
 				itemHandler.getStackInSlot(9).grow(1);
 			}
 			else {
@@ -263,7 +253,7 @@ public class PackagerExtensionBlockEntity extends BaseBlockEntity {
 			if(itemHandler.getStackInSlot(9).isEmpty()) {
 				itemHandler.setStackInSlot(9, currentPattern.getOutput());
 			}
-			else if(itemHandler.getStackInSlot(9).getItem() instanceof IPackageItem) {
+			else if(MiscHelper.INSTANCE.isPackage(itemHandler.getStackInSlot(9))) {
 				itemHandler.getStackInSlot(9).grow(1);
 			}
 			else {
@@ -339,21 +329,21 @@ public class PackagerExtensionBlockEntity extends BaseBlockEntity {
 	protected void postPatternChange() {}
 
 	@Override
-	public void load(CompoundTag nbt) {
+	public void loadAdditional(CompoundTag nbt, HolderLookup.Provider registries) {
 		mode = PackagerBlockEntity.Mode.values()[nbt.getByte("Mode")];
-		super.load(nbt);
+		super.loadAdditional(nbt, registries);
 		updatePatternList();
-		isWorking = nbt.getBoolean("Working");
-		remainingProgress = nbt.getInt("Progress");
-		powered = nbt.getBoolean("Powered");
+		isWorking = nbt.getBoolean("working");
+		remainingProgress = nbt.getInt("progress");
+		powered = nbt.getBoolean("powered");
 		lockPattern = false;
 		currentPattern = null;
-		if(nbt.contains("Pattern")) {
-			CompoundTag tag = nbt.getCompound("Pattern");
-			IPackageRecipeInfo recipe = MiscHelper.INSTANCE.loadRecipe(tag);
+		if(nbt.contains("pattern")) {
+			CompoundTag tag = nbt.getCompound("pattern");
+			IPackageRecipeInfo recipe = MiscHelper.INSTANCE.loadRecipe(tag, registries);
 			if(recipe != null) {
 				List<IPackagePattern> patterns = recipe.getPatterns();
-				byte index = tag.getByte("Index");
+				byte index = tag.getByte("index");
 				if(index >= 0 && index < patterns.size()) {
 					currentPattern = patterns.get(index);
 					lockPattern = true;
@@ -363,16 +353,16 @@ public class PackagerExtensionBlockEntity extends BaseBlockEntity {
 	}
 
 	@Override
-	public void saveAdditional(CompoundTag nbt) {
-		super.saveAdditional(nbt);
-		nbt.putByte("Mode", (byte)mode.ordinal());
-		nbt.putBoolean("Working", isWorking);
-		nbt.putInt("Progress", remainingProgress);
-		nbt.putBoolean("Powered", powered);
+	public void saveAdditional(CompoundTag nbt, HolderLookup.Provider registries) {
+		super.saveAdditional(nbt, registries);
+		nbt.putByte("mode", (byte)mode.ordinal());
+		nbt.putBoolean("working", isWorking);
+		nbt.putInt("progress", remainingProgress);
+		nbt.putBoolean("powered", powered);
 		if(lockPattern) {
-			CompoundTag tag = MiscHelper.INSTANCE.saveRecipe(new CompoundTag(), currentPattern.getRecipeInfo());
-			tag.putByte("Index", (byte)currentPattern.getIndex());
-			nbt.put("Pattern", tag);
+			CompoundTag tag = MiscHelper.INSTANCE.saveRecipe(new CompoundTag(), currentPattern.getRecipeInfo(), registries);
+			tag.putByte("index", (byte)currentPattern.getIndex());
+			nbt.put("pattern", tag);
 		}
 	}
 

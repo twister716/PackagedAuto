@@ -2,10 +2,19 @@ package thelm.packagedauto.api;
 
 import java.util.List;
 
+import com.mojang.serialization.Codec;
+
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.codec.StreamCodec;
 
 public interface IVolumeStackWrapper {
+
+	static final Codec<IVolumeStackWrapper> CODEC = IVolumeType.CODEC.dispatch(
+			"type", IVolumeStackWrapper::getVolumeType, type->type.getStackCodec().fieldOf("stack"));
+	static final StreamCodec<RegistryFriendlyByteBuf, IVolumeStackWrapper> STREAM_CODEC = IVolumeType.STREAM_CODEC.
+			<RegistryFriendlyByteBuf>cast().dispatch(IVolumeStackWrapper::getVolumeType, IVolumeType::getStackStreamCodec);
 
 	IVolumeType getVolumeType();
 
@@ -13,11 +22,9 @@ public interface IVolumeStackWrapper {
 
 	IVolumeStackWrapper copy();
 
-	void setAmount(int amount);
+	IVolumeStackWrapper withAmount(int amount);
 
 	boolean isEmpty();
-
-	CompoundTag save(CompoundTag tag);
 
 	CompoundTag saveAEKey(CompoundTag tag);
 

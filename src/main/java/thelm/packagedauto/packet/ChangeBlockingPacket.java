@@ -1,32 +1,27 @@
 package thelm.packagedauto.packet;
 
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
-import net.neoforged.neoforge.network.handling.PlayPayloadContext;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 import thelm.packagedauto.menu.UnpackagerMenu;
 
 public record ChangeBlockingPacket() implements CustomPacketPayload {
 
-	public static final ResourceLocation ID = new ResourceLocation("packagedauto:change_blocking");
+	public static final Type<ChangeBlockingPacket> TYPE = new Type<>(ResourceLocation.parse("packagedauto:change_blocking"));
 	public static final ChangeBlockingPacket INSTANCE = new ChangeBlockingPacket();
+	public static final StreamCodec<RegistryFriendlyByteBuf, ChangeBlockingPacket> STREAM_CODEC = StreamCodec.unit(INSTANCE);
 
 	@Override
-	public ResourceLocation id() {
-		return ID;
+	public Type<ChangeBlockingPacket> type() {
+		return TYPE;
 	}
 
-	@Override
-	public void write(FriendlyByteBuf buf) {}
-
-	public static ChangeBlockingPacket read(FriendlyByteBuf buf) {
-		return INSTANCE;
-	}
-
-	public void handle(PlayPayloadContext ctx) {
-		if(ctx.player().orElse(null) instanceof ServerPlayer player) {
-			ctx.workHandler().execute(()->{
+	public void handle(IPayloadContext ctx) {
+		if(ctx.player() instanceof ServerPlayer player) {
+			ctx.enqueueWork(()->{
 				if(player.containerMenu instanceof UnpackagerMenu menu) {
 					menu.blockEntity.changeBlockingMode();
 				}

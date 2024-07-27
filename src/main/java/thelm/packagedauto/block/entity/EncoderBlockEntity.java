@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Set;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
@@ -12,21 +14,14 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import thelm.packagedauto.api.IPackageRecipeInfo;
-import thelm.packagedauto.api.IPackageRecipeList;
-import thelm.packagedauto.api.IPackageRecipeListItem;
-import thelm.packagedauto.block.EncoderBlock;
+import thelm.packagedauto.component.PackagedAutoDataComponents;
 import thelm.packagedauto.inventory.EncoderItemHandler;
 import thelm.packagedauto.inventory.EncoderPatternItemHandler;
 import thelm.packagedauto.menu.EncoderMenu;
-import thelm.packagedauto.recipe.ProcessingPackageRecipeType;
 
 public class EncoderBlockEntity extends BaseBlockEntity {
-
-	public static final BlockEntityType<EncoderBlockEntity> TYPE_INSTANCE = BlockEntityType.Builder.
-			of(EncoderBlockEntity::new, EncoderBlock.INSTANCE).build(null);
 
 	public static int patternSlots = 20;
 	public static Set<String> disabledRecipeTypes = Set.of();
@@ -35,7 +30,7 @@ public class EncoderBlockEntity extends BaseBlockEntity {
 	public int patternIndex;
 
 	public EncoderBlockEntity(BlockPos pos, BlockState state) {
-		super(TYPE_INSTANCE, pos, state);
+		super(PackagedAutoBlockEntities.ENCODER.get(), pos, state);
 		setItemHandler(new EncoderItemHandler(this));
 		for(int i = 0; i < patternItemHandlers.length; ++i) {
 			patternItemHandlers[i] = new EncoderPatternItemHandler(this);
@@ -56,22 +51,22 @@ public class EncoderBlockEntity extends BaseBlockEntity {
 	}
 
 	@Override
-	public void loadSync(CompoundTag nbt) {
-		super.loadSync(nbt);
-		patternIndex = nbt.getByte("PatternIndex");
+	public void loadSync(CompoundTag nbt, HolderLookup.Provider registries) {
+		super.loadSync(nbt, registries);
+		patternIndex = nbt.getByte("pattern_index");
 		for(int i = 0; i < patternItemHandlers.length; ++i) {
-			patternItemHandlers[i].load(nbt.getCompound(String.format("Pattern%02d", i)));
+			patternItemHandlers[i].load(nbt.getCompound(String.format("pattern_%02d", i)), registries);
 		}
 	}
 
 	@Override
-	public CompoundTag saveSync(CompoundTag nbt) {
-		super.saveSync(nbt);
-		nbt.putByte("PatternIndex", (byte)patternIndex);
+	public CompoundTag saveSync(CompoundTag nbt, HolderLookup.Provider registries) {
+		super.saveSync(nbt, registries);
+		nbt.putByte("pattern_index", (byte)patternIndex);
 		for(int i = 0; i < patternItemHandlers.length; ++i) {
 			CompoundTag subNBT = new CompoundTag();
-			patternItemHandlers[i].save(subNBT);
-			nbt.put(String.format("Pattern%02d", i), subNBT);
+			patternItemHandlers[i].save(subNBT, registries);
+			nbt.put(String.format("pattern_%02d", i), subNBT);
 		}
 		return nbt;
 	}
@@ -84,7 +79,7 @@ public class EncoderBlockEntity extends BaseBlockEntity {
 
 	public void saveRecipeList(boolean single) {
 		ItemStack stack = itemHandler.getStackInSlot(0);
-		if(stack.getItem() instanceof IPackageRecipeListItem listItem) {
+		if(!stack.isEmpty()) {
 			List<IPackageRecipeInfo> recipeList = new ArrayList<>();
 			if(!single) {
 				for(EncoderPatternItemHandler inv : patternItemHandlers) {
@@ -99,24 +94,31 @@ public class EncoderBlockEntity extends BaseBlockEntity {
 					recipeList.add(inv.recipeInfo);
 				}
 			}
-			IPackageRecipeList recipeListItem = listItem.getRecipeList(level, stack);
-			recipeListItem.setRecipeList(recipeList);
-			CompoundTag nbt = new CompoundTag();
-			recipeListItem.save(nbt);
-			stack.setTag(nbt);
+			DataComponentPatch patch;
+			if(recipeList.isEmpty()) {
+				patch = DataComponentPatch.builder().
+						remove(PackagedAutoDataComponents.RECIPE_LIST.get()).
+						build();
+			}
+			else {
+				patch = DataComponentPatch.builder().
+						set(PackagedAutoDataComponents.RECIPE_LIST.get(), recipeList).
+						build();
+			}
+			stack.applyComponents(patch);
 		}
 	}
 
 	public void loadRecipeList(boolean single) {
 		ItemStack stack = itemHandler.getStackInSlot(0);
-		if(stack.getItem() instanceof IPackageRecipeListItem listItem) {
-			IPackageRecipeList recipeListItem = listItem.getRecipeList(level, stack);
-			List<IPackageRecipeInfo> recipeList = recipeListItem.getRecipeList();
+		if(stack.has(PackagedAutoDataComponents.RECIPE_LIST)) {
+			List<IPackageRecipeInfo> recipeList = stack.get(PackagedAutoDataComponents.RECIPE_LIST);
 			if(single) {
 				EncoderPatternItemHandler inv = patternItemHandlers[patternIndex];
 				if(!recipeList.isEmpty()) {
 					int i = recipeList.size() > patternIndex ? patternIndex : 0;
 					IPackageRecipeInfo recipe = recipeList.get(i);
+					inv.recipeType = recipe.getRecipeType();
 					if(recipe.isValid()) {
 						inv.setRecipe(recipe.getEncoderStacks());
 					}

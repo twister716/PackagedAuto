@@ -10,16 +10,17 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
 import thelm.packagedauto.api.IPackagePattern;
 import thelm.packagedauto.api.IPackageRecipeInfo;
-import thelm.packagedauto.api.IVolumePackageItem;
 import thelm.packagedauto.api.IVolumeStackWrapper;
+import thelm.packagedauto.component.PackagedAutoDataComponents;
 import thelm.packagedauto.integration.appeng.AppEngUtil;
+import thelm.packagedauto.util.MiscHelper;
 
 public class RecipeCraftingPatternDetails implements IPatternDetails {
 
 	public final AEItemKey recipeHolder;
 	public final IPackageRecipeInfo recipe;
 	public final IInput[] inputs;
-	public final GenericStack[] outputs;
+	public final List<GenericStack> outputs;
 
 	public RecipeCraftingPatternDetails(ItemStack recipeHolder, IPackageRecipeInfo recipe) {
 		this.recipeHolder = AEItemKey.of(recipeHolder);
@@ -41,7 +42,7 @@ public class RecipeCraftingPatternDetails implements IPatternDetails {
 	}
 
 	@Override
-	public GenericStack[] getOutputs() {
+	public List<GenericStack> getOutputs() {
 		return outputs;
 	}
 
@@ -59,10 +60,10 @@ public class RecipeCraftingPatternDetails implements IPatternDetails {
 	}
 
 	private GenericStack getGenericOutput(ItemStack stack) {
-		if(stack.getItem() instanceof IVolumePackageItem vPackage) {
-			IVolumeStackWrapper vStack = vPackage.getVolumeStack(stack);
+		if(stack.has(PackagedAutoDataComponents.VOLUME_PACKAGE_STACK)) {
+			IVolumeStackWrapper vStack = stack.get(PackagedAutoDataComponents.VOLUME_PACKAGE_STACK);
 			if(!vStack.isEmpty() && vStack.getVolumeType() != null && vStack.getVolumeType().supportsAE()) {
-				AEKey key = AEKey.fromTagGeneric(vStack.saveAEKey(new CompoundTag()));
+				AEKey key = AEKey.fromTagGeneric(MiscHelper.INSTANCE.getRegistryAccess(), vStack.saveAEKey(new CompoundTag()));
 				if(key != null) {
 					return new GenericStack(key, vStack.getAmount()*stack.getCount());
 				}

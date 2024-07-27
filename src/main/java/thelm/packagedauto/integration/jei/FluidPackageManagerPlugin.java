@@ -9,8 +9,8 @@ import mezz.jei.api.recipe.advanced.IRecipeManagerPlugin;
 import mezz.jei.api.recipe.category.IRecipeCategory;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.fluids.FluidStack;
-import thelm.packagedauto.api.IVolumePackageItem;
 import thelm.packagedauto.api.IVolumeStackWrapper;
+import thelm.packagedauto.component.PackagedAutoDataComponents;
 import thelm.packagedauto.integration.jei.category.FluidPackageContentsCategory;
 import thelm.packagedauto.integration.jei.category.FluidPackageFillingCategory;
 import thelm.packagedauto.volume.FluidVolumeType;
@@ -21,8 +21,9 @@ public class FluidPackageManagerPlugin implements IRecipeManagerPlugin {
 	public <V> List<RecipeType<?>> getRecipeTypes(IFocus<V> focus) {
 		V ingredient = focus.getTypedValue().getIngredient();
 		if(ingredient instanceof ItemStack stack) {
-			if(stack.getItem() instanceof IVolumePackageItem vPackage) {
-				if(vPackage.getVolumeType(stack) == FluidVolumeType.INSTANCE) {
+			if(stack.has(PackagedAutoDataComponents.VOLUME_PACKAGE_STACK)) {
+				IVolumeStackWrapper vStack = stack.get(PackagedAutoDataComponents.VOLUME_PACKAGE_STACK);
+				if(vStack.getVolumeType() == FluidVolumeType.INSTANCE) {
 					switch(focus.getRole()) {
 					case INPUT: return List.of(FluidPackageContentsCategory.TYPE);
 					case OUTPUT: return List.of(FluidPackageFillingCategory.TYPE);
@@ -46,10 +47,11 @@ public class FluidPackageManagerPlugin implements IRecipeManagerPlugin {
 		RecipeType<T> type = recipeCategory.getRecipeType();
 		V ingredient = focus.getTypedValue().getIngredient();
 		if(ingredient instanceof ItemStack stack) {
-			if(stack.getItem() instanceof IVolumePackageItem vPackage) {
-				if(vPackage.getVolumeType(stack) == FluidVolumeType.INSTANCE) {
+			if(stack.has(PackagedAutoDataComponents.VOLUME_PACKAGE_STACK)) {
+				IVolumeStackWrapper vStack = stack.get(PackagedAutoDataComponents.VOLUME_PACKAGE_STACK);
+				if(vStack.getVolumeType() == FluidVolumeType.INSTANCE) {
 					if(FluidPackageContentsCategory.TYPE.equals(type) || FluidPackageFillingCategory.TYPE.equals(type)) {
-						return (List<T>)List.of(vPackage.getVolumeStack(stack));
+						return (List<T>)List.of(vStack);
 					}
 				}
 			}

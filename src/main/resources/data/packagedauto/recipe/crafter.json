@@ -10,29 +10,29 @@
 	],
 	"type": "minecraft:crafting_shaped",
 	"result": {
-		"item": "packagedauto:unpackager",
+		"id": "packagedauto:crafter",
 		"count": 1
 	},
 	"pattern": [
 		"ICI",
-		"RSR",
+		"RTR",
 		"IHI"
 	],
 	"key": {
 		"C": {
 			"item": "packagedauto:package_component"
 		},
-		"S": {
-			"tag": "forge:chests/wooden"
+		"T": {
+			"item": "minecraft:crafter"
 		},
 		"H": {
 			"item": "minecraft:hopper"
 		},
 		"I": {
-			"tag": "forge:ingots/iron"
+			"tag": "c:ingots/iron"
 		},
 		"R": {
-			"tag": "forge:dusts/redstone"
+			"tag": "c:dusts/redstone"
 		}
 	}
 }

@@ -1,8 +1,8 @@
 package thelm.packagedauto.block;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.Containers;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.LivingEntity;
@@ -31,7 +31,7 @@ public abstract class BaseBlock extends Block implements EntityBlock {
 	}
 
 	@Override
-	public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+	protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
 		if(player.isShiftKeyDown()) {
 			return InteractionResult.PASS;
 		}
@@ -49,7 +49,7 @@ public abstract class BaseBlock extends Block implements EntityBlock {
 		if(!level.isClientSide) {
 			BlockEntity blockEntity = level.getBlockEntity(pos);
 			if(blockEntity instanceof BaseBlockEntity baseBlockEntity) {
-				if(stack.hasCustomHoverName()) {
+				if(stack.has(DataComponents.CUSTOM_NAME)) {
 					baseBlockEntity.setCustomName(stack.getDisplayName());
 				}
 				if(placer instanceof Player player) {

@@ -2,15 +2,15 @@ package thelm.packagedauto.inventory;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.items.IItemHandlerModifiable;
-import thelm.packagedauto.api.IPackageItem;
 import thelm.packagedauto.api.IPackageRecipeInfo;
-import thelm.packagedauto.api.IPackageRecipeListItem;
 import thelm.packagedauto.block.entity.PackagerBlockEntity;
 import thelm.packagedauto.block.entity.PackagerExtensionBlockEntity;
+import thelm.packagedauto.component.PackagedAutoDataComponents;
 import thelm.packagedauto.util.MiscHelper;
 
 public class PackagerItemHandler extends BaseItemHandler<PackagerBlockEntity> {
@@ -44,7 +44,7 @@ public class PackagerItemHandler extends BaseItemHandler<PackagerBlockEntity> {
 	public boolean isItemValid(int slot, ItemStack stack) {
 		return switch(slot) {
 		case 9 -> false;
-		case 10 -> stack.getItem() instanceof IPackageRecipeListItem || stack.getItem() instanceof IPackageItem;
+		case 10 -> stack.has(PackagedAutoDataComponents.RECIPE_LIST) || MiscHelper.INSTANCE.isPackage(stack);
 		case 11 -> stack.getCapability(Capabilities.EnergyStorage.ITEM) != null;
 		default -> blockEntity.isWorking ? !getStackInSlot(slot).isEmpty() : true;
 		};
@@ -82,25 +82,25 @@ public class PackagerItemHandler extends BaseItemHandler<PackagerBlockEntity> {
 	}
 
 	@Override
-	public void load(CompoundTag nbt) {
-		super.load(nbt);
+	public void load(CompoundTag nbt, HolderLookup.Provider registries) {
+		super.load(nbt, registries);
 		updatePatternList();
 	}
 
 	public void updatePatternList() {
 		blockEntity.patternList.clear();
 		ItemStack listStack = getStackInSlot(10);
-		if(listStack.getItem() instanceof IPackageRecipeListItem listItem) {
-			listItem.getRecipeList(blockEntity.getLevel(), listStack).getRecipeList().stream().
+		if(listStack.has(PackagedAutoDataComponents.RECIPE_LIST)) {
+			listStack.get(PackagedAutoDataComponents.RECIPE_LIST).stream().
 			filter(IPackageRecipeInfo::isValid).forEach(recipe->{
 				recipe.getPatterns().forEach(blockEntity.patternList::add);
 				recipe.getExtraPatterns().forEach(blockEntity.patternList::add);
 			});
 		}
-		else if(listStack.getItem() instanceof IPackageItem packageItem) {
-			IPackageRecipeInfo recipe = packageItem.getRecipeInfo(listStack);
-			int index = packageItem.getIndex(listStack);
-			if(recipe != null && recipe.isValid() && recipe.validPatternIndex(index)) {
+		else if(MiscHelper.INSTANCE.isPackage(listStack)) {
+			IPackageRecipeInfo recipe = listStack.get(PackagedAutoDataComponents.RECIPE);
+			int index = listStack.get(PackagedAutoDataComponents.PACKAGE_INDEX);
+			if(recipe.isValid() && recipe.validPatternIndex(index)) {
 				blockEntity.patternList.add(recipe.getPatterns().get(index));
 			}
 		}

@@ -43,9 +43,8 @@ public class VolumeAmountSpecifyingScreen extends AmountSpecifyingScreen<VolumeA
 	protected void onOkButtonPressed(boolean shiftDown) {
 		try {
 			int amount = Mth.clamp(Integer.parseInt(amountField.getValue()), 0, maxAmount);
-			IVolumeStackWrapper newStack = stack.copy();
-			newStack.setAmount(amount);
-			PacketDistributor.SERVER.with(null).send(new SetItemStackPacket((short)containerSlot, MiscHelper.INSTANCE.makeVolumePackage(newStack)));
+			IVolumeStackWrapper newStack = stack.withAmount(amount);
+			PacketDistributor.sendToServer(new SetItemStackPacket((short)containerSlot, MiscHelper.INSTANCE.makeVolumePackage(newStack)));
 			close();
 		}
 		catch(NumberFormatException e) {

@@ -8,7 +8,7 @@ import thelm.packagedauto.menu.DistributorMenu;
 
 public class DistributorScreen extends BaseScreen<DistributorMenu> {
 
-	public static final ResourceLocation BACKGROUND = new ResourceLocation("packagedauto:textures/gui/distributor.png");
+	public static final ResourceLocation BACKGROUND = ResourceLocation.parse("packagedauto:textures/gui/distributor.png");
 
 	public DistributorScreen(DistributorMenu menu, Inventory inventory, Component title) {
 		super(menu, inventory, title);

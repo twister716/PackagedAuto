@@ -2,15 +2,21 @@ package thelm.packagedauto.recipe;
 
 import java.util.List;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+
+import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.ints.IntRBTreeSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import net.minecraft.core.Vec3i;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import thelm.packagedauto.api.IPackageRecipeInfo;
 import thelm.packagedauto.api.IPackageRecipeType;
@@ -20,9 +26,9 @@ import thelm.packagedauto.api.IRecipeSlotsViewWrapper;
 public class CraftingPackageRecipeType implements IPackageRecipeType {
 
 	public static final CraftingPackageRecipeType INSTANCE = new CraftingPackageRecipeType();
-	public static final ResourceLocation NAME = new ResourceLocation("packagedauto:crafting");
+	public static final ResourceLocation NAME = ResourceLocation.parse("packagedauto:crafting");
 	public static final IntSet SLOTS;
-	public static final List<ResourceLocation> CATEGORIES = List.of(new ResourceLocation("minecraft:crafting"));
+	public static final List<ResourceLocation> CATEGORIES = List.of(ResourceLocation.parse("minecraft:crafting"));
 	public static final Vec3i COLOR = new Vec3i(139, 139, 139);
 	public static final Vec3i COLOR_DISABLED = new Vec3i(64, 64, 64);
 
@@ -53,8 +59,23 @@ public class CraftingPackageRecipeType implements IPackageRecipeType {
 	}
 
 	@Override
-	public IPackageRecipeInfo getNewRecipeInfo() {
-		return new CraftingPackageRecipeInfo();
+	public MapCodec<? extends IPackageRecipeInfo> getRecipeInfoMapCodec() {
+		return CraftingPackageRecipeInfo.MAP_CODEC;
+	}
+
+	@Override
+	public Codec<? extends IPackageRecipeInfo> getRecipeInfoCodec() {
+		return CraftingPackageRecipeInfo.CODEC;
+	}
+
+	@Override
+	public StreamCodec<RegistryFriendlyByteBuf, ? extends IPackageRecipeInfo> getRecipeInfoStreamCodec() {
+		return CraftingPackageRecipeInfo.STREAM_CODEC;
+	}
+
+	@Override
+	public IPackageRecipeInfo generateRecipeInfoFromStacks(List<ItemStack> inputs, List<ItemStack> outputs, Level level) {
+		return new CraftingPackageRecipeInfo(inputs, level);
 	}
 
 	@Override
@@ -69,7 +90,7 @@ public class CraftingPackageRecipeType implements IPackageRecipeType {
 
 	@Override
 	public Int2ObjectMap<ItemStack> getRecipeTransferMap(IRecipeSlotsViewWrapper recipeLayoutWrapper) {
-		Int2ObjectMap<ItemStack> map = new Int2ObjectOpenHashMap<>();
+		Int2ObjectMap<ItemStack> map = new Int2ObjectArrayMap<>();
 		List<IRecipeSlotViewWrapper> slotViews = recipeLayoutWrapper.getRecipeSlotViews();
 		int index = 0;
 		int[] slotArray = SLOTS.toIntArray();
@@ -77,7 +98,7 @@ public class CraftingPackageRecipeType implements IPackageRecipeType {
 			if(slotView.isInput()) {
 				Object displayed = slotView.getDisplayedIngredient().orElse(null);
 				if(displayed instanceof ItemStack stack && !stack.isEmpty()) {
-					map.put(slotArray[index], stack);
+					map.put((byte)slotArray[index], stack);
 				}
 				++index;
 			}

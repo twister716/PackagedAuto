@@ -121,7 +121,7 @@ public class BaseMenu<T extends BaseBlockEntity> extends AbstractContainerMenu {
 				if(!existingStack.isEmpty()) {
 					int maxStack = Math.min(stack.getMaxStackSize(), slot.getMaxStackSize());
 					int rmv = Math.min(maxStack, stack.getCount());
-					if(slot.mayPlace(MiscHelper.INSTANCE.cloneStack(stack, rmv)) && ItemStack.isSameItemSameTags(stack, existingStack)) {
+					if(slot.mayPlace(MiscHelper.INSTANCE.cloneStack(stack, rmv)) && ItemStack.isSameItemSameComponents(stack, existingStack)) {
 						int existingSize = existingStack.getCount() + stack.getCount();
 						if(existingSize <= maxStack) {
 							stack.setCount(0);
@@ -176,7 +176,7 @@ public class BaseMenu<T extends BaseBlockEntity> extends AbstractContainerMenu {
 					toPut.setCount(1);
 					slot.set(toPut);
 				}
-				else if(ItemStack.isSameItemSameTags(stack, toPut) && stack.getCount() < stack.getMaxStackSize()) {
+				else if(ItemStack.isSameItemSameComponents(stack, toPut) && stack.getCount() < stack.getMaxStackSize()) {
 					stack.grow(1);
 					slot.set(stack);
 				}

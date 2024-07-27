@@ -1,14 +1,15 @@
 package thelm.packagedauto.inventory;
 
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.items.IItemHandlerModifiable;
-import thelm.packagedauto.api.IPackageItem;
-import thelm.packagedauto.api.IPackageRecipeListItem;
 import thelm.packagedauto.block.entity.UnpackagerBlockEntity;
 import thelm.packagedauto.block.entity.UnpackagerBlockEntity.PackageTracker;
+import thelm.packagedauto.component.PackagedAutoDataComponents;
+import thelm.packagedauto.util.MiscHelper;
 
 public class UnpackagerItemHandler extends BaseItemHandler<UnpackagerBlockEntity> {
 
@@ -38,15 +39,15 @@ public class UnpackagerItemHandler extends BaseItemHandler<UnpackagerBlockEntity
 	@Override
 	public boolean isItemValid(int slot, ItemStack stack) {
 		return switch(slot) {
-		case 9 -> stack.getItem() instanceof IPackageRecipeListItem;
+		case 9 -> stack.has(PackagedAutoDataComponents.RECIPE_LIST);
 		case 10 -> stack.getCapability(Capabilities.EnergyStorage.ITEM) != null;
-		default -> stack.getItem() instanceof IPackageItem;
+		default -> MiscHelper.INSTANCE.isPackage(stack);
 		};
 	}
 
 	@Override
-	public void load(CompoundTag nbt) {
-		super.load(nbt);
+	public void load(CompoundTag nbt, HolderLookup.Provider registries) {
+		super.load(nbt, registries);
 		updateRecipeList();
 	}
 
@@ -88,8 +89,8 @@ public class UnpackagerItemHandler extends BaseItemHandler<UnpackagerBlockEntity
 	public void updateRecipeList() {
 		blockEntity.recipeList.clear();
 		ItemStack listStack = getStackInSlot(9);
-		if(listStack.getItem() instanceof IPackageRecipeListItem listItem) {
-			blockEntity.recipeList.addAll(listItem.getRecipeList(blockEntity.getLevel(), listStack).getRecipeList());
+		if(listStack.has(PackagedAutoDataComponents.RECIPE_LIST)) {
+			blockEntity.recipeList.addAll(listStack.get(PackagedAutoDataComponents.RECIPE_LIST));
 		}
 		if(blockEntity.getLevel() != null && !blockEntity.getLevel().isClientSide) {
 			blockEntity.postPatternChange();

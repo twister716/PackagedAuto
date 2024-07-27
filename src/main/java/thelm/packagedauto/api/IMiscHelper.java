@@ -7,6 +7,8 @@ import java.util.stream.Stream;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.HolderLookup.Provider;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -32,17 +34,17 @@ public interface IMiscHelper {
 
 	List<ItemStack> condenseStacks(List<ItemStack> stacks, boolean ignoreStackSize);
 
-	ListTag saveAllItems(ListTag tagList, List<ItemStack> list);
+	ListTag saveAllItems(ListTag tagList, List<ItemStack> list, HolderLookup.Provider registries);
 
-	ListTag saveAllItems(ListTag tagList, List<ItemStack> list, String indexKey);
+	ListTag saveAllItems(ListTag tagList, List<ItemStack> list, String indexKey, HolderLookup.Provider registries);
 
-	void loadAllItems(ListTag tagList, List<ItemStack> list);
+	void loadAllItems(ListTag tagList, List<ItemStack> list, HolderLookup.Provider registries);
 
-	void loadAllItems(ListTag tagList, List<ItemStack> list, String indexKey);
+	void loadAllItems(ListTag tagList, List<ItemStack> list, String indexKey, HolderLookup.Provider registries);
 
-	CompoundTag saveItemWithLargeCount(CompoundTag nbt, ItemStack stack);
+	CompoundTag saveItemWithLargeCount(CompoundTag nbt, ItemStack stack, HolderLookup.Provider registries);
 
-	ItemStack loadItemWithLargeCount(CompoundTag nbt);
+	ItemStack loadItemWithLargeCount(CompoundTag nbt, HolderLookup.Provider registries);
 
 	IPackagePattern getPattern(IPackageRecipeInfo recipeInfo, int index);
 
@@ -58,15 +60,17 @@ public interface IMiscHelper {
 
 	ItemStack cloneStack(ItemStack stack, int stackSize);
 
+	boolean isPackage(ItemStack stack);
+
 	boolean isEmpty(IItemHandler itemHandler);
 
 	ItemStack makeVolumePackage(IVolumeStackWrapper volumeStack);
 
 	ItemStack tryMakeVolumePackage(Object volumeStack);
 
-	CompoundTag saveRecipe(CompoundTag nbt, IPackageRecipeInfo recipe);
+	CompoundTag saveRecipe(CompoundTag nbt, IPackageRecipeInfo recipe, Provider registries);
 
-	IPackageRecipeInfo loadRecipe(CompoundTag nbt);
+	IPackageRecipeInfo loadRecipe(CompoundTag nbt, HolderLookup.Provider registries);
 
 	boolean recipeEquals(IPackageRecipeInfo recipeA, Object recipeInternalA, IPackageRecipeInfo recipeB, Object recipeInternalB);
 

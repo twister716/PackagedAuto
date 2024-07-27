@@ -2,7 +2,7 @@ package thelm.packagedauto.item;
 
 import java.util.List;
 
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentUtils;
 import net.minecraft.world.InteractionHand;
@@ -13,26 +13,25 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
-import thelm.packagedauto.api.IPackageItem;
 import thelm.packagedauto.api.IPackagePattern;
 import thelm.packagedauto.api.IPackageRecipeInfo;
-import thelm.packagedauto.api.IVolumePackageItem;
 import thelm.packagedauto.api.IVolumeStackWrapper;
+import thelm.packagedauto.component.PackagedAutoDataComponents;
 import thelm.packagedauto.util.MiscHelper;
 
-public class PackageItem extends Item implements IPackageItem {
-
-	public static final PackageItem INSTANCE = new PackageItem();
+public class PackageItem extends Item {
 
 	protected PackageItem() {
 		super(new Item.Properties());
 	}
 
 	public static ItemStack makePackage(IPackageRecipeInfo recipeInfo, int index) {
-		ItemStack stack = new ItemStack(INSTANCE);
-		CompoundTag tag = MiscHelper.INSTANCE.saveRecipe(new CompoundTag(), recipeInfo);
-		tag.putByte("Index", (byte)index);
-		stack.setTag(tag);
+		ItemStack stack = PackagedAutoItems.PACKAGE.toStack();
+		DataComponentPatch patch = DataComponentPatch.builder().
+				set(PackagedAutoDataComponents.PACKAGE_INDEX.get(), index).
+				set(PackagedAutoDataComponents.RECIPE.get(), recipeInfo).
+				build();
+		stack.applyComponents(patch);
 		return stack;
 	}
 
@@ -41,17 +40,19 @@ public class PackageItem extends Item implements IPackageItem {
 		if(!level.isClientSide && player.isShiftKeyDown()) {
 			ItemStack stack = player.getItemInHand(hand).copy();
 			ItemStack stack1 = stack.split(1);
-			IPackageRecipeInfo recipe = getRecipeInfo(stack1);
-			int index = getIndex(stack1);
-			if(recipe != null && recipe.validPatternIndex(index)) {
-				IPackagePattern pattern = recipe.getPatterns().get(index);
-				List<ItemStack> inputs = pattern.getInputs();
-				for(int i = 0; i < inputs.size(); ++i) {
-					ItemStack input = inputs.get(i).copy();
-					if(!player.getInventory().add(input)) {
-						ItemEntity item = new ItemEntity(level, player.getX(), player.getY(), player.getZ(), input);
-						item.setThrower(player);
-						level.addFreshEntity(item);
+			if(MiscHelper.INSTANCE.isPackage(stack1)) {
+				IPackageRecipeInfo recipe = stack1.get(PackagedAutoDataComponents.RECIPE);
+				int index = stack1.get(PackagedAutoDataComponents.PACKAGE_INDEX);
+				if(recipe.validPatternIndex(index)) {
+					IPackagePattern pattern = recipe.getPatterns().get(index);
+					List<ItemStack> inputs = pattern.getInputs();
+					for(int i = 0; i < inputs.size(); ++i) {
+						ItemStack input = inputs.get(i).copy();
+						if(!player.getInventory().add(input)) {
+							ItemEntity item = new ItemEntity(level, player.getX(), player.getY(), player.getZ(), input);
+							item.setThrower(player);
+							level.addFreshEntity(item);
+						}
 					}
 				}
 			}
@@ -61,53 +62,38 @@ public class PackageItem extends Item implements IPackageItem {
 	}
 
 	@Override
-	public void appendHoverText(ItemStack stack, Level level, List<Component> tooltip, TooltipFlag isAdvanced) {
-		IPackageRecipeInfo recipe = getRecipeInfo(stack);
-		int index = getIndex(stack);
-		if(recipe != null && recipe.validPatternIndex(index)) {
-			tooltip.add(recipe.getRecipeType().getDisplayName().append(": "));
-			for(ItemStack is : recipe.getOutputs()) {
-				if(is.getItem() instanceof IVolumePackageItem vp) {
-					IVolumeStackWrapper vs = vp.getVolumeStack(is);
-					tooltip.add(Component.literal(is.getCount()+"x").append(vs.getAmountDesc()).append(" ").
-							append(ComponentUtils.wrapInSquareBrackets(vs.getDisplayName())));
+	public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag isAdvanced) {
+		if(MiscHelper.INSTANCE.isPackage(stack)) {
+			IPackageRecipeInfo recipe = stack.get(PackagedAutoDataComponents.RECIPE);
+			int index = stack.get(PackagedAutoDataComponents.PACKAGE_INDEX);
+			if(recipe.validPatternIndex(index)) {
+				tooltip.add(recipe.getRecipeType().getDisplayName().append(": "));
+				for(ItemStack is : recipe.getOutputs()) {
+					if(is.has(PackagedAutoDataComponents.VOLUME_PACKAGE_STACK)) {
+						IVolumeStackWrapper vs = is.get(PackagedAutoDataComponents.VOLUME_PACKAGE_STACK);
+						tooltip.add(Component.literal(is.getCount()+"x").append(vs.getAmountDesc()).append(" ").
+								append(ComponentUtils.wrapInSquareBrackets(vs.getDisplayName())));
+					}
+					else {
+						tooltip.add(Component.literal(is.getCount()+" ").append(is.getDisplayName()));
+					}
 				}
-				else {
-					tooltip.add(Component.literal(is.getCount()+" ").append(is.getDisplayName()));
+				tooltip.add(Component.translatable("item.packagedauto.package.index", index));
+				tooltip.add(Component.translatable("item.packagedauto.package.items"));
+				List<ItemStack> recipeInputs = recipe.getInputs();
+				List<ItemStack> packageItems = recipeInputs.subList(9*index, Math.min(9*index+9, recipeInputs.size()));
+				for(ItemStack is : packageItems) {
+					if(is.has(PackagedAutoDataComponents.VOLUME_PACKAGE_STACK)) {
+						IVolumeStackWrapper vs = is.get(PackagedAutoDataComponents.VOLUME_PACKAGE_STACK);
+						tooltip.add(Component.literal(is.getCount()+"x").append(vs.getAmountDesc()).append(" ").
+								append(ComponentUtils.wrapInSquareBrackets(vs.getDisplayName())));
+					}
+					else {
+						tooltip.add(Component.literal(is.getCount()+" ").append(is.getDisplayName()));
+					}
 				}
 			}
-			tooltip.add(Component.translatable("item.packagedauto.package.index", index));
-			tooltip.add(Component.translatable("item.packagedauto.package.items"));
-			List<ItemStack> recipeInputs = recipe.getInputs();
-			List<ItemStack> packageItems = recipeInputs.subList(9*index, Math.min(9*index+9, recipeInputs.size()));
-			for(ItemStack is : packageItems) {
-				if(is.getItem() instanceof IVolumePackageItem vp) {
-					IVolumeStackWrapper vs = vp.getVolumeStack(is);
-					tooltip.add(Component.literal(is.getCount()+"x").append(vs.getAmountDesc()).append(" ").
-							append(ComponentUtils.wrapInSquareBrackets(vs.getDisplayName())));
-				}
-				else {
-					tooltip.add(Component.literal(is.getCount()+" ").append(is.getDisplayName()));
-				}
-			}
 		}
-		super.appendHoverText(stack, level, tooltip, isAdvanced);
-	}
-
-	@Override
-	public IPackageRecipeInfo getRecipeInfo(ItemStack stack) {
-		if(stack.hasTag()) {
-			CompoundTag tag = stack.getTag();
-			return MiscHelper.INSTANCE.loadRecipe(tag);
-		}
-		return null;
-	}
-
-	@Override
-	public int getIndex(ItemStack stack) {
-		if(stack.hasTag()) {
-			return stack.getTag().getByte("Index");
-		}
-		return -1;
+		super.appendHoverText(stack, context, tooltip, isAdvanced);
 	}
 }
