@@ -64,6 +64,11 @@ public abstract class BaseTile extends TileEntity implements INamedContainerProv
 		return getName();
 	}
 
+	@Override
+	public ITextComponent getCustomName() {
+		return customName;
+	}
+
 	public void setCustomName(ITextComponent name) {
 		customName = name;
 	}

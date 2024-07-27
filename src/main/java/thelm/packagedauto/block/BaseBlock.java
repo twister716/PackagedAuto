@@ -56,7 +56,7 @@ public abstract class BaseBlock extends Block {
 			TileEntity tileentity = worldIn.getBlockEntity(pos);
 			if(tileentity instanceof BaseTile) {
 				if(stack.hasCustomHoverName()) {
-					((BaseTile)tileentity).setCustomName(stack.getDisplayName());
+					((BaseTile)tileentity).setCustomName(stack.getHoverName());
 				}
 				if(placer instanceof PlayerEntity) {
 					((BaseTile)tileentity).setOwner((PlayerEntity)placer);
