@@ -39,12 +39,12 @@ public class RecipeInfoCrafting implements IRecipeInfoCrafting {
 		for(int i = 0; i < 9 && i < matrixList.size(); ++i) {
 			matrix.setInventorySlotContents(i, matrixList.get(i));
 		}
+		if(recipe != null) {
+			output = recipe.getCraftingResult(matrix).copy();
+		}
 		input.addAll(MiscUtil.condenseStacks(matrix));
 		for(int i = 0; i*9 < input.size(); ++i) {
 			patterns.add(new PatternHelper(this, i));
-		}
-		if(recipe != null) {
-			output = recipe.getCraftingResult(matrix).copy();
 		}
 	}
 
