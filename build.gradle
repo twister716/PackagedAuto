@@ -77,7 +77,7 @@ def specVersion = "4"
 def vendor = "thelm"
 
 group = "thelm.packagedauto"
-version = "4.0.b.2"
+version = "4.0.0.0"
 
 archivesBaseName = "${modName}-${mcVersion}"
 
@@ -112,22 +112,22 @@ dependencies {
 		officialMojangMappings()
 		parchment "org.parchmentmc.data:parchment-1.21:2024.07.07@zip"
 	}
-	neoForge "net.neoforged:neoforge:21.0.133-beta"
+	neoForge "net.neoforged:neoforge:21.0.146"
 
 	// Dependencies
-	implementation("mezz.jei:jei-1.21-neoforge:19.5.0.59") {transitive = false}
+	implementation("mezz.jei:jei-1.21-neoforge:19.5.2.66") {transitive = false}
 	implementation "dev.emi:emi-neoforge:1.1.10+1.21"
-	implementation "appeng:appliedenergistics2:19.0.16-beta"
+	implementation "appeng:appliedenergistics2:19.0.17-beta"
 	implementation "vazkii.patchouli:Patchouli:1.21-87-NEOFORGE-SNAPSHOT"
 	implementation "curse.maven:mouse-tweaks-60089:5437296"
 
 	// Testing
-	implementation "mekanism:Mekanism:1.21-10.6.6.53"
-	implementation "curse.maven:applied-mekanistics-574300:5530305"
+	implementation "mekanism:Mekanism:1.21-10.6.7.54"
+	implementation "curse.maven:applied-mekanistics-574300:5564115"
 
 	//Performance
 	implementation "curse.maven:yeetusexperimentus-635427:5444189"
-	implementation "curse.maven:modernfix-790626:5527238"
+	implementation "curse.maven:modernfix-790626:5569656"
 	implementation "curse.maven:ferritecore-429235:5434178"
 }
 
@@ -169,7 +169,7 @@ publishMods {
 	file = remapJar.archiveFile
 	version = displayName = "${mcVersion}-${project.version}"
 	changelog = file("changelog.md").text
-	type = ALPHA
+	type = BETA
 	modLoaders.add("neoforge")
 	additionalFiles.from(remapSourcesJar.archiveFile)
 

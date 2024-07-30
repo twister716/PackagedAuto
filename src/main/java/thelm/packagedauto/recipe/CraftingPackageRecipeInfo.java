@@ -77,10 +77,6 @@ public class CraftingPackageRecipeInfo implements ICraftingPackageRecipeInfo {
 			matrixList.set(i, toSet.copy());
 		}
 		matrix = CraftingInput.of(3, 3, matrixList);
-		input = MiscHelper.INSTANCE.condenseStacks(matrix.items());
-		for(int i = 0; i*9 < input.size(); ++i) {
-			this.patterns.add(new PackagePattern(this, i));
-		}
 		RecipeHolder<CraftingRecipe> recipeHolder = MiscHelper.INSTANCE.getRecipeManager().getRecipeFor(RecipeType.CRAFTING, matrix, level).orElse(null);
 		if(recipeHolder != null) {
 			id = recipeHolder.id();
@@ -91,6 +87,10 @@ public class CraftingPackageRecipeInfo implements ICraftingPackageRecipeInfo {
 			id = null;
 			recipe = null;
 			output = null;
+		}
+		input = MiscHelper.INSTANCE.condenseStacks(matrix.items());
+		for(int i = 0; i*9 < input.size(); ++i) {
+			this.patterns.add(new PackagePattern(this, i));
 		}
 	}
 
