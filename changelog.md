@@ -1,1 +1,1 @@
-Fix custom block names  
+Make pattern calculation last when reading recipe from nbt  
