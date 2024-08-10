@@ -1,10 +1,10 @@
 plugins {
-	id "com.crystaelix.loom" version "jitpack-af214fdb"
+	id "com.crystaelix.loom" version "jitpack-6cccf24f"
 	id "eclipse"
 	id "idea"
 	id "maven-publish"
 	id "net.kyori.blossom" version "[1,2)"
-	id "me.modmuss50.mod-publish-plugin" version "0.5.0"
+	id "me.modmuss50.mod-publish-plugin" version "0.7.2"
 }
 
 repositories {
@@ -112,25 +112,25 @@ dependencies {
 		officialMojangMappings()
 		parchment "org.parchmentmc.data:parchment-1.20.1:2023.09.03@zip"
 	}
-	forge "net.minecraftforge:forge:1.20.1-47.3.5"
+	forge "net.minecraftforge:forge:1.20.1-47.3.7"
 
 	// Dependencies
-	modImplementation("mezz.jei:jei-1.20.1-forge:15.8.2.25") {transitive = false}
-	modImplementation "dev.emi:emi-forge:1.1.10+1.20.1"
-	modImplementation "appeng:appliedenergistics2-forge:15.2.9"
+	modImplementation("mezz.jei:jei-1.20.1-forge:15.17.0.76") {transitive = false}
+	modImplementation "dev.emi:emi-forge:1.1.12+1.20.1"
+	modImplementation "appeng:appliedenergistics2-forge:15.2.13"
 	modImplementation "vazkii.patchouli:Patchouli:1.20.1-84-FORGE"
 	modImplementation "curse.maven:mouse-tweaks-60089:5338457"
 
 	// Testing
-	modImplementation "curse.maven:cucumber-272335:5502065"
+	modImplementation "curse.maven:cucumber-272335:5587888"
 	modImplementation "curse.maven:extended-crafting-268387:5228960"
-	modImplementation "mekanism:Mekanism:1.20.1-10.4.8.43"
+	modImplementation "mekanism:Mekanism:1.20.1-10.4.9.61"
 	modImplementation "curse.maven:applied-mekanistics-574300:4842281"
 
 	//Performance
 	modImplementation "curse.maven:yeetusexperimentus-635427:4680832"
 	implementation "io.github.llamalad7:mixinextras-forge:0.3.6"
-	modImplementation "curse.maven:modernfix-790626:5569652"
+	modImplementation "curse.maven:modernfix-790626:5676014"
 	modImplementation "curse.maven:ferritecore-429235:4810975"
 }
 
