@@ -143,21 +143,21 @@ public class AEUnpackagerBlockEntity extends UnpackagerBlockEntity implements II
 	}
 
 	@Override
-	protected boolean isPatternProvider(BlockEntity blockEntity, Direction direction) {
-		return AppEngUtil.isPatternProvider(blockEntity, direction);
-	}
-
-	@Override
 	public void postPatternChange() {
 		ICraftingProvider.requestUpdate(getMainNode());
 	}
 
-	@SuppressWarnings("removal")
+	@Override
+	protected boolean validSendTarget(BlockEntity blockEntity, Direction direction) {
+		return super.validSendTarget(blockEntity, direction) &&
+				!AppEngUtil.isPatternProvider(blockEntity, direction);
+	}
+
 	protected void chargeMEEnergy() {
 		if(getMainNode().isActive()) {
 			IGrid grid = getMainNode().getGrid();
 			IEnergyService energyService = grid.getEnergyService();
-			double conversion = PowerUnits.RF.convertTo(PowerUnits.AE, 1);
+			double conversion = PowerUnits.FE.convertTo(PowerUnits.AE, 1);
 			int request = Math.min(energyStorage.getMaxReceive(), energyStorage.getMaxEnergyStored()-energyStorage.getEnergyStored());
 			double available = energyService.extractAEPower((request+0.5)*conversion, Actionable.SIMULATE, PowerMultiplier.CONFIG);
 			int extract = (int)(available/conversion);

@@ -10,11 +10,16 @@ import com.google.common.base.Functions;
 
 import appeng.api.crafting.IPatternDetails.IInput;
 import appeng.api.parts.IPartHost;
+import appeng.api.stacks.AEKey;
 import appeng.api.stacks.GenericStack;
 import appeng.helpers.patternprovider.PatternProviderLogicHost;
 import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import thelm.packagedauto.api.IPackageRecipeInfo;
+import thelm.packagedauto.api.IVolumePackageItem;
+import thelm.packagedauto.api.IVolumeStackWrapper;
 import thelm.packagedauto.integration.appeng.recipe.SimpleInput;
 
 public class AppEngUtil {
@@ -51,6 +56,19 @@ public class AppEngUtil {
 			inputs[i] = new SimpleInput(recipe, stacks.get(i));
 		}
 		return inputs;
+	}
+
+	public static GenericStack getGenericOutput(ItemStack stack) {
+		if(stack.getItem() instanceof IVolumePackageItem vPackage) {
+			IVolumeStackWrapper vStack = vPackage.getVolumeStack(stack);
+			if(!vStack.isEmpty() && vStack.getVolumeType() != null && vStack.getVolumeType().supportsAE()) {
+				AEKey key = AEKey.fromTagGeneric(vStack.saveAEKey(new CompoundTag()));
+				if(key != null) {
+					return new GenericStack(key, vStack.getAmount()*stack.getCount());
+				}
+			}
+		}
+		return GenericStack.fromItemStack(stack);
 	}
 
 	public static boolean isPatternProvider(BlockEntity blockEntity, Direction direction) {
