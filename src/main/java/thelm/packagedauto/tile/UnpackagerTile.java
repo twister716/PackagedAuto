@@ -30,7 +30,6 @@ import net.minecraftforge.items.IItemHandler;
 import thelm.packagedauto.api.IPackageCraftingMachine;
 import thelm.packagedauto.api.IPackageItem;
 import thelm.packagedauto.api.IPackageRecipeInfo;
-import thelm.packagedauto.api.IPackageRecipeType;
 import thelm.packagedauto.block.UnpackagerBlock;
 import thelm.packagedauto.container.UnpackagerContainer;
 import thelm.packagedauto.energy.EnergyStorage;
@@ -154,6 +153,39 @@ public class UnpackagerTile extends BaseTile implements ITickableTileEntity {
 				continue;
 			}
 		}
+		if(!powered) {
+			for(Direction direction : Direction.values()) {
+				TileEntity tile = level.getBlockEntity(worldPosition.relative(direction));
+				if(!validSendTarget(tile, direction.getOpposite())) {
+					continue;
+				}
+				if(!tile.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, direction.getOpposite()).isPresent()) {
+					continue;
+				}
+				IItemHandler itemHandler = tile.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, direction.getOpposite()).resolve().get();
+				if(blocking && !MiscHelper.INSTANCE.isEmpty(itemHandler)) {
+					continue;
+				}
+				PackageTracker trackerToEmpty = Arrays.stream(trackers).filter(t->t.isFilled() && t.direction == null && t.recipe != null && !t.recipe.getRecipeType().hasMachine()).findFirst().orElse(null);
+				if(trackerToEmpty == null) {
+					continue;
+				}
+				if(trackerToEmpty.toSend.isEmpty()) {
+					trackerToEmpty.setupToSend();
+				}
+				boolean acceptsAll = true;
+				for(int i = 0; i < trackerToEmpty.toSend.size(); ++i) {
+					ItemStack stack = trackerToEmpty.toSend.get(i);
+					ItemStack stackRem = MiscHelper.INSTANCE.insertItem(itemHandler, stack, false, true);
+					acceptsAll &= stackRem.getCount() < stack.getCount();
+				}
+				trackerToEmpty.toSend.removeIf(ItemStack::isEmpty);
+				if(acceptsAll) {
+					trackerToEmpty.direction = direction;
+				}
+				setChanged();
+			}
+		}
 		for(Direction direction : Direction.values()) {
 			TileEntity tile = level.getBlockEntity(worldPosition.relative(direction));
 			PackageTracker trackerToEmpty = Arrays.stream(trackers).filter(t->t.direction == direction).findFirst().orElse(null);
@@ -165,14 +197,13 @@ public class UnpackagerTile extends BaseTile implements ITickableTileEntity {
 			}
 			boolean ordered = false;
 			if(trackerToEmpty.recipe != null) {
-				IPackageRecipeType recipeType = trackerToEmpty.recipe.getRecipeType();
-				if(recipeType.hasMachine()) {
-					trackerToEmpty.direction = null;
-					continue;
-				}
-				ordered = recipeType.isOrdered();
+				ordered = trackerToEmpty.recipe.getRecipeType().isOrdered();
 			}
-			if(tile == null || tile instanceof PackagerTile || tile instanceof UnpackagerTile || isInterface(tile, direction.getOpposite()) || !tile.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, direction.getOpposite()).isPresent()) {
+			if(!validSendTarget(tile, direction.getOpposite())) {
+				trackerToEmpty.direction = null;
+				continue;
+			}
+			if(!tile.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, direction.getOpposite()).isPresent()) {
 				trackerToEmpty.direction = null;
 				continue;
 			}
@@ -188,42 +219,13 @@ public class UnpackagerTile extends BaseTile implements ITickableTileEntity {
 			}
 			setChanged();
 		}
-		if(powered) {
-			return;
-		}
-		for(Direction direction : Direction.values()) {
-			TileEntity tile = level.getBlockEntity(worldPosition.relative(direction));
-			if(tile == null || tile instanceof PackagerTile || tile instanceof UnpackagerTile || isInterface(tile, direction.getOpposite()) || !tile.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, direction.getOpposite()).isPresent()) {
-				continue;
-			}
-			IItemHandler itemHandler = tile.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, direction.getOpposite()).resolve().get();
-			if(blocking && !MiscHelper.INSTANCE.isEmpty(itemHandler)) {
-				continue;
-			}
-			PackageTracker trackerToEmpty = Arrays.stream(trackers).filter(t->t.isFilled() && t.direction == null && t.recipe != null && !t.recipe.getRecipeType().hasMachine()).findFirst().orElse(null);
-			if(trackerToEmpty == null) {
-				continue;
-			}
-			if(trackerToEmpty.toSend.isEmpty()) {
-				trackerToEmpty.setupToSend();
-			}
-			boolean ordered = trackerToEmpty.recipe.getRecipeType().isOrdered();
-			boolean inserted = false;
-			for(int i = 0; i < trackerToEmpty.toSend.size(); ++i) {
-				ItemStack stack = trackerToEmpty.toSend.get(i);
-				ItemStack stackRem = MiscHelper.INSTANCE.insertItem(itemHandler, stack, ordered, false);
-				inserted |= stackRem.getCount() < stack.getCount();
-				trackerToEmpty.toSend.set(i, stackRem);
-			}
-			trackerToEmpty.toSend.removeIf(ItemStack::isEmpty);
-			if(inserted) {
-				trackerToEmpty.direction = direction;
-				if(trackerToEmpty.toSend.isEmpty()) {
-					trackerToEmpty.clearRecipe();
-				}
-				setChanged();
-			}
-		}
+	}
+
+	protected boolean validSendTarget(TileEntity tile, Direction direction) {
+		return tile != null &&
+				!(tile instanceof PackagerTile) &&
+				!(tile instanceof PackagerExtensionTile) &&
+				!(tile instanceof UnpackagerTile);
 	}
 
 	protected void chargeEnergy() {
@@ -247,10 +249,6 @@ public class UnpackagerTile extends BaseTile implements ITickableTileEntity {
 	@Override
 	public int getComparatorSignal() {
 		return Math.min((int)Arrays.stream(trackers).filter(t->t.isFilled()).count(), 15);
-	}
-
-	protected boolean isInterface(TileEntity tile, Direction facing) {
-		return false;
 	}
 
 	public void postPatternChange() {}

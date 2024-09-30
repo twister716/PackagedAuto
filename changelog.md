@@ -1,1 +1,1 @@
-Make pattern calculation last when reading recipe from nbt  
+Changed unpackager processing logic to only send items if all items can be accepted  

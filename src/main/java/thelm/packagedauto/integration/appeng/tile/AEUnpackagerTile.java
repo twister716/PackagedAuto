@@ -142,16 +142,17 @@ public class AEUnpackagerTile extends UnpackagerTile implements IGridHost, IActi
 	}
 
 	@Override
-	protected boolean isInterface(TileEntity tile, Direction direction) {
-		return AppEngUtil.isInterface(tile, direction);
-	}
-
-	@Override
 	public void postPatternChange() {
 		if(getActionableNode().isActive()) {
 			IGrid grid = getActionableNode().getGrid();
 			grid.postEvent(new MENetworkCraftingPatternChange(this, getActionableNode()));
 		}
+	}
+
+	@Override
+	protected boolean validSendTarget(TileEntity tile, Direction direction) {
+		return super.validSendTarget(tile, direction) &&
+				!AppEngUtil.isInterface(tile, direction);
 	}
 
 	protected void chargeMEEnergy() {
