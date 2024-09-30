@@ -8,6 +8,7 @@ import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.simple.SimpleChannel;
 import thelm.packagedauto.network.packet.ChangeBlockingPacket;
 import thelm.packagedauto.network.packet.ChangePackagingPacket;
+import thelm.packagedauto.network.packet.ChangeProvidingPacket;
 import thelm.packagedauto.network.packet.CycleRecipeTypePacket;
 import thelm.packagedauto.network.packet.DistributorBeamPacket;
 import thelm.packagedauto.network.packet.LoadRecipeListPacket;
@@ -64,5 +65,8 @@ public class PacketHandler {
 		INSTANCE.registerMessage(id++, DistributorBeamPacket.class,
 				DistributorBeamPacket::encode, DistributorBeamPacket::decode,
 				DistributorBeamPacket::handle, Optional.of(NetworkDirection.PLAY_TO_CLIENT));
+		INSTANCE.registerMessage(id++, ChangeProvidingPacket.class,
+				ChangeProvidingPacket::encode, ChangeProvidingPacket::decode,
+				ChangeProvidingPacket::handle, Optional.of(NetworkDirection.PLAY_TO_SERVER));
 	}
 }

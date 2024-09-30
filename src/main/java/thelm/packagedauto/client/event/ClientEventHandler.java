@@ -13,6 +13,7 @@ import thelm.packagedauto.client.screen.EncoderScreen;
 import thelm.packagedauto.client.screen.FluidPackageFillerScreen;
 import thelm.packagedauto.client.screen.PackagerExtensionScreen;
 import thelm.packagedauto.client.screen.PackagerScreen;
+import thelm.packagedauto.client.screen.PackagingProviderScreen;
 import thelm.packagedauto.client.screen.UnpackagerScreen;
 import thelm.packagedauto.item.DistributorMarkerItem;
 import thelm.packagedauto.item.RecipeHolderItem;
@@ -22,6 +23,7 @@ import thelm.packagedauto.menu.EncoderMenu;
 import thelm.packagedauto.menu.FluidPackageFillerMenu;
 import thelm.packagedauto.menu.PackagerExtensionMenu;
 import thelm.packagedauto.menu.PackagerMenu;
+import thelm.packagedauto.menu.PackagingProviderMenu;
 import thelm.packagedauto.menu.UnpackagerMenu;
 
 public class ClientEventHandler {
@@ -46,6 +48,7 @@ public class ClientEventHandler {
 		MenuScreens.register(DistributorMenu.TYPE_INSTANCE, DistributorScreen::new);
 		MenuScreens.register(CrafterMenu.TYPE_INSTANCE, CrafterScreen::new);
 		MenuScreens.register(FluidPackageFillerMenu.TYPE_INSTANCE, FluidPackageFillerScreen::new);
+		MenuScreens.register(PackagingProviderMenu.TYPE_INSTANCE, PackagingProviderScreen::new);
 
 		event.enqueueWork(()->{
 			ItemProperties.register(RecipeHolderItem.INSTANCE,

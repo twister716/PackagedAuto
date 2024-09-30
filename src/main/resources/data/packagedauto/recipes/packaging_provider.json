@@ -1,0 +1,35 @@
+{
+	"conditions": [
+		{
+			"type": "forge:mod_loaded",
+			"modid": "ae2"
+		}
+	],
+	"type": "minecraft:crafting_shaped",
+	"result": {
+		"item": "packagedauto:packaging_provider",
+		"count": 1
+	},
+	"pattern": [
+		"IPI",
+		"FEF",
+		"IUI"
+	],
+	"key": {
+		"P": {
+			"item": "packagedauto:packager"
+		},
+		"U": {
+			"item": "packagedauto:unpackager"
+		},
+		"E": {
+			"item": "ae2:engineering_processor"
+		},
+		"F": {
+			"item": "ae2:fluix_pearl"
+		},
+		"I": {
+			"tag": "forge:ingots/iron"
+		}
+	}
+}

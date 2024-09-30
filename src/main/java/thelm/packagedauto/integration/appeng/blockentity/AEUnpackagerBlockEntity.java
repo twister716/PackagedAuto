@@ -148,13 +148,14 @@ public class AEUnpackagerBlockEntity extends UnpackagerBlockEntity implements II
 	}
 
 	@Override
-	protected boolean isPatternProvider(BlockEntity blockEntity, Direction direction) {
-		return AppEngUtil.isPatternProvider(blockEntity, direction);
+	public void postPatternChange() {
+		ICraftingProvider.requestUpdate(getMainNode());
 	}
 
 	@Override
-	public void postPatternChange() {
-		ICraftingProvider.requestUpdate(getMainNode());
+	protected boolean validSendTarget(BlockEntity blockEntity, Direction direction) {
+		return super.validSendTarget(blockEntity, direction) &&
+				!AppEngUtil.isPatternProvider(blockEntity, direction);
 	}
 
 	protected void chargeMEEnergy() {

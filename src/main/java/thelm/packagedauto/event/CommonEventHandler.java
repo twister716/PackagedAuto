@@ -18,6 +18,7 @@ import thelm.packagedauto.block.EncoderBlock;
 import thelm.packagedauto.block.FluidPackageFillerBlock;
 import thelm.packagedauto.block.PackagerBlock;
 import thelm.packagedauto.block.PackagerExtensionBlock;
+import thelm.packagedauto.block.PackagingProviderBlock;
 import thelm.packagedauto.block.UnpackagerBlock;
 import thelm.packagedauto.block.entity.CrafterBlockEntity;
 import thelm.packagedauto.block.entity.DistributorBlockEntity;
@@ -25,6 +26,7 @@ import thelm.packagedauto.block.entity.EncoderBlockEntity;
 import thelm.packagedauto.block.entity.FluidPackageFillerBlockEntity;
 import thelm.packagedauto.block.entity.PackagerBlockEntity;
 import thelm.packagedauto.block.entity.PackagerExtensionBlockEntity;
+import thelm.packagedauto.block.entity.PackagingProviderBlockEntity;
 import thelm.packagedauto.block.entity.UnpackagerBlockEntity;
 import thelm.packagedauto.config.PackagedAutoConfig;
 import thelm.packagedauto.item.DistributorMarkerItem;
@@ -38,6 +40,7 @@ import thelm.packagedauto.menu.EncoderMenu;
 import thelm.packagedauto.menu.FluidPackageFillerMenu;
 import thelm.packagedauto.menu.PackagerExtensionMenu;
 import thelm.packagedauto.menu.PackagerMenu;
+import thelm.packagedauto.menu.PackagingProviderMenu;
 import thelm.packagedauto.menu.UnpackagerMenu;
 import thelm.packagedauto.network.PacketHandler;
 import thelm.packagedauto.recipe.CraftingPackageRecipeType;
@@ -72,6 +75,7 @@ public class CommonEventHandler {
 		registry.register(DistributorBlock.INSTANCE);
 		registry.register(CrafterBlock.INSTANCE);
 		registry.register(FluidPackageFillerBlock.INSTANCE);
+		registry.register(PackagingProviderBlock.INSTANCE);
 	}
 
 	@SubscribeEvent
@@ -84,6 +88,7 @@ public class CommonEventHandler {
 		registry.register(DistributorBlock.ITEM_INSTANCE);
 		registry.register(CrafterBlock.ITEM_INSTANCE);
 		registry.register(FluidPackageFillerBlock.ITEM_INSTANCE);
+		registry.register(PackagingProviderBlock.ITEM_INSTANCE);
 		registry.register(RecipeHolderItem.INSTANCE);
 		registry.register(DistributorMarkerItem.INSTANCE);
 		registry.register(PackageItem.INSTANCE);
@@ -102,6 +107,7 @@ public class CommonEventHandler {
 		registry.register(DistributorBlockEntity.TYPE_INSTANCE);
 		registry.register(CrafterBlockEntity.TYPE_INSTANCE);
 		registry.register(FluidPackageFillerBlockEntity.TYPE_INSTANCE);
+		registry.register(PackagingProviderBlockEntity.TYPE_INSTANCE);
 	}
 
 	@SubscribeEvent
@@ -114,6 +120,7 @@ public class CommonEventHandler {
 		registry.register(DistributorMenu.TYPE_INSTANCE);
 		registry.register(CrafterMenu.TYPE_INSTANCE);
 		registry.register(FluidPackageFillerMenu.TYPE_INSTANCE);
+		registry.register(PackagingProviderMenu.TYPE_INSTANCE);
 	}
 
 	@SubscribeEvent
