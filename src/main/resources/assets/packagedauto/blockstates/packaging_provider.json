@@ -1,0 +1,5 @@
+{
+	"variants": {
+		"": { "model": "packagedauto:block/packaging_provider" }
+	}
+}

@@ -22,6 +22,13 @@
 	"block.packagedauto.crafter": "封包合成器",
 	"block.packagedauto.fluid_package_filler": "液體封包填充機",
 	"block.packagedauto.fluid_package_filler.redstone": "以紅石訊號啟動",
+	"block.packagedauto.packaging_provider": "ME 封包供應器",
+	"block.packagedauto.packaging_provider.direct.false": "不供應徑直配方",
+	"block.packagedauto.packaging_provider.direct.true": "供應徑直配方",
+	"block.packagedauto.packaging_provider.packaging.false": "不供應封包配方",
+	"block.packagedauto.packaging_provider.packaging.true": "供應封包配方",
+	"block.packagedauto.packaging_provider.unpackaging.false": "不供應解包配方",
+	"block.packagedauto.packaging_provider.unpackaging.true": "供應解包配方",
 
 	"item.packagedauto.recipe_holder": "封包配方儲存器",
 	"item.packagedauto.recipe_holder.recipes": "配方:",

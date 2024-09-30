@@ -5,27 +5,24 @@ import java.util.function.Supplier;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkEvent;
+import thelm.packagedauto.block.entity.PackagingProviderBlockEntity;
 import thelm.packagedauto.menu.PackagingProviderMenu;
-import thelm.packagedauto.menu.UnpackagerMenu;
 
-public record ChangeBlockingPacket() {
+public record ChangeProvidingPacket(PackagingProviderBlockEntity.Type type) {
 
-	public static final ChangeBlockingPacket INSTANCE = new ChangeBlockingPacket();
+	public void encode(FriendlyByteBuf buf) {
+		buf.writeEnum(type);
+	}
 
-	public void encode(FriendlyByteBuf buf) {}
-
-	public static ChangeBlockingPacket decode(FriendlyByteBuf buf) {
-		return INSTANCE;
+	public static ChangeProvidingPacket decode(FriendlyByteBuf buf) {
+		return new ChangeProvidingPacket(buf.readEnum(PackagingProviderBlockEntity.Type.class));
 	}
 
 	public void handle(Supplier<NetworkEvent.Context> ctx) {
 		ServerPlayer player = ctx.get().getSender();
 		ctx.get().enqueueWork(()->{
-			if(player.containerMenu instanceof UnpackagerMenu menu) {
-				menu.blockEntity.changeBlockingMode();
-			}
 			if(player.containerMenu instanceof PackagingProviderMenu menu) {
-				menu.blockEntity.changeBlockingMode();
+				menu.blockEntity.changeProvideType(type);
 			}
 		});
 		ctx.get().setPacketHandled(true);

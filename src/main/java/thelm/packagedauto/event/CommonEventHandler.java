@@ -19,6 +19,7 @@ import thelm.packagedauto.block.EncoderBlock;
 import thelm.packagedauto.block.FluidPackageFillerBlock;
 import thelm.packagedauto.block.PackagerBlock;
 import thelm.packagedauto.block.PackagerExtensionBlock;
+import thelm.packagedauto.block.PackagingProviderBlock;
 import thelm.packagedauto.block.UnpackagerBlock;
 import thelm.packagedauto.block.entity.CrafterBlockEntity;
 import thelm.packagedauto.block.entity.DistributorBlockEntity;
@@ -26,6 +27,7 @@ import thelm.packagedauto.block.entity.EncoderBlockEntity;
 import thelm.packagedauto.block.entity.FluidPackageFillerBlockEntity;
 import thelm.packagedauto.block.entity.PackagerBlockEntity;
 import thelm.packagedauto.block.entity.PackagerExtensionBlockEntity;
+import thelm.packagedauto.block.entity.PackagingProviderBlockEntity;
 import thelm.packagedauto.block.entity.UnpackagerBlockEntity;
 import thelm.packagedauto.config.PackagedAutoConfig;
 import thelm.packagedauto.item.DistributorMarkerItem;
@@ -39,6 +41,7 @@ import thelm.packagedauto.menu.EncoderMenu;
 import thelm.packagedauto.menu.FluidPackageFillerMenu;
 import thelm.packagedauto.menu.PackagerExtensionMenu;
 import thelm.packagedauto.menu.PackagerMenu;
+import thelm.packagedauto.menu.PackagingProviderMenu;
 import thelm.packagedauto.menu.UnpackagerMenu;
 import thelm.packagedauto.network.PacketHandler;
 import thelm.packagedauto.recipe.CraftingPackageRecipeType;
@@ -72,6 +75,7 @@ public class CommonEventHandler {
 		blockRegister.register("distributor", ()->DistributorBlock.INSTANCE);
 		blockRegister.register("crafter", ()->CrafterBlock.INSTANCE);
 		blockRegister.register("fluid_package_filler", ()->FluidPackageFillerBlock.INSTANCE);
+		blockRegister.register("packaging_provider", ()->PackagingProviderBlock.INSTANCE);
 
 		DeferredRegister<Item> itemRegister = DeferredRegister.create(Registry.ITEM_REGISTRY, "packagedauto");
 		itemRegister.register(modEventBus);
@@ -82,6 +86,7 @@ public class CommonEventHandler {
 		itemRegister.register("distributor", ()->DistributorBlock.ITEM_INSTANCE);
 		itemRegister.register("crafter", ()->CrafterBlock.ITEM_INSTANCE);
 		itemRegister.register("fluid_package_filler", ()->FluidPackageFillerBlock.ITEM_INSTANCE);
+		itemRegister.register("packaging_provider", ()->PackagingProviderBlock.ITEM_INSTANCE);
 		itemRegister.register("recipe_holder", ()->RecipeHolderItem.INSTANCE);
 		itemRegister.register("distributor_marker", ()->DistributorMarkerItem.INSTANCE);
 		itemRegister.register("package", ()->PackageItem.INSTANCE);
@@ -98,6 +103,7 @@ public class CommonEventHandler {
 		blockEntityRegister.register("distributor", ()->DistributorBlockEntity.TYPE_INSTANCE);
 		blockEntityRegister.register("crafter", ()->CrafterBlockEntity.TYPE_INSTANCE);
 		blockEntityRegister.register("fluid_package_filler", ()->FluidPackageFillerBlockEntity.TYPE_INSTANCE);
+		blockEntityRegister.register("packaging_provider", ()->PackagingProviderBlockEntity.TYPE_INSTANCE);
 
 		DeferredRegister<MenuType<?>> menuRegister = DeferredRegister.create(Registry.MENU_REGISTRY, "packagedauto");
 		menuRegister.register(modEventBus);
@@ -108,6 +114,7 @@ public class CommonEventHandler {
 		menuRegister.register("distributor", ()->DistributorMenu.TYPE_INSTANCE);
 		menuRegister.register("crafter", ()->CrafterMenu.TYPE_INSTANCE);
 		menuRegister.register("fluid_package_filler", ()->FluidPackageFillerMenu.TYPE_INSTANCE);
+		menuRegister.register("packaging_provider", ()->PackagingProviderMenu.TYPE_INSTANCE);
 	}
 
 	@SubscribeEvent
