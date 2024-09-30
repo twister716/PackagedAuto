@@ -41,7 +41,6 @@ import net.minecraftforge.items.IItemHandler;
 import thelm.packagedauto.api.IPackageCraftingMachine;
 import thelm.packagedauto.api.IPackageItem;
 import thelm.packagedauto.api.IRecipeInfo;
-import thelm.packagedauto.api.IRecipeType;
 import thelm.packagedauto.api.MiscUtil;
 import thelm.packagedauto.client.gui.GuiUnpackager;
 import thelm.packagedauto.container.ContainerUnpackager;
@@ -169,6 +168,38 @@ public class TileUnpackager extends TileBase implements ITickable, IGridHost, IA
 				continue;
 			}
 		}
+		if(!powered) {
+			for(EnumFacing facing : EnumFacing.VALUES) {
+				TileEntity tile = world.getTileEntity(pos.offset(facing));
+				if(!validSendTarget(tile, facing.getOpposite())) {
+					continue;
+				}
+				if(!tile.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, facing.getOpposite())) {
+					continue;
+				}
+				IItemHandler itemHandler = tile.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, facing.getOpposite());
+				if(blocking && !MiscUtil.isEmpty(itemHandler)) {
+					continue;
+				}
+				PackageTracker trackerToEmpty = Arrays.stream(trackers).filter(t->t.isFilled() && t.facing == null && t.recipe != null && !t.recipe.getRecipeType().hasMachine()).findFirst().orElse(null);
+				if(trackerToEmpty == null) {
+					continue;
+				}
+				if(trackerToEmpty.toSend.isEmpty()) {
+					trackerToEmpty.setupToSend();
+				}
+				boolean acceptsAll = true;
+				for(int i = 0; i < trackerToEmpty.toSend.size(); ++i) {
+					ItemStack stack = trackerToEmpty.toSend.get(i);
+					ItemStack stackRem = MiscUtil.insertItem(itemHandler, stack, false, true);
+					acceptsAll &= stackRem.getCount() < stack.getCount();
+				}
+				trackerToEmpty.toSend.removeIf(ItemStack::isEmpty);
+				if(acceptsAll) {
+					trackerToEmpty.facing = facing;
+				}
+			}
+		}
 		for(EnumFacing facing : EnumFacing.VALUES) {
 			TileEntity tile = world.getTileEntity(pos.offset(facing));
 			PackageTracker trackerToEmpty = Arrays.stream(trackers).filter(t->t.facing == facing).findFirst().orElse(null);
@@ -180,14 +211,13 @@ public class TileUnpackager extends TileBase implements ITickable, IGridHost, IA
 			}
 			boolean ordered = false;
 			if(trackerToEmpty.recipe != null) {
-				IRecipeType recipeType = trackerToEmpty.recipe.getRecipeType();
-				if(recipeType.hasMachine()) {
-					trackerToEmpty.facing = null;
-					continue;
-				}
-				ordered = recipeType.isOrdered();
+				ordered = trackerToEmpty.recipe.getRecipeType().isOrdered();
 			}
-			if(tile == null || tile instanceof TilePackager || tile instanceof TileUnpackager || isInterface(tile, facing.getOpposite()) || !tile.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, facing.getOpposite())) {
+			if(!validSendTarget(tile, facing.getOpposite())) {
+				trackerToEmpty.facing = null;
+				continue;
+			}
+			if(!tile.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, facing.getOpposite())) {
 				trackerToEmpty.facing = null;
 				continue;
 			}
@@ -203,42 +233,14 @@ public class TileUnpackager extends TileBase implements ITickable, IGridHost, IA
 			}
 			markDirty();
 		}
-		if(powered) {
-			return;
-		}
-		for(EnumFacing facing : EnumFacing.VALUES) {
-			TileEntity tile = world.getTileEntity(pos.offset(facing));
-			if(tile == null || tile instanceof TilePackager || tile instanceof TileUnpackager || isInterface(tile, facing.getOpposite()) || !tile.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, facing.getOpposite())) {
-				continue;
-			}
-			IItemHandler itemHandler = tile.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, facing.getOpposite());
-			if(blocking && !MiscUtil.isEmpty(itemHandler)) {
-				continue;
-			}
-			PackageTracker trackerToEmpty = Arrays.stream(trackers).filter(t->t.isFilled() && t.facing == null && t.recipe != null && !t.recipe.getRecipeType().hasMachine()).findFirst().orElse(null);
-			if(trackerToEmpty == null) {
-				continue;
-			}
-			if(trackerToEmpty.toSend.isEmpty()) {
-				trackerToEmpty.setupToSend();
-			}
-			boolean ordered = trackerToEmpty.recipe.getRecipeType().isOrdered();
-			boolean inserted = false;
-			for(int i = 0; i < trackerToEmpty.toSend.size(); ++i) {
-				ItemStack stack = trackerToEmpty.toSend.get(i);
-				ItemStack stackRem = MiscUtil.insertItem(itemHandler, stack, ordered, false);
-				inserted |= stackRem.getCount() < stack.getCount();
-				trackerToEmpty.toSend.set(i, stackRem);
-			}
-			trackerToEmpty.toSend.removeIf(ItemStack::isEmpty);
-			if(inserted) {
-				trackerToEmpty.facing = facing;
-				if(trackerToEmpty.toSend.isEmpty()) {
-					trackerToEmpty.clearRecipe();
-				}
-				markDirty();
-			}
-		}
+	}
+
+	protected boolean validSendTarget(TileEntity tile, EnumFacing facing) {
+		return tile != null &&
+				!(tile instanceof TilePackager) &&
+				!(tile instanceof TilePackagerExtension) &&
+				!(tile instanceof TileUnpackager) &&
+				!isInterface(tile, facing.getOpposite());
 	}
 
 	protected void chargeEnergy() {
