@@ -18,6 +18,7 @@ import thelm.packagedauto.integration.appeng.blockentity.AECrafterBlockEntity;
 import thelm.packagedauto.integration.appeng.blockentity.AEDistributorBlockEntity;
 import thelm.packagedauto.integration.appeng.blockentity.AEPackagerBlockEntity;
 import thelm.packagedauto.integration.appeng.blockentity.AEPackagerExtensionBlockEntity;
+import thelm.packagedauto.integration.appeng.blockentity.AEPackagingProviderBlockEntity;
 import thelm.packagedauto.integration.appeng.blockentity.AEUnpackagerBlockEntity;
 import thelm.packagedauto.util.MiscHelper;
 
@@ -51,4 +52,6 @@ public class PackagedAutoBlockEntities {
 			"crafter", of(AE2_LOADED, ()->()->AECrafterBlockEntity::new, ()->()->CrafterBlockEntity::new, PackagedAutoBlocks.CRAFTER));
 	public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<FluidPackageFillerBlockEntity>> FLUID_PACKAGE_FILLER = BLOCK_ENTITIES.register(
 			"fluid_package_filler", of(FluidPackageFillerBlockEntity::new, PackagedAutoBlocks.FLUID_PACKAGE_FILLER));
+	public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<PackagingProviderBlockEntity>> PACKAGING_PROVIDER = BLOCK_ENTITIES.register(
+			"packaging_provider", of(AE2_LOADED, ()->()->AEPackagingProviderBlockEntity::new, ()->()->PackagingProviderBlockEntity::new, PackagedAutoBlocks.PACKAGING_PROVIDER));
 }

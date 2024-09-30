@@ -17,6 +17,7 @@ public class PackagedAutoItems {
 	public static final DeferredItem<?> DISTRIBUTOR = ITEMS.registerSimpleBlockItem(PackagedAutoBlocks.DISTRIBUTOR);
 	public static final DeferredItem<?> CRAFTER = ITEMS.registerSimpleBlockItem(PackagedAutoBlocks.CRAFTER);
 	public static final DeferredItem<?> FLUID_PACKAGE_FILLER = ITEMS.registerSimpleBlockItem(PackagedAutoBlocks.FLUID_PACKAGE_FILLER);
+	public static final DeferredItem<?> PACKAGING_PROVIDER = ITEMS.registerSimpleBlockItem(PackagedAutoBlocks.PACKAGING_PROVIDER);
 
 	public static final DeferredItem<RecipeHolderItem> RECIPE_HOLDER = ITEMS.register("recipe_holder", RecipeHolderItem::new);
 	public static final DeferredItem<DistributorMarkerItem> DISTRIBUTOR_MARKER = ITEMS.register("distributor_marker", DistributorMarkerItem::new);

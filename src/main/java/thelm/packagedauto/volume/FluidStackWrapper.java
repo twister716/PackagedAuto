@@ -18,7 +18,6 @@ import net.neoforged.neoforge.fluids.FluidStack;
 import thelm.packagedauto.api.IFluidStackWrapper;
 import thelm.packagedauto.api.IVolumeStackWrapper;
 import thelm.packagedauto.api.IVolumeType;
-import thelm.packagedauto.util.MiscHelper;
 
 public record FluidStackWrapper(FluidStack stack) implements IFluidStackWrapper {
 

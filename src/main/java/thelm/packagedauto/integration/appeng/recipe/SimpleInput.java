@@ -10,7 +10,6 @@ import net.minecraft.world.level.Level;
 import thelm.packagedauto.api.IPackageRecipeInfo;
 import thelm.packagedauto.api.IVolumeStackWrapper;
 import thelm.packagedauto.component.PackagedAutoDataComponents;
-import thelm.packagedauto.util.MiscHelper;
 
 public class SimpleInput implements IInput {
 

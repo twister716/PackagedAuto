@@ -24,6 +24,7 @@ import thelm.packagedauto.item.PackagedAutoItems;
 import thelm.packagedauto.menu.PackagedAutoMenus;
 import thelm.packagedauto.packet.ChangeBlockingPacket;
 import thelm.packagedauto.packet.ChangePackagingPacket;
+import thelm.packagedauto.packet.ChangeProvidingPacket;
 import thelm.packagedauto.packet.CycleRecipeTypePacket;
 import thelm.packagedauto.packet.DistributorBeamPacket;
 import thelm.packagedauto.packet.LoadRecipeListPacket;
@@ -93,6 +94,7 @@ public class CommonEventHandler {
 			event.registerBlockEntity(AECapabilities.IN_WORLD_GRID_NODE_HOST, PackagedAutoBlockEntities.UNPACKAGER.get(), (be, v)->AppEngUtil.getAsInWorldGridNodeHost(be));
 			event.registerBlockEntity(AECapabilities.IN_WORLD_GRID_NODE_HOST, PackagedAutoBlockEntities.DISTRIBUTOR.get(), (be, v)->AppEngUtil.getAsInWorldGridNodeHost(be));
 			event.registerBlockEntity(AECapabilities.IN_WORLD_GRID_NODE_HOST, PackagedAutoBlockEntities.CRAFTER.get(), (be, v)->AppEngUtil.getAsInWorldGridNodeHost(be));
+			event.registerBlockEntity(AECapabilities.IN_WORLD_GRID_NODE_HOST, PackagedAutoBlockEntities.PACKAGING_PROVIDER.get(), (be, v)->AppEngUtil.getAsInWorldGridNodeHost(be));
 		}, ()->()->{}).run();
 
 		for(IVolumeType volumeType : ApiImpl.INSTANCE.getVolumeTypeRegistry().values()) {
@@ -120,6 +122,7 @@ public class CommonEventHandler {
 		registrar.playToServer(ChangePackagingPacket.TYPE, ChangePackagingPacket.STREAM_CODEC, ChangePackagingPacket::handle);
 		registrar.playToServer(TrackerCountPacket.TYPE, TrackerCountPacket.STREAM_CODEC, TrackerCountPacket::handle);
 		registrar.playToClient(DistributorBeamPacket.TYPE, DistributorBeamPacket.STREAM_CODEC, DistributorBeamPacket::handle);
+		registrar.playToServer(ChangeProvidingPacket.TYPE, ChangeProvidingPacket.STREAM_CODEC, ChangeProvidingPacket::handle);
 	}
 
 	@SubscribeEvent

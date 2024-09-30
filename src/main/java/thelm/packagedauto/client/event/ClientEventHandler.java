@@ -14,6 +14,7 @@ import thelm.packagedauto.client.screen.EncoderScreen;
 import thelm.packagedauto.client.screen.FluidPackageFillerScreen;
 import thelm.packagedauto.client.screen.PackagerExtensionScreen;
 import thelm.packagedauto.client.screen.PackagerScreen;
+import thelm.packagedauto.client.screen.PackagingProviderScreen;
 import thelm.packagedauto.client.screen.UnpackagerScreen;
 import thelm.packagedauto.component.PackagedAutoDataComponents;
 import thelm.packagedauto.item.PackagedAutoItems;
@@ -55,6 +56,7 @@ public class ClientEventHandler {
 		event.register(PackagedAutoMenus.DISTRIBUTOR.get(), DistributorScreen::new);
 		event.register(PackagedAutoMenus.CRAFTER.get(), CrafterScreen::new);
 		event.register(PackagedAutoMenus.FLUID_PACKAGE_FILLER.get(), FluidPackageFillerScreen::new);
+		event.register(PackagedAutoMenus.PACKAGING_PROVIDER.get(), PackagingProviderScreen::new);
 	}
 
 	@SubscribeEvent

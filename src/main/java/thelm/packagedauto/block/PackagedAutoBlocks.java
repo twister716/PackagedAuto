@@ -17,4 +17,5 @@ public class PackagedAutoBlocks {
 	public static final DeferredBlock<Block> DISTRIBUTOR = BLOCKS.register("distributor", DistributorBlock::new);
 	public static final DeferredBlock<Block> CRAFTER = BLOCKS.register("crafter", CrafterBlock::new);
 	public static final DeferredBlock<Block> FLUID_PACKAGE_FILLER = BLOCKS.register("fluid_package_filler", FluidPackageFillerBlock::new);
+	public static final DeferredBlock<Block> PACKAGING_PROVIDER = BLOCKS.register("packaging_provider", PackagingProviderBlock::new);
 }

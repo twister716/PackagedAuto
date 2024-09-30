@@ -3,6 +3,7 @@ package thelm.packagedauto.creativetab;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab;
+import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import thelm.packagedauto.item.PackagedAutoItems;
@@ -25,6 +26,9 @@ public class PackagedAutoCreativeTabs {
 				output.accept(PackagedAutoItems.DISTRIBUTOR);
 				output.accept(PackagedAutoItems.CRAFTER);
 				output.accept(PackagedAutoItems.FLUID_PACKAGE_FILLER);
+				if(ModList.get().isLoaded("ae2")) {
+					output.accept(PackagedAutoItems.PACKAGING_PROVIDER);
+				}
 				output.accept(PackagedAutoItems.RECIPE_HOLDER);
 				output.accept(PackagedAutoItems.DISTRIBUTOR_MARKER);
 				output.accept(PackagedAutoItems.PACKAGE_COMPONENT);

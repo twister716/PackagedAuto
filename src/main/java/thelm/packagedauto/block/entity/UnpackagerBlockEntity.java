@@ -19,7 +19,6 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.capabilities.Capabilities;
@@ -27,8 +26,6 @@ import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.items.IItemHandler;
 import thelm.packagedauto.api.IPackageCraftingMachine;
 import thelm.packagedauto.api.IPackageRecipeInfo;
-import thelm.packagedauto.api.IPackageRecipeType;
-import thelm.packagedauto.block.PackagedAutoBlocks;
 import thelm.packagedauto.component.PackagedAutoDataComponents;
 import thelm.packagedauto.energy.EnergyStorage;
 import thelm.packagedauto.inventory.UnpackagerItemHandler;
@@ -144,6 +141,54 @@ public class UnpackagerBlockEntity extends BaseBlockEntity {
 				continue;
 			}
 		}
+		if(!powered) {
+			dir:for(Direction direction : Direction.values()) {
+				PackageTracker trackerToEmpty = Arrays.stream(trackers).filter(t->t.isFilled() && t.direction == null && t.recipe != null && !t.recipe.getRecipeType().hasMachine()).findFirst().orElse(null);
+				if(trackerToEmpty == null) {
+					continue;
+				}
+				BlockPos offsetPos = worldPosition.relative(direction);
+				BlockEntity blockEntity = level.getBlockEntity(worldPosition.relative(direction));
+				if(!validSendTarget(blockEntity, direction.getOpposite())) {
+					continue;
+				}
+				if(trackerToEmpty.toSend.isEmpty()) {
+					trackerToEmpty.setupToSend();
+				}
+				IItemHandler itemHandler = level.getCapability(Capabilities.ItemHandler.BLOCK, offsetPos, direction.getOpposite());
+				if(blocking) {
+					for(int i = 0; i < trackerToEmpty.toSend.size(); ++i) {
+						ItemStack stack = trackerToEmpty.toSend.get(i);
+						if(stack.has(PackagedAutoDataComponents.VOLUME_PACKAGE_STACK) &&
+								stack.get(PackagedAutoDataComponents.VOLUME_PACKAGE_STACK).getVolumeType().hasBlockCapability(level, offsetPos, direction.getOpposite())) {
+							if(!stack.get(PackagedAutoDataComponents.VOLUME_PACKAGE_STACK).getVolumeType().isEmpty(level, offsetPos, direction.getOpposite())) {
+								continue dir;
+							}
+						}
+						else if(itemHandler != null && !MiscHelper.INSTANCE.isEmpty(itemHandler)) {
+							continue dir;
+						}
+					}
+				}
+				boolean acceptsAll = true;
+				for(int i = 0; i < trackerToEmpty.toSend.size(); ++i) {
+					ItemStack stack = trackerToEmpty.toSend.get(i);
+					ItemStack stackRem = stack;
+					if(stack.has(PackagedAutoDataComponents.VOLUME_PACKAGE_STACK) &&
+							stack.get(PackagedAutoDataComponents.VOLUME_PACKAGE_STACK).getVolumeType().hasBlockCapability(level, offsetPos, direction.getOpposite())) {
+						stackRem = MiscHelper.INSTANCE.fillVolume(level, offsetPos, direction.getOpposite(), stack, true);
+					}
+					else if(itemHandler != null) {
+						stackRem = MiscHelper.INSTANCE.insertItem(itemHandler, stack, false, true);
+					}
+					acceptsAll &= stackRem.getCount() < stack.getCount();
+				}
+				if(acceptsAll) {
+					trackerToEmpty.direction = direction;
+				}
+				setChanged();
+			}
+		}
 		for(Direction direction : Direction.values()) {
 			PackageTracker trackerToEmpty = Arrays.stream(trackers).filter(t->t.direction == direction).findFirst().orElse(null);
 			if(trackerToEmpty == null) {
@@ -154,23 +199,11 @@ public class UnpackagerBlockEntity extends BaseBlockEntity {
 			}
 			boolean ordered = false;
 			if(trackerToEmpty.recipe != null) {
-				IPackageRecipeType recipeType = trackerToEmpty.recipe.getRecipeType();
-				if(recipeType.hasMachine()) {
-					trackerToEmpty.direction = null;
-					continue;
-				}
-				ordered = recipeType.isOrdered();
+				ordered = trackerToEmpty.recipe.getRecipeType().isOrdered();
 			}
 			BlockPos offsetPos = worldPosition.relative(direction);
-			Block block = level.getBlockState(offsetPos).getBlock();
-			if(block == PackagedAutoBlocks.PACKAGER.get() ||
-					block == PackagedAutoBlocks.PACKAGER_EXTENSION.get() ||
-					block == PackagedAutoBlocks.UNPACKAGER.get()) {
-				trackerToEmpty.direction = null;
-				continue;
-			}
 			BlockEntity blockEntity = level.getBlockEntity(offsetPos);
-			if(isPatternProvider(blockEntity, direction.getOpposite())) {
+			if(!validSendTarget(blockEntity, direction.getOpposite())) {
 				trackerToEmpty.direction = null;
 				continue;
 			}
@@ -193,67 +226,13 @@ public class UnpackagerBlockEntity extends BaseBlockEntity {
 			}
 			setChanged();
 		}
-		if(powered) {
-			return;
-		}
-		dir:for(Direction direction : Direction.values()) {
-			PackageTracker trackerToEmpty = Arrays.stream(trackers).filter(t->t.isFilled() && t.direction == null && t.recipe != null && !t.recipe.getRecipeType().hasMachine()).findFirst().orElse(null);
-			if(trackerToEmpty == null) {
-				continue;
-			}
-			BlockPos offsetPos = worldPosition.relative(direction);
-			Block block = level.getBlockState(offsetPos).getBlock();
-			if(block == PackagedAutoBlocks.PACKAGER.get() ||
-					block == PackagedAutoBlocks.PACKAGER_EXTENSION.get() ||
-					block == PackagedAutoBlocks.UNPACKAGER.get()) {
-				continue;
-			}
-			BlockEntity blockEntity = level.getBlockEntity(worldPosition.relative(direction));
-			if(isPatternProvider(blockEntity, direction.getOpposite())) {
-				continue;
-			}
-			if(trackerToEmpty.toSend.isEmpty()) {
-				trackerToEmpty.setupToSend();
-			}
-			IItemHandler itemHandler = level.getCapability(Capabilities.ItemHandler.BLOCK, offsetPos, direction.getOpposite());
-			if(blocking) {
-				for(int i = 0; i < trackerToEmpty.toSend.size(); ++i) {
-					ItemStack stack = trackerToEmpty.toSend.get(i);
-					if(stack.has(PackagedAutoDataComponents.VOLUME_PACKAGE_STACK) &&
-							stack.get(PackagedAutoDataComponents.VOLUME_PACKAGE_STACK).getVolumeType().hasBlockCapability(level, offsetPos, direction.getOpposite())) {
-						if(!stack.get(PackagedAutoDataComponents.VOLUME_PACKAGE_STACK).getVolumeType().isEmpty(level, offsetPos, direction.getOpposite())) {
-							continue dir;
-						}
-					}
-					else if(itemHandler != null && !MiscHelper.INSTANCE.isEmpty(itemHandler)) {
-						continue dir;
-					}
-				}
-			}
-			boolean ordered = trackerToEmpty.recipe.getRecipeType().isOrdered();
-			boolean inserted = false;
-			for(int i = 0; i < trackerToEmpty.toSend.size(); ++i) {
-				ItemStack stack = trackerToEmpty.toSend.get(i);
-				ItemStack stackRem = stack;
-				if(stack.has(PackagedAutoDataComponents.VOLUME_PACKAGE_STACK) &&
-						stack.get(PackagedAutoDataComponents.VOLUME_PACKAGE_STACK).getVolumeType().hasBlockCapability(level, offsetPos, direction.getOpposite())) {
-					stackRem = MiscHelper.INSTANCE.fillVolume(level, offsetPos, direction.getOpposite(), stack, false);
-				}
-				else if(itemHandler != null) {
-					stackRem = MiscHelper.INSTANCE.insertItem(itemHandler, stack, ordered, false);
-				}
-				inserted |= stackRem.getCount() < stack.getCount();
-				trackerToEmpty.toSend.set(i, stackRem);
-			}
-			trackerToEmpty.toSend.removeIf(ItemStack::isEmpty);
-			if(inserted) {
-				trackerToEmpty.direction = direction;
-			}
-			if(trackerToEmpty.toSend.isEmpty()) {
-				trackerToEmpty.clearRecipe();
-			}
-			setChanged();
-		}
+	}
+
+	protected boolean validSendTarget(BlockEntity blockEntity, Direction direction) {
+		return blockEntity != null &&
+				!(blockEntity instanceof PackagerBlockEntity) &&
+				!(blockEntity instanceof PackagerExtensionBlockEntity) &&
+				!(blockEntity instanceof UnpackagerBlockEntity);
 	}
 
 	protected void chargeEnergy() {
@@ -279,10 +258,6 @@ public class UnpackagerBlockEntity extends BaseBlockEntity {
 	@Override
 	public int getComparatorSignal() {
 		return Math.min((int)Arrays.stream(trackers).filter(t->t.isFilled()).count(), 15);
-	}
-
-	protected boolean isPatternProvider(BlockEntity blockEntity, Direction facing) {
-		return false;
 	}
 
 	public void postPatternChange() {}

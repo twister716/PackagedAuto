@@ -1,0 +1,39 @@
+{
+	"neoforge:conditions": [
+		{
+			"type": "neoforge:mod_loaded",
+			"modid": "ae2"
+		},
+		{
+			"type": "neoforge:tag_empty",
+			"tag": "c:ingots/sky_steel"
+		}
+	],
+	"type": "minecraft:crafting_shaped",
+	"result": {
+		"id": "packagedauto:packaging_provider",
+		"count": 1
+	},
+	"pattern": [
+		"IPI",
+		"FEF",
+		"IUI"
+	],
+	"key": {
+		"P": {
+			"item": "packagedauto:packager"
+		},
+		"U": {
+			"item": "packagedauto:unpackager"
+		},
+		"E": {
+			"item": "ae2:engineering_processor"
+		},
+		"F": {
+			"item": "ae2:fluix_pearl"
+		},
+		"I": {
+			"tag": "c:ingots/iron"
+		}
+	}
+}

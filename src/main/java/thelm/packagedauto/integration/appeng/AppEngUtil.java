@@ -11,12 +11,17 @@ import com.google.common.base.Functions;
 import appeng.api.crafting.IPatternDetails.IInput;
 import appeng.api.networking.IInWorldGridNodeHost;
 import appeng.api.parts.IPartHost;
+import appeng.api.stacks.AEKey;
 import appeng.api.stacks.GenericStack;
 import appeng.helpers.patternprovider.PatternProviderLogicHost;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import thelm.packagedauto.api.IPackageRecipeInfo;
+import thelm.packagedauto.api.IVolumeStackWrapper;
+import thelm.packagedauto.component.PackagedAutoDataComponents;
 import thelm.packagedauto.integration.appeng.recipe.SimpleInput;
 
 public class AppEngUtil {
@@ -52,6 +57,19 @@ public class AppEngUtil {
 			inputs[i] = new SimpleInput(recipe, stacks.get(i), registries);
 		}
 		return inputs;
+	}
+
+	public static GenericStack getGenericOutput(ItemStack stack, HolderLookup.Provider registries) {
+		if(stack.has(PackagedAutoDataComponents.VOLUME_PACKAGE_STACK)) {
+			IVolumeStackWrapper vStack = stack.get(PackagedAutoDataComponents.VOLUME_PACKAGE_STACK);
+			if(!vStack.isEmpty() && vStack.getVolumeType() != null && vStack.getVolumeType().supportsAE()) {
+				AEKey key = AEKey.fromTagGeneric(registries, vStack.saveAEKey(new CompoundTag(), registries));
+				if(key != null) {
+					return new GenericStack(key, vStack.getAmount()*stack.getCount());
+				}
+			}
+		}
+		return GenericStack.fromItemStack(stack);
 	}
 
 	public static boolean isPatternProvider(BlockEntity blockEntity, Direction direction) {

@@ -6,28 +6,25 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
+import thelm.packagedauto.block.entity.PackagingProviderBlockEntity;
 import thelm.packagedauto.menu.PackagingProviderMenu;
-import thelm.packagedauto.menu.UnpackagerMenu;
 
-public record ChangeBlockingPacket() implements CustomPacketPayload {
+public record ChangeProvidingPacket(PackagingProviderBlockEntity.Type provideType) implements CustomPacketPayload {
 
-	public static final Type<ChangeBlockingPacket> TYPE = new Type<>(ResourceLocation.parse("packagedauto:change_blocking"));
-	public static final ChangeBlockingPacket INSTANCE = new ChangeBlockingPacket();
-	public static final StreamCodec<RegistryFriendlyByteBuf, ChangeBlockingPacket> STREAM_CODEC = StreamCodec.unit(INSTANCE);
+	public static final Type<ChangeProvidingPacket> TYPE = new Type<>(ResourceLocation.parse("packagedauto:change_providing"));
+	public static final StreamCodec<RegistryFriendlyByteBuf, ChangeProvidingPacket> STREAM_CODEC = PackagingProviderBlockEntity.Type.STREAM_CODEC.
+			map(ChangeProvidingPacket::new, ChangeProvidingPacket::provideType).cast();
 
 	@Override
-	public Type<ChangeBlockingPacket> type() {
+	public Type<ChangeProvidingPacket> type() {
 		return TYPE;
 	}
 
 	public void handle(IPayloadContext ctx) {
 		if(ctx.player() instanceof ServerPlayer player) {
 			ctx.enqueueWork(()->{
-				if(player.containerMenu instanceof UnpackagerMenu menu) {
-					menu.blockEntity.changeBlockingMode();
-				}
 				if(player.containerMenu instanceof PackagingProviderMenu menu) {
-					menu.blockEntity.changeBlockingMode();
+					menu.blockEntity.changeProvideType(provideType);
 				}
 			});
 		}
