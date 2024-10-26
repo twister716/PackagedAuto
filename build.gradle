@@ -112,7 +112,7 @@ dependencies {
 		officialMojangMappings()
 		parchment "org.parchmentmc.data:parchment-1.21:2024.07.28@zip"
 	}
-	neoForge "net.neoforged:neoforge:21.1.62"
+	neoForge "net.neoforged:neoforge:21.1.72"
 
 	// Dependencies
 	implementation("mezz.jei:jei-1.21.1-neoforge:19.21.0.246") {transitive = false}
