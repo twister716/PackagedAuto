@@ -13,16 +13,17 @@ import thelm.packagedauto.integration.appeng.AppEngUtil;
 
 public class RecipeCraftingPatternHelper implements ICraftingPatternDetails {
 
-	public final ItemStack recipeHolder;
 	public final IRecipeInfo recipe;
+	public final ItemStack definition;
 	public final IAEItemStack[] inputs;
 	public final IAEItemStack[] outputs;
 	public final IAEItemStack[] condensedInputs;
 	public final IAEItemStack[] condensedOutputs;
 
-	public RecipeCraftingPatternHelper(ItemStack recipeHolder, IRecipeInfo recipe) {
-		this.recipeHolder = recipeHolder;
+	public RecipeCraftingPatternHelper(IRecipeInfo recipe) {
 		this.recipe = recipe;
+		definition = recipe.getPatterns().get(0).getOutput();
+		definition.getTagCompound().setString("PatternType", "recipe");
 		IItemStorageChannel storageChannel = AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class);
 		inputs = recipe.getPatterns().stream().map(IPackagePattern::getOutput).map(storageChannel::createStack).toArray(IAEItemStack[]::new);
 		outputs = recipe.getOutputs().stream().map(storageChannel::createStack).toArray(IAEItemStack[]::new);
@@ -32,7 +33,7 @@ public class RecipeCraftingPatternHelper implements ICraftingPatternDetails {
 
 	@Override
 	public ItemStack getPattern() {
-		return recipeHolder;
+		return definition;
 	}
 
 	@Override

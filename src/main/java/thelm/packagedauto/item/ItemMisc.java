@@ -4,6 +4,7 @@ import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraftforge.client.model.ModelLoader;
+import net.minecraftforge.fml.common.Loader;
 import thelm.packagedauto.PackagedAuto;
 import thelm.packagedauto.client.IModelRegister;
 
@@ -24,5 +25,5 @@ public class ItemMisc extends Item implements IModelRegister {
 	}
 
 	public static final ItemMisc PACKAGE_COMPONENT = new ItemMisc("packagedauto:package_component", "packagedauto.package_component", "packagedauto:package_component#inventory", PackagedAuto.CREATIVE_TAB);
-	public static final ItemMisc ME_PACKAGE_COMPONENT = new ItemMisc("packagedauto:me_package_component", "packagedauto.me_package_component", "packagedauto:me_package_component#inventory", PackagedAuto.CREATIVE_TAB);
+	public static final ItemMisc ME_PACKAGE_COMPONENT = new ItemMisc("packagedauto:me_package_component", "packagedauto.me_package_component", "packagedauto:me_package_component#inventory", Loader.isModLoaded("appliedenergistics2") ? PackagedAuto.CREATIVE_TAB : null);
 }

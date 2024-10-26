@@ -29,6 +29,10 @@ public class HostHelperTile<TILE extends TileBase & IGridHost & IActionHost> {
 		if(gridNode == null && tile.hasWorld() && !tile.getWorld().isRemote) {
 			IAppEngApi api = AEApi.instance();
 			gridNode = api.grid().createGridNode(gridBlock);
+			if(data != null && data.hasKey("Node")) {
+				gridNode.loadFromNBT("Node", data);
+				data = null;
+			}
 			if(tile.getOwnerUUID() != null) {
 				gridNode.setPlayerID(api.registries().players().getID(new GameProfile(tile.getOwnerUUID(), "[UNKNOWN]")));
 			}
@@ -48,9 +52,7 @@ public class HostHelperTile<TILE extends TileBase & IGridHost & IActionHost> {
 	}
 
 	public void readFromNBT(NBTTagCompound nbt) {
-		if(tile.hasWorld() && nbt.hasKey("Node")) {
-			getNode().loadFromNBT("Node", nbt);
-		}
+		data = nbt;
 	}
 
 	public NBTTagCompound writeToNBT(NBTTagCompound nbt) {

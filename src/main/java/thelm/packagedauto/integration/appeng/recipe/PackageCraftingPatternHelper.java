@@ -14,16 +14,17 @@ import thelm.packagedauto.integration.appeng.AppEngUtil;
 
 public class PackageCraftingPatternHelper implements ICraftingPatternDetails {
 
-	public final ItemStack recipeHolder;
 	public final IPackagePattern pattern;
+	public final ItemStack definition;
 	public final IAEItemStack[] inputs;
 	public final IAEItemStack[] outputs;
 	public final IAEItemStack[] condensedInputs;
 	public final IAEItemStack[] condensedOutputs;
 
-	public PackageCraftingPatternHelper(ItemStack recipeHolder, IPackagePattern pattern) {
-		this.recipeHolder = recipeHolder;
+	public PackageCraftingPatternHelper(IPackagePattern pattern) {
 		this.pattern = pattern;
+		definition = pattern.getOutput();
+		definition.getTagCompound().setString("PatternType", "package");
 		IItemStorageChannel storageChannel = AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class);
 		inputs = pattern.getInputs().stream().map(storageChannel::createStack).toArray(IAEItemStack[]::new);
 		outputs = new IAEItemStack[] {storageChannel.createStack(pattern.getOutput())};
@@ -33,7 +34,7 @@ public class PackageCraftingPatternHelper implements ICraftingPatternDetails {
 
 	@Override
 	public ItemStack getPattern() {
-		return recipeHolder;
+		return definition;
 	}
 
 	@Override

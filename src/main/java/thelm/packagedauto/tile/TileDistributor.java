@@ -234,6 +234,9 @@ public class TileDistributor extends TileBase implements ITickable, IPackageCraf
 
 	@Override
 	public void readFromNBT(NBTTagCompound nbt) {
+		if(hostHelper != null) {
+			hostHelper.readFromNBT(nbt);
+		}
 		super.readFromNBT(nbt);
 		pending.clear();
 		List<ItemStack> pendingList = new ArrayList<>();
@@ -255,6 +258,9 @@ public class TileDistributor extends TileBase implements ITickable, IPackageCraf
 		}
 		NBTTagList pendingTag = MiscUtil.saveAllItems(new NBTTagList(), pendingList);
 		nbt.setTag("Pending", pendingTag);
+		if(hostHelper != null) {
+			hostHelper.writeToNBT(nbt);
+		}
 		return nbt;
 	}
 

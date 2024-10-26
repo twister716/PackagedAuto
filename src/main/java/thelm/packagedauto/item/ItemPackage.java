@@ -2,6 +2,8 @@ package thelm.packagedauto.item;
 
 import java.util.List;
 
+import appeng.api.implementations.ICraftingPatternItem;
+import appeng.api.networking.crafting.ICraftingPatternDetails;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.item.EntityItem;
@@ -15,14 +17,21 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
 import net.minecraftforge.client.model.ModelLoader;
+import net.minecraftforge.fml.common.Optional;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import thelm.packagedauto.api.IPackageItem;
 import thelm.packagedauto.api.IRecipeInfo;
 import thelm.packagedauto.api.MiscUtil;
+import thelm.packagedauto.api.PatternType;
 import thelm.packagedauto.client.IModelRegister;
+import thelm.packagedauto.integration.appeng.recipe.PackageCraftingPatternHelper;
+import thelm.packagedauto.integration.appeng.recipe.RecipeCraftingPatternHelper;
 
-public class ItemPackage extends Item implements IPackageItem, IModelRegister {
+@Optional.InterfaceList({
+	@Optional.Interface(iface="appeng.api.implementations.ICraftingPatternItem", modid="appliedenergistics2"),
+})
+public class ItemPackage extends Item implements IPackageItem, IModelRegister, ICraftingPatternItem {
 
 	public static final ItemPackage INSTANCE = new ItemPackage();
 	public static final ModelResourceLocation MODEL_LOCATION = new ModelResourceLocation("packagedauto:package#inventory");
@@ -99,6 +108,38 @@ public class ItemPackage extends Item implements IPackageItem, IModelRegister {
 			return stack.getTagCompound().getByte("Index");
 		}
 		return -1;
+	}
+
+	@Override
+	public PatternType getPatternType(ItemStack stack) {
+		if(stack.hasTagCompound()) {
+			return PatternType.fromName(stack.getTagCompound().getString("PatternType"));
+		}
+		return null;
+	}
+
+	@Optional.Method(modid="appliedenergistics2")
+	@Override
+	public ICraftingPatternDetails getPatternForItem(ItemStack stack, World world) {
+		switch(getPatternType(stack)) {
+		case PACKAGE: {
+			IRecipeInfo recipe = getRecipeInfo(stack);
+			int index = getIndex(stack);
+			if(recipe != null && recipe.isValid() && recipe.validPatternIndex(index)) {
+				return new PackageCraftingPatternHelper(recipe.getPatterns().get(index));
+			}
+			break;
+		}
+		case RECIPE: {
+			IRecipeInfo recipe = getRecipeInfo(stack);
+			if(recipe != null && recipe.isValid()) {
+				return new RecipeCraftingPatternHelper(recipe);
+			}
+			break;
+		}
+		default: break;
+		}
+		return null;
 	}
 
 	@SideOnly(Side.CLIENT)

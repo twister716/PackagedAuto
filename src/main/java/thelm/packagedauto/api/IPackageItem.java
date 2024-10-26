@@ -7,4 +7,6 @@ public interface IPackageItem {
 	IRecipeInfo getRecipeInfo(ItemStack stack);
 
 	int getIndex(ItemStack stack);
+
+	PatternType getPatternType(ItemStack stack);
 }

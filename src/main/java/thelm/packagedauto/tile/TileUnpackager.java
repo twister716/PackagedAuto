@@ -344,10 +344,9 @@ public class TileUnpackager extends TileBase implements ITickable, IGridHost, IA
 	@Optional.Method(modid="appliedenergistics2")
 	@Override
 	public void provideCrafting(ICraftingProviderHelper craftingTracker) {
-		ItemStack patternStack = inventory.getStackInSlot(9);
 		for(IRecipeInfo pattern : recipeList) {
 			if(!pattern.getOutputs().isEmpty()) {
-				craftingTracker.addCraftingOption(this, new RecipeCraftingPatternHelper(patternStack, pattern));
+				craftingTracker.addCraftingOption(this, new RecipeCraftingPatternHelper(pattern));
 			}
 		}
 	}
@@ -368,15 +367,15 @@ public class TileUnpackager extends TileBase implements ITickable, IGridHost, IA
 
 	@Override
 	public void readFromNBT(NBTTagCompound nbt) {
+		if(hostHelper != null) {
+			hostHelper.readFromNBT(nbt);
+		}
 		super.readFromNBT(nbt);
 		blocking = nbt.getBoolean("Blocking");
 		trackerCount = nbt.hasKey("Trackers") ? nbt.getByte("Trackers") : 6;
 		powered = nbt.getBoolean("Powered");
 		for(int i = 0; i < trackers.length; ++i) {
 			trackers[i].readFromNBT(nbt.getCompoundTag(String.format("Tracker%02d", i)));
-		}
-		if(hostHelper != null) {
-			hostHelper.readFromNBT(nbt);
 		}
 	}
 

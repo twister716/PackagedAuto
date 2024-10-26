@@ -233,6 +233,9 @@ public class TileCrafter extends TileBase implements ITickable, IPackageCrafting
 
 	@Override
 	public void readFromNBT(NBTTagCompound nbt) {
+		if(hostHelper != null) {
+			hostHelper.readFromNBT(nbt);
+		}
 		super.readFromNBT(nbt);
 		isWorking = nbt.getBoolean("Working");
 		remainingProgress = nbt.getInteger("Progress");
@@ -243,9 +246,6 @@ public class TileCrafter extends TileBase implements ITickable, IPackageCrafting
 			if(recipe instanceof IRecipeInfoCrafting) {
 				currentRecipe = (IRecipeInfoCrafting)recipe;
 			}
-		}
-		if(hostHelper != null) {
-			hostHelper.readFromNBT(nbt);
 		}
 	}
 

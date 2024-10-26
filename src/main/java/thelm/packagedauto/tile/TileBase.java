@@ -83,24 +83,24 @@ public abstract class TileBase extends TileEntity implements IWorldNameable, IGu
 	@Override
 	public void readFromNBT(NBTTagCompound nbt) {
 		super.readFromNBT(nbt);
-		readSyncNBT(nbt);
-		inventory.readFromNBT(nbt);
-		energyStorage.readFromNBT(nbt);
 		ownerUUID = null;
 		if(nbt.hasUniqueId("OwnerUUID")) {
 			ownerUUID = nbt.getUniqueId("OwnerUUID");
 		}
+		readSyncNBT(nbt);
+		inventory.readFromNBT(nbt);
+		energyStorage.readFromNBT(nbt);
 	}
 
 	@Override
 	public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
 		super.writeToNBT(nbt);
-		writeSyncNBT(nbt);
-		inventory.writeToNBT(nbt);
-		energyStorage.writeToNBT(nbt);
 		if(ownerUUID != null) {
 			nbt.setUniqueId("OwnerUUID", ownerUUID);
 		}
+		writeSyncNBT(nbt);
+		inventory.writeToNBT(nbt);
+		energyStorage.writeToNBT(nbt);
 		return nbt;
 	}
 

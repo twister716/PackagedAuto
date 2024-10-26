@@ -399,14 +399,16 @@ public class TilePackager extends TileBase implements ITickable, IGridHost, IAct
 	@Optional.Method(modid="appliedenergistics2")
 	@Override
 	public void provideCrafting(ICraftingProviderHelper craftingTracker) {
-		ItemStack listStack = inventory.getStackInSlot(10);
 		for(IPackagePattern pattern : patternList) {
-			craftingTracker.addCraftingOption(this, new PackageCraftingPatternHelper(listStack, pattern));
+			craftingTracker.addCraftingOption(this, new PackageCraftingPatternHelper(pattern));
 		}
 	}
 
 	@Override
 	public void readFromNBT(NBTTagCompound nbt) {
+		if(hostHelper != null) {
+			hostHelper.readFromNBT(nbt);
+		}
 		mode = Mode.values()[nbt.getByte("Mode")];
 		super.readFromNBT(nbt);
 		isWorking = nbt.getBoolean("Working");
@@ -425,9 +427,6 @@ public class TilePackager extends TileBase implements ITickable, IGridHost, IAct
 					lockPattern = true;
 				}
 			}
-		}
-		if(hostHelper != null) {
-			hostHelper.readFromNBT(nbt);
 		}
 	}
 
