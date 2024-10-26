@@ -82,24 +82,24 @@ public abstract class BaseTile extends TileEntity implements INamedContainerProv
 	@Override
 	public void load(BlockState blockState, CompoundNBT nbt) {
 		super.load(blockState, nbt);
-		readSync(nbt);
-		itemHandler.read(nbt);
-		energyStorage.read(nbt);
 		ownerUUID = null;
 		if(nbt.hasUUID("OwnerUUID")) {
 			ownerUUID = nbt.getUUID("OwnerUUID");
 		}
+		readSync(nbt);
+		itemHandler.read(nbt);
+		energyStorage.read(nbt);
 	}
 
 	@Override
 	public CompoundNBT save(CompoundNBT nbt) {
 		super.save(nbt);
-		writeSync(nbt);
-		itemHandler.write(nbt);
-		energyStorage.write(nbt);
 		if(ownerUUID != null) {
 			nbt.putUUID("OwnerUUID", ownerUUID);
 		}
+		writeSync(nbt);
+		itemHandler.write(nbt);
+		energyStorage.write(nbt);
 		return nbt;
 	}
 

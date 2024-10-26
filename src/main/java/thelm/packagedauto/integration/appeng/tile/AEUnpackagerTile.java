@@ -22,11 +22,11 @@ import appeng.api.util.AECableType;
 import appeng.api.util.AEPartLocation;
 import appeng.core.Api;
 import appeng.me.helpers.MachineSource;
+import appeng.util.Platform;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import net.minecraft.block.BlockState;
 import net.minecraft.inventory.CraftingInventory;
-import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
@@ -50,6 +50,11 @@ public class AEUnpackagerTile extends UnpackagerTile implements IGridHost, IActi
 
 	@Override
 	public void tick() {
+		if(firstTick) {
+			if(!level.isClientSide) {
+				getActionableNode().updateState();
+			}
+		}
 		super.tick();
 		if(drawMEEnergy && !level.isClientSide && level.getGameTime() % 8 == 0) {
 			chargeMEEnergy();
@@ -89,13 +94,12 @@ public class AEUnpackagerTile extends UnpackagerTile implements IGridHost, IActi
 
 	@Override
 	public IGridNode getActionableNode() {
-		if(gridNode == null && level != null && !level.isClientSide) {
+		if(gridNode == null && !Platform.isClient()) {
 			IAppEngApi api = Api.instance();
 			gridNode = api.grid().createGridNode(gridBlock);
 			if(ownerUUID != null) {
 				gridNode.setPlayerID(api.registries().players().getID(new GameProfile(ownerUUID, "[UNKNOWN]")));
 			}
-			gridNode.updateState();
 		}
 		return gridNode;
 	}
@@ -133,10 +137,9 @@ public class AEUnpackagerTile extends UnpackagerTile implements IGridHost, IActi
 
 	@Override
 	public void provideCrafting(ICraftingProviderHelper craftingTracker) {
-		ItemStack patternStack = itemHandler.getStackInSlot(9);
 		for(IPackageRecipeInfo pattern : recipeList) {
 			if(!pattern.getOutputs().isEmpty()) {
-				craftingTracker.addCraftingOption(this, new RecipeCraftingPatternDetails(patternStack, pattern).toAEInternal(level));
+				craftingTracker.addCraftingOption(this, new RecipeCraftingPatternDetails(pattern).toAEInternal(level));
 			}
 		}
 	}
@@ -171,7 +174,7 @@ public class AEUnpackagerTile extends UnpackagerTile implements IGridHost, IActi
 	@Override
 	public void load(BlockState blockState, CompoundNBT nbt) {
 		super.load(blockState, nbt);
-		if(level != null && nbt.contains("Node")) {
+		if(nbt.contains("Node")) {
 			getActionableNode().loadFromNBT("Node", nbt);
 		}
 	}

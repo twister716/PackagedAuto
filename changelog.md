@@ -1,1 +1,2 @@
-Changed unpackager processing logic to only send items if all items can be accepted  
+Disable showing ME Packaging Component if AE2 is not present  
+Fix AE2 grid node data reading  

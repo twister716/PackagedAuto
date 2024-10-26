@@ -24,6 +24,7 @@ import appeng.api.util.AECableType;
 import appeng.api.util.AEPartLocation;
 import appeng.core.Api;
 import appeng.me.helpers.MachineSource;
+import appeng.util.Platform;
 import net.minecraft.block.BlockState;
 import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.item.ItemStack;
@@ -49,6 +50,11 @@ public class AEPackagerTile extends PackagerTile implements IGridHost, IActionHo
 
 	@Override
 	public void tick() {
+		if(firstTick) {
+			if(!level.isClientSide) {
+				getActionableNode().updateState();
+			}
+		}
 		super.tick();
 		if(drawMEEnergy && !level.isClientSide && level.getGameTime() % 8 == 0) {
 			chargeMEEnergy();
@@ -88,13 +94,12 @@ public class AEPackagerTile extends PackagerTile implements IGridHost, IActionHo
 
 	@Override
 	public IGridNode getActionableNode() {
-		if(gridNode == null && level != null) {
+		if(gridNode == null && !Platform.isClient()) {
 			IAppEngApi api = Api.instance();
 			gridNode = api.grid().createGridNode(gridBlock);
 			if(ownerUUID != null) {
 				gridNode.setPlayerID(api.registries().players().getID(new GameProfile(ownerUUID, "[UNKNOWN]")));
 			}
-			gridNode.updateState();
 		}
 		return gridNode;
 	}
@@ -141,9 +146,8 @@ public class AEPackagerTile extends PackagerTile implements IGridHost, IActionHo
 
 	@Override
 	public void provideCrafting(ICraftingProviderHelper craftingTracker) {
-		ItemStack listStack = itemHandler.getStackInSlot(10);
 		for(IPackagePattern pattern : patternList) {
-			craftingTracker.addCraftingOption(this, new PackageCraftingPatternDetails(listStack, pattern).toAEInternal(level));
+			craftingTracker.addCraftingOption(this, new PackageCraftingPatternDetails(pattern).toAEInternal(level));
 		}
 	}
 
@@ -193,7 +197,7 @@ public class AEPackagerTile extends PackagerTile implements IGridHost, IActionHo
 	@Override
 	public void load(BlockState blockState, CompoundNBT nbt) {
 		super.load(blockState, nbt);
-		if(level != null && nbt.contains("Node")) {
+		if(nbt.contains("Node")) {
 			getActionableNode().loadFromNBT("Node", nbt);
 		}
 	}
