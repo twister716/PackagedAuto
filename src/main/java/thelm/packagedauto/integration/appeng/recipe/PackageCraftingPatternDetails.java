@@ -12,14 +12,16 @@ import thelm.packagedauto.integration.appeng.AppEngUtil;
 
 public class PackageCraftingPatternDetails implements IPatternDetails {
 
-	public final AEItemKey recipeHolder;
 	public final IPackagePattern pattern;
+	public final AEItemKey definition;
 	public final IInput[] inputs;
 	public final GenericStack[] outputs;
 
-	public PackageCraftingPatternDetails(ItemStack recipeHolder, IPackagePattern pattern) {
-		this.recipeHolder = AEItemKey.of(recipeHolder);
+	public PackageCraftingPatternDetails(IPackagePattern pattern) {
 		this.pattern = pattern;
+		ItemStack definitionStack = pattern.getOutput();
+		definitionStack.getTag().putString("PatternType", "package");
+		definition = AEItemKey.of(definitionStack);
 		List<GenericStack> sparseInputs = pattern.getInputs().stream().map(GenericStack::fromItemStack).toList();
 		inputs = AppEngUtil.toInputs(pattern.getRecipeInfo(), AppEngUtil.condenseStacks(sparseInputs));
 		outputs = new GenericStack[] {GenericStack.fromItemStack(pattern.getOutput())};
@@ -27,7 +29,7 @@ public class PackageCraftingPatternDetails implements IPatternDetails {
 
 	@Override
 	public AEItemKey getDefinition() {
-		return recipeHolder;
+		return definition;
 	}
 
 	@Override

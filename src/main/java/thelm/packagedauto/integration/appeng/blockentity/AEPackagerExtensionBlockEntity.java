@@ -27,6 +27,7 @@ import appeng.api.util.AEColor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import thelm.packagedauto.block.PackagerExtensionBlock;
@@ -99,7 +100,7 @@ public class AEPackagerExtensionBlockEntity extends PackagerExtensionBlockEntity
 			gridNode.addService(ICraftingProvider.class, this);
 			gridNode.setIdlePowerUsage(1);
 			gridNode.setInWorldNode(true);
-			if(ownerUUID != null) {
+			if(ownerUUID != null && level instanceof ServerLevel) {
 				gridNode.setOwningPlayerId(IPlayerRegistry.getMapping(level).getPlayerId(ownerUUID));
 			}
 		}
@@ -136,8 +137,7 @@ public class AEPackagerExtensionBlockEntity extends PackagerExtensionBlockEntity
 
 	@Override
 	public List<IPatternDetails> getAvailablePatterns() {
-		ItemStack listStack = itemHandler.getStackInSlot(10);
-		return patternList.stream().<IPatternDetails>map(pattern->new PackageCraftingPatternDetails(listStack, pattern)).toList();
+		return patternList.stream().<IPatternDetails>map(pattern->new PackageCraftingPatternDetails(pattern)).toList();
 	}
 
 	@Override
@@ -184,7 +184,7 @@ public class AEPackagerExtensionBlockEntity extends PackagerExtensionBlockEntity
 	@Override
 	public void load(CompoundTag nbt) {
 		super.load(nbt);
-		if(level != null && nbt.contains("Node")) {
+		if(nbt.contains("Node")) {
 			getMainNode().loadFromNBT(nbt);
 		}
 	}

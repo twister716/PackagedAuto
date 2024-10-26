@@ -14,14 +14,16 @@ import thelm.packagedauto.integration.appeng.AppEngUtil;
 
 public class DirectCraftingPatternDetails implements IPatternDetails {
 
-	public final AEItemKey recipeHolder;
 	public final IPackageRecipeInfo recipe;
+	public final AEItemKey definition;
 	public final IInput[] inputs;
 	public final GenericStack[] outputs;
 
-	public DirectCraftingPatternDetails(ItemStack recipeHolder, IPackageRecipeInfo recipe) {
-		this.recipeHolder = AEItemKey.of(recipeHolder);
+	public DirectCraftingPatternDetails(IPackageRecipeInfo recipe) {
 		this.recipe = recipe;
+		ItemStack definitionStack = recipe.getPatterns().get(0).getOutput();
+		definitionStack.getTag().putString("PatternType", "direct");
+		definition = AEItemKey.of(definitionStack);
 		List<GenericStack> sparseInputs = recipe.getInputs().stream().flatMap(stack->{
 			// Do one recursive packing
 			if(stack.getItem() instanceof IPackageItem packageItem) {
@@ -39,7 +41,7 @@ public class DirectCraftingPatternDetails implements IPatternDetails {
 
 	@Override
 	public AEItemKey getDefinition() {
-		return recipeHolder;
+		return definition;
 	}
 
 	@Override

@@ -1,2 +1,4 @@
-Changed unpackager processing logic to only send items if all items can be accepted  
-Added the ME Packaging Provider which combines the functionality of the packager and unpackager in an ME system  
+Allow AE2 to persist package crafting status  
+Change ME Packaging Provider recipe  
+Disable showing ME Packaging Component if AE2 is not present  
+Fix AE2 grid node data reading  
