@@ -40,7 +40,7 @@ public class CraftingPackageRecipeInfo implements ICraftingPackageRecipeInfo {
 			ResourceLocation.STREAM_CODEC, CraftingPackageRecipeInfo::getRecipeId,
 			ByteBufCodecs.INT, CraftingPackageRecipeInfo::getMatrixWidth,
 			ByteBufCodecs.INT, CraftingPackageRecipeInfo::getMatrixHeight,
-			ItemStack.OPTIONAL_LIST_STREAM_CODEC, i->i.matrix.items(),
+			ItemStack.OPTIONAL_LIST_STREAM_CODEC, CraftingPackageRecipeInfo::getMatrixAsList,
 			CraftingPackageRecipeInfo::new);
 
 	private final ResourceLocation id;

@@ -91,7 +91,7 @@ public class AEPackagerBlockEntity extends PackagerBlockEntity implements IInWor
 	public IManagedGridNode getMainNode() {
 		if(gridNode == null) {
 			gridNode = GridHelper.createManagedNode(this, this);
-			gridNode.setTagName("Node");
+			gridNode.setTagName("node");
 			gridNode.setVisualRepresentation(PackagedAutoBlocks.PACKAGER);
 			gridNode.setGridColor(AEColor.TRANSPARENT);
 			gridNode.setFlags(GridFlags.REQUIRE_CHANNEL);

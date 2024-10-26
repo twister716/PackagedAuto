@@ -183,7 +183,7 @@ public class AEPackagingProviderBlockEntity extends PackagingProviderBlockEntity
 	public IManagedGridNode getMainNode() {
 		if(gridNode == null) {
 			gridNode = GridHelper.createManagedNode(this, this);
-			gridNode.setTagName("Node");
+			gridNode.setTagName("node");
 			gridNode.setVisualRepresentation(PackagedAutoBlocks.PACKAGING_PROVIDER);
 			gridNode.setGridColor(AEColor.TRANSPARENT);
 			gridNode.setFlags(GridFlags.REQUIRE_CHANNEL);

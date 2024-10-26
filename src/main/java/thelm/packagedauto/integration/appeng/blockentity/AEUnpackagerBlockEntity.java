@@ -92,7 +92,7 @@ public class AEUnpackagerBlockEntity extends UnpackagerBlockEntity implements II
 	public IManagedGridNode getMainNode() {
 		if(gridNode == null) {
 			gridNode = GridHelper.createManagedNode(this, this);
-			gridNode.setTagName("Node");
+			gridNode.setTagName("node");
 			gridNode.setVisualRepresentation(PackagedAutoBlocks.UNPACKAGER);
 			gridNode.setGridColor(AEColor.TRANSPARENT);
 			gridNode.setFlags(GridFlags.REQUIRE_CHANNEL);

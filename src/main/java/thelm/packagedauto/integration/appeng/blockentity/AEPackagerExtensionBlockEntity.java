@@ -90,7 +90,7 @@ public class AEPackagerExtensionBlockEntity extends PackagerExtensionBlockEntity
 	public IManagedGridNode getMainNode() {
 		if(gridNode == null) {
 			gridNode = GridHelper.createManagedNode(this, this);
-			gridNode.setTagName("Node");
+			gridNode.setTagName("node");
 			gridNode.setVisualRepresentation(PackagedAutoBlocks.PACKAGER_EXTENSION);
 			gridNode.setGridColor(AEColor.TRANSPARENT);
 			gridNode.addService(ICraftingProvider.class, this);

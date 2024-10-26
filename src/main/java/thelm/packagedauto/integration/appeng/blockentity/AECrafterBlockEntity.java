@@ -86,7 +86,7 @@ public class AECrafterBlockEntity extends CrafterBlockEntity implements IInWorld
 	public IManagedGridNode getMainNode() {
 		if(gridNode == null) {
 			gridNode = GridHelper.createManagedNode(this, this);
-			gridNode.setTagName("Node");
+			gridNode.setTagName("node");
 			gridNode.setVisualRepresentation(PackagedAutoBlocks.CRAFTER);
 			gridNode.setGridColor(AEColor.TRANSPARENT);
 			gridNode.setIdlePowerUsage(1);
