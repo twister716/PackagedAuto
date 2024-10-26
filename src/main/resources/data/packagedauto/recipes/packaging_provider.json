@@ -11,9 +11,9 @@
 		"count": 1
 	},
 	"pattern": [
-		"IPI",
-		"FEF",
-		"IUI"
+		"FPF",
+		"UEU",
+		"FIF"
 	],
 	"key": {
 		"P": {
@@ -29,7 +29,7 @@
 			"item": "ae2:fluix_pearl"
 		},
 		"I": {
-			"tag": "forge:ingots/iron"
+			"tag": "forge:storage_blocks/iron"
 		}
 	}
 }

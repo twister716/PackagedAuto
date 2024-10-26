@@ -1,5 +1,6 @@
 package thelm.packagedauto.event;
 
+import appeng.api.crafting.PatternDetailsHelper;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
@@ -8,6 +9,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.server.ServerAboutToStartEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.event.config.ModConfigEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -29,6 +31,7 @@ import thelm.packagedauto.block.entity.PackagerExtensionBlockEntity;
 import thelm.packagedauto.block.entity.PackagingProviderBlockEntity;
 import thelm.packagedauto.block.entity.UnpackagerBlockEntity;
 import thelm.packagedauto.config.PackagedAutoConfig;
+import thelm.packagedauto.integration.appeng.recipe.PackagePatternDetailsDecoder;
 import thelm.packagedauto.item.DistributorMarkerItem;
 import thelm.packagedauto.item.MiscItem;
 import thelm.packagedauto.item.PackageItem;
@@ -133,6 +136,10 @@ public class CommonEventHandler {
 		ApiImpl.INSTANCE.registerRecipeType(CraftingPackageRecipeType.INSTANCE);
 
 		PacketHandler.registerPackets();
+
+		MiscHelper.INSTANCE.conditionalRunnable(()->ModList.get().isLoaded("ae2"), ()->()->{
+			PatternDetailsHelper.registerDecoder(PackagePatternDetailsDecoder.INSTANCE);
+		}, ()->()->{}).run();
 	}
 
 	@SubscribeEvent
