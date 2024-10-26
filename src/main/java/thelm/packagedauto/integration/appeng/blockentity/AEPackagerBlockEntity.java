@@ -29,6 +29,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import thelm.packagedauto.block.PackagedAutoBlocks;
@@ -97,7 +98,7 @@ public class AEPackagerBlockEntity extends PackagerBlockEntity implements IInWor
 			gridNode.addService(ICraftingProvider.class, this);
 			gridNode.setIdlePowerUsage(1);
 			gridNode.setInWorldNode(true);
-			if(ownerUUID != null) {
+			if(ownerUUID != null && level instanceof ServerLevel) {
 				gridNode.setOwningPlayerId(IPlayerRegistry.getMapping(level).getPlayerId(ownerUUID));
 			}
 		}
@@ -134,8 +135,7 @@ public class AEPackagerBlockEntity extends PackagerBlockEntity implements IInWor
 
 	@Override
 	public List<IPatternDetails> getAvailablePatterns() {
-		ItemStack listStack = itemHandler.getStackInSlot(10);
-		return patternList.stream().<IPatternDetails>map(pattern->new PackageCraftingPatternDetails(listStack, pattern, level.registryAccess())).toList();
+		return patternList.stream().<IPatternDetails>map(pattern->new PackageCraftingPatternDetails(pattern, level.registryAccess())).toList();
 	}
 
 	@Override
@@ -182,7 +182,7 @@ public class AEPackagerBlockEntity extends PackagerBlockEntity implements IInWor
 	@Override
 	public void loadAdditional(CompoundTag nbt, HolderLookup.Provider registries) {
 		super.loadAdditional(nbt, registries);
-		if(level != null && nbt.contains("node")) {
+		if(nbt.contains("node")) {
 			getMainNode().loadFromNBT(nbt);
 		}
 	}

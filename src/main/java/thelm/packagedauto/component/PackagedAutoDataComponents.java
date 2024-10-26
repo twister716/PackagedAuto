@@ -11,6 +11,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import thelm.packagedauto.api.DirectionalGlobalPos;
 import thelm.packagedauto.api.IPackageRecipeInfo;
 import thelm.packagedauto.api.IVolumeStackWrapper;
+import thelm.packagedauto.api.PatternType;
 
 public class PackagedAutoDataComponents {
 
@@ -24,6 +25,8 @@ public class PackagedAutoDataComponents {
 			"recipe_list", builder->builder.persistent(IPackageRecipeInfo.CODEC.listOf().orElse(List.of())).networkSynchronized(IPackageRecipeInfo.STREAM_CODEC.apply(ByteBufCodecs.list())).cacheEncoding());
 	public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> PACKAGE_INDEX = DATA_COMPONENTS.registerComponentType(
 			"package_index", builder->builder.persistent(ExtraCodecs.NON_NEGATIVE_INT).networkSynchronized(ByteBufCodecs.VAR_INT));
+	public static final DeferredHolder<DataComponentType<?>, DataComponentType<PatternType>> PATTERN_TYPE = DATA_COMPONENTS.registerComponentType(
+			"pattern_type", builder->builder.persistent(PatternType.CODEC).networkSynchronized(PatternType.STREAM_CODEC));
 	public static final DeferredHolder<DataComponentType<?>, DataComponentType<DirectionalGlobalPos>> MARKER_POS = DATA_COMPONENTS.registerComponentType(
 			"marker_pos", builder->builder.persistent(DirectionalGlobalPos.CODEC).networkSynchronized(DirectionalGlobalPos.STREAM_CODEC));
 	public static final DeferredHolder<DataComponentType<?>, DataComponentType<IVolumeStackWrapper>> VOLUME_PACKAGE_STACK = DATA_COMPONENTS.registerComponentType(

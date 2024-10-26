@@ -1,6 +1,7 @@
 package thelm.packagedauto.event;
 
 import appeng.api.AECapabilities;
+import appeng.api.crafting.PatternDetailsHelper;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModList;
@@ -20,6 +21,7 @@ import thelm.packagedauto.component.PackagedAutoDataComponents;
 import thelm.packagedauto.config.PackagedAutoConfig;
 import thelm.packagedauto.creativetab.PackagedAutoCreativeTabs;
 import thelm.packagedauto.integration.appeng.AppEngUtil;
+import thelm.packagedauto.integration.appeng.recipe.PackagePatternDetailsDecoder;
 import thelm.packagedauto.item.PackagedAutoItems;
 import thelm.packagedauto.menu.PackagedAutoMenus;
 import thelm.packagedauto.packet.ChangeBlockingPacket;
@@ -72,6 +74,10 @@ public class CommonEventHandler {
 		ApiImpl.INSTANCE.registerRecipeType(OrderedProcessingPackageRecipeType.INSTANCE);
 		ApiImpl.INSTANCE.registerRecipeType(PositionedProcessingPackageRecipeType.INSTANCE);
 		ApiImpl.INSTANCE.registerRecipeType(CraftingPackageRecipeType.INSTANCE);
+
+		MiscHelper.INSTANCE.conditionalRunnable(()->ModList.get().isLoaded("ae2"), ()->()->{
+			PatternDetailsHelper.registerDecoder(PackagePatternDetailsDecoder.INSTANCE);
+		}, ()->()->{}).run();
 	}
 
 	@SubscribeEvent

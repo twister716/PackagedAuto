@@ -8,22 +8,29 @@ import appeng.api.crafting.IPatternDetails;
 import appeng.api.stacks.AEItemKey;
 import appeng.api.stacks.GenericStack;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.world.item.ItemStack;
 import thelm.packagedauto.api.IPackageRecipeInfo;
+import thelm.packagedauto.api.PatternType;
 import thelm.packagedauto.component.PackagedAutoDataComponents;
 import thelm.packagedauto.integration.appeng.AppEngUtil;
 import thelm.packagedauto.util.MiscHelper;
 
 public class DirectCraftingPatternDetails implements IPatternDetails {
 
-	public final AEItemKey recipeHolder;
 	public final IPackageRecipeInfo recipe;
+	public final AEItemKey definition;
 	public final IInput[] inputs;
 	public final List<GenericStack> outputs;
 
-	public DirectCraftingPatternDetails(ItemStack recipeHolder, IPackageRecipeInfo recipe, HolderLookup.Provider registries) {
-		this.recipeHolder = AEItemKey.of(recipeHolder);
+	public DirectCraftingPatternDetails(IPackageRecipeInfo recipe, HolderLookup.Provider registries) {
 		this.recipe = recipe;
+		ItemStack definitionStack = recipe.getPatterns().get(0).getOutput();
+		DataComponentPatch patch = DataComponentPatch.builder().
+				set(PackagedAutoDataComponents.PATTERN_TYPE.get(), PatternType.DIRECT).
+				build();
+		definitionStack.applyComponents(patch);
+		this.definition = AEItemKey.of(definitionStack);
 		List<GenericStack> sparseInputs = recipe.getInputs().stream().flatMap(stack->{
 			// Do one recursive packing
 			if(MiscHelper.INSTANCE.isPackage(stack)) {
@@ -41,7 +48,7 @@ public class DirectCraftingPatternDetails implements IPatternDetails {
 
 	@Override
 	public AEItemKey getDefinition() {
-		return recipeHolder;
+		return definition;
 	}
 
 	@Override

@@ -3,10 +3,6 @@
 		{
 			"type": "neoforge:mod_loaded",
 			"modid": "ae2"
-		},
-		{
-			"type": "neoforge:tag_empty",
-			"tag": "c:ingots/sky_steel"
 		}
 	],
 	"type": "minecraft:crafting_shaped",
@@ -15,9 +11,9 @@
 		"count": 1
 	},
 	"pattern": [
-		"IPI",
-		"FEF",
-		"IUI"
+		"FPF",
+		"UEU",
+		"FIF"
 	],
 	"key": {
 		"P": {
@@ -33,7 +29,7 @@
 			"item": "ae2:fluix_pearl"
 		},
 		"I": {
-			"tag": "c:ingots/iron"
+			"tag": "c:storage_blocks/iron"
 		}
 	}
 }

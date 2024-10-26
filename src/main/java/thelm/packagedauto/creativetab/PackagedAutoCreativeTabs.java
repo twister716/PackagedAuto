@@ -32,6 +32,8 @@ public class PackagedAutoCreativeTabs {
 				output.accept(PackagedAutoItems.RECIPE_HOLDER);
 				output.accept(PackagedAutoItems.DISTRIBUTOR_MARKER);
 				output.accept(PackagedAutoItems.PACKAGE_COMPONENT);
-				output.accept(PackagedAutoItems.ME_PACKAGE_COMPONENT);
+				if(ModList.get().isLoaded("ae2")) {
+					output.accept(PackagedAutoItems.ME_PACKAGE_COMPONENT);
+				}
 			}).build());
 }

@@ -33,6 +33,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -189,7 +190,7 @@ public class AEPackagingProviderBlockEntity extends PackagingProviderBlockEntity
 			gridNode.addService(ICraftingProvider.class, this);
 			gridNode.setIdlePowerUsage(1);
 			gridNode.setInWorldNode(true);
-			if(ownerUUID != null) {
+			if(ownerUUID != null && level instanceof ServerLevel) {
 				gridNode.setOwningPlayerId(IPlayerRegistry.getMapping(level).getPlayerId(ownerUUID));
 			}
 		}
@@ -305,22 +306,21 @@ public class AEPackagingProviderBlockEntity extends PackagingProviderBlockEntity
 
 	@Override
 	public List<IPatternDetails> getAvailablePatterns() {
-		ItemStack patternStack = itemHandler.getStackInSlot(0);
 		List<IPatternDetails> patterns = new ArrayList<>();
 		if(provideDirect) {
 			recipeList.stream().filter(pattern->!pattern.getOutputs().isEmpty()).
-			map(pattern->new DirectCraftingPatternDetails(patternStack, pattern, level.registryAccess())).
+			map(pattern->new DirectCraftingPatternDetails(pattern, level.registryAccess())).
 			forEach(patterns::add);
 		}
 		if(providePackaging) {
 			recipeList.stream().filter(IPackageRecipeInfo::isValid).
 			flatMap(recipe->Streams.concat(recipe.getPatterns().stream(), recipe.getExtraPatterns().stream())).
-			map(pattern->new PackageCraftingPatternDetails(patternStack, pattern, level.registryAccess())).
+			map(pattern->new PackageCraftingPatternDetails(pattern, level.registryAccess())).
 			forEach(patterns::add);
 		}
 		if(provideUnpackaging) {
 			recipeList.stream().filter(pattern->!pattern.getOutputs().isEmpty()).
-			map(pattern->new RecipeCraftingPatternDetails(patternStack, pattern, level.registryAccess())).
+			map(pattern->new RecipeCraftingPatternDetails(pattern, level.registryAccess())).
 			forEach(patterns::add);
 		}
 		return patterns;
@@ -334,7 +334,7 @@ public class AEPackagingProviderBlockEntity extends PackagingProviderBlockEntity
 	@Override
 	public void loadAdditional(CompoundTag nbt, HolderLookup.Provider registries) {
 		super.loadAdditional(nbt, registries);
-		if(level != null && nbt.contains("node")) {
+		if(nbt.contains("node")) {
 			getMainNode().loadFromNBT(nbt);
 		}
 	}

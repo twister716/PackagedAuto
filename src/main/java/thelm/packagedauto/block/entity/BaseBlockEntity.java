@@ -104,24 +104,24 @@ public abstract class BaseBlockEntity extends BlockEntity implements Nameable, M
 	@Override
 	protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registries) {
 		super.loadAdditional(nbt, registries);
-		loadSync(nbt, registries);
-		itemHandler.load(nbt, registries);
-		energyStorage.read(nbt);
 		ownerUUID = null;
 		if(nbt.hasUUID("owner_uuid")) {
 			ownerUUID = nbt.getUUID("owner_uuid");
 		}
+		loadSync(nbt, registries);
+		itemHandler.load(nbt, registries);
+		energyStorage.read(nbt);
 	}
 
 	@Override
 	public void saveAdditional(CompoundTag nbt, HolderLookup.Provider registries) {
 		super.saveAdditional(nbt, registries);
-		saveSync(nbt, registries);
-		itemHandler.save(nbt, registries);
-		energyStorage.save(nbt);
 		if(ownerUUID != null) {
 			nbt.putUUID("owner_uuid", ownerUUID);
 		}
+		saveSync(nbt, registries);
+		itemHandler.save(nbt, registries);
+		energyStorage.save(nbt);
 	}
 
 	public void loadSync(CompoundTag nbt, HolderLookup.Provider registries) {
