@@ -18,6 +18,7 @@ import thelm.packagedauto.api.IPackagePattern;
 import thelm.packagedauto.api.IPackageRecipeInfo;
 import thelm.packagedauto.api.IVolumePackageItem;
 import thelm.packagedauto.api.IVolumeStackWrapper;
+import thelm.packagedauto.api.PatternType;
 import thelm.packagedauto.util.MiscHelper;
 
 public class PackageItem extends Item implements IPackageItem {
@@ -110,5 +111,13 @@ public class PackageItem extends Item implements IPackageItem {
 			return stack.getTag().getByte("Index");
 		}
 		return -1;
+	}
+
+	@Override
+	public PatternType getPatternType(ItemStack stack) {
+		if(stack.hasTag()) {
+			return PatternType.fromName(stack.getTag().getString("PatternType"));
+		}
+		return null;
 	}
 }

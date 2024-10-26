@@ -1,5 +1,6 @@
 package thelm.packagedauto.event;
 
+import appeng.api.crafting.PatternDetailsHelper;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.inventory.MenuType;
@@ -34,6 +35,7 @@ import thelm.packagedauto.block.entity.PackagerExtensionBlockEntity;
 import thelm.packagedauto.block.entity.PackagingProviderBlockEntity;
 import thelm.packagedauto.block.entity.UnpackagerBlockEntity;
 import thelm.packagedauto.config.PackagedAutoConfig;
+import thelm.packagedauto.integration.appeng.recipe.PackagePatternDetailsDecoder;
 import thelm.packagedauto.item.DistributorMarkerItem;
 import thelm.packagedauto.item.MiscItem;
 import thelm.packagedauto.item.PackageItem;
@@ -139,7 +141,9 @@ public class CommonEventHandler {
 					output.accept(RecipeHolderItem.INSTANCE);
 					output.accept(DistributorMarkerItem.INSTANCE);
 					output.accept(MiscItem.PACKAGE_COMPONENT);
-					output.accept(MiscItem.ME_PACKAGE_COMPONENT);
+					if(ModList.get().isLoaded("ae2")) {
+						output.accept(MiscItem.ME_PACKAGE_COMPONENT);
+					}
 				}).
 				build());
 	}
@@ -154,6 +158,10 @@ public class CommonEventHandler {
 		ApiImpl.INSTANCE.registerRecipeType(CraftingPackageRecipeType.INSTANCE);
 
 		PacketHandler.registerPackets();
+
+		MiscHelper.INSTANCE.conditionalRunnable(()->ModList.get().isLoaded("ae2"), ()->()->{
+			PatternDetailsHelper.registerDecoder(PackagePatternDetailsDecoder.INSTANCE);
+		}, ()->()->{}).run();
 	}
 
 	@SubscribeEvent
