@@ -121,23 +121,25 @@ public class ItemPackage extends Item implements IPackageItem, IModelRegister, I
 	@Optional.Method(modid="appliedenergistics2")
 	@Override
 	public ICraftingPatternDetails getPatternForItem(ItemStack stack, World world) {
-		switch(getPatternType(stack)) {
-		case PACKAGE: {
-			IRecipeInfo recipe = getRecipeInfo(stack);
-			int index = getIndex(stack);
-			if(recipe != null && recipe.isValid() && recipe.validPatternIndex(index)) {
-				return new PackageCraftingPatternHelper(recipe.getPatterns().get(index));
+		PatternType patternType = getPatternType(stack);
+		if(patternType != null) {
+			switch(getPatternType(stack)) {
+			case PACKAGE: {
+				IRecipeInfo recipe = getRecipeInfo(stack);
+				int index = getIndex(stack);
+				if(recipe != null && recipe.isValid() && recipe.validPatternIndex(index)) {
+					return new PackageCraftingPatternHelper(recipe.getPatterns().get(index));
+				}
+				break;
 			}
-			break;
-		}
-		case RECIPE: {
-			IRecipeInfo recipe = getRecipeInfo(stack);
-			if(recipe != null && recipe.isValid()) {
-				return new RecipeCraftingPatternHelper(recipe);
+			case RECIPE: {
+				IRecipeInfo recipe = getRecipeInfo(stack);
+				if(recipe != null && recipe.isValid()) {
+					return new RecipeCraftingPatternHelper(recipe);
+				}
+				break;
 			}
-			break;
-		}
-		default: break;
+			}
 		}
 		return null;
 	}
