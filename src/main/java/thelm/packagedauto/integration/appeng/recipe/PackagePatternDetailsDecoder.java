@@ -7,6 +7,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import thelm.packagedauto.api.IPackageItem;
 import thelm.packagedauto.api.IPackageRecipeInfo;
+import thelm.packagedauto.api.PatternType;
 
 public class PackagePatternDetailsDecoder implements IPatternDetailsDecoder {
 
@@ -27,27 +28,29 @@ public class PackagePatternDetailsDecoder implements IPatternDetailsDecoder {
 	@Override
 	public IPatternDetails decodePattern(ItemStack what, Level level, boolean tryRecovery) {
 		if(what.getItem() instanceof IPackageItem packageItem) {
-			switch(packageItem.getPatternType(what)) {
-			case PACKAGE -> {
-				IPackageRecipeInfo recipe = packageItem.getRecipeInfo(what);
-				int index = packageItem.getIndex(what);
-				if(recipe != null && recipe.isValid() && recipe.validPatternIndex(index)) {
-					return new PackageCraftingPatternDetails(recipe.getPatterns().get(index));
+			PatternType patternType = packageItem.getPatternType(what);
+			if(patternType != null) {
+				switch(packageItem.getPatternType(what)) {
+				case PACKAGE -> {
+					IPackageRecipeInfo recipe = packageItem.getRecipeInfo(what);
+					int index = packageItem.getIndex(what);
+					if(recipe != null && recipe.isValid() && recipe.validPatternIndex(index)) {
+						return new PackageCraftingPatternDetails(recipe.getPatterns().get(index));
+					}
 				}
-			}
-			case RECIPE -> {
-				IPackageRecipeInfo recipe = packageItem.getRecipeInfo(what);
-				if(recipe != null && recipe.isValid()) {
-					return new RecipeCraftingPatternDetails(recipe);
+				case RECIPE -> {
+					IPackageRecipeInfo recipe = packageItem.getRecipeInfo(what);
+					if(recipe != null && recipe.isValid()) {
+						return new RecipeCraftingPatternDetails(recipe);
+					}
 				}
-			}
-			case DIRECT -> {
-				IPackageRecipeInfo recipe = packageItem.getRecipeInfo(what);
-				if(recipe != null && recipe.isValid()) {
-					return new DirectCraftingPatternDetails(recipe);
+				case DIRECT -> {
+					IPackageRecipeInfo recipe = packageItem.getRecipeInfo(what);
+					if(recipe != null && recipe.isValid()) {
+						return new DirectCraftingPatternDetails(recipe);
+					}
 				}
-			}
-			default -> {}
+				}
 			}
 		}
 		return null;
